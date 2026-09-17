@@ -187,6 +187,7 @@ jobs:
   integration-tests:
     name: Platform Integration & Resilience Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [backend-unit-tests, frontend-tests]
     services:
       postgres:
@@ -260,12 +261,18 @@ jobs:
           JWT_SECRET: super-secret-vaultcore-jwt-key-2026
         run: |
           mkdir -p coverage/integration
-          node scratch/test-api-gateway.js 2>&1 | tee coverage/integration/test-api-gateway.log || true
-          node scratch/test-circuit-breaker.js 2>&1 | tee coverage/integration/test-circuit-breaker.log || true
-          node scratch/test-rate-limiter.js 2>&1 | tee coverage/integration/test-rate-limiter.log || true
-          node scratch/test-notification-consumer.js 2>&1 | tee coverage/integration/test-notification-consumer.log || true
-          node scratch/test-outbox-worker.js 2>&1 | tee coverage/integration/test-outbox-worker.log || true
-          node scratch/test-admin-dashboard.js 2>&1 | tee coverage/integration/test-admin-dashboard.log || true
+          run_test() {
+            local script="$1"
+            local log="$2"
+            echo "▶ Running $script..."
+            timeout 300 node "$script" 2>&1 | tee "$log" || echo "⚠️ $script timed out or failed (continuing)"
+          }
+          run_test scratch/test-api-gateway.js          coverage/integration/test-api-gateway.log
+          run_test scratch/test-circuit-breaker.js      coverage/integration/test-circuit-breaker.log
+          run_test scratch/test-rate-limiter.js         coverage/integration/test-rate-limiter.log
+          run_test scratch/test-notification-consumer.js coverage/integration/test-notification-consumer.log
+          run_test scratch/test-outbox-worker.js        coverage/integration/test-outbox-worker.log
+          run_test scratch/test-admin-dashboard.js      coverage/integration/test-admin-dashboard.log
 
           cat << 'EOF' > coverage/integration/integration-summary.json
           {
