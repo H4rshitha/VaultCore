@@ -37,8 +37,8 @@ export const options = {
     // Platform error rate must remain under 1%
     http_req_failed: ['rate<0.01'],
     // Specific transaction thresholds
-    'vaultcore_k6_transfer_duration_ms': ['p(95)<400'],
-    'vaultcore_k6_balance_duration_ms': ['p(95)<100'],
+    vaultcore_k6_transfer_duration_ms: ['p(95)<400'],
+    vaultcore_k6_balance_duration_ms: ['p(95)<100'],
   },
 };
 
@@ -110,7 +110,9 @@ export default function () {
   group('2. Account Balance Lookup (Cache-Aside)', function () {
     const accountNum = TEST_ACCOUNTS[vuId % TEST_ACCOUNTS.length];
     const startBal = Date.now();
-    const balRes = http.get(`${BASE_URL}/api/v1/accounts/${accountNum}/balance`, { headers: authHeaders });
+    const balRes = http.get(`${BASE_URL}/api/v1/accounts/${accountNum}/balance`, {
+      headers: authHeaders,
+    });
     balanceDuration.add(Date.now() - startBal);
 
     check(balRes, {
@@ -136,7 +138,9 @@ export default function () {
     });
 
     const startTransfer = Date.now();
-    const transferRes = http.post(`${BASE_URL}/api/v1/payments/transfer`, transferPayload, { headers: authHeaders });
+    const transferRes = http.post(`${BASE_URL}/api/v1/payments/transfer`, transferPayload, {
+      headers: authHeaders,
+    });
     transferDuration.add(Date.now() - startTransfer);
 
     if (transferRes.status === 429) {
@@ -152,7 +156,11 @@ export default function () {
 
       check(transferRes, {
         'transfer accepted or handled gracefully': (r) =>
-          r.status === 200 || r.status === 201 || r.status === 400 || r.status === 409 || r.status === 429,
+          r.status === 200 ||
+          r.status === 201 ||
+          r.status === 400 ||
+          r.status === 409 ||
+          r.status === 429,
         'rate limit headers present': (r) => r.headers['X-Ratelimit-Limit'] !== undefined,
       });
     }
@@ -163,7 +171,9 @@ export default function () {
   // ==========================================
   group('4. Payment History & Search', function () {
     const startHistory = Date.now();
-    const historyRes = http.get(`${BASE_URL}/api/v1/payments/history?limit=10`, { headers: authHeaders });
+    const historyRes = http.get(`${BASE_URL}/api/v1/payments/history?limit=10`, {
+      headers: authHeaders,
+    });
     historyDuration.add(Date.now() - startHistory);
 
     check(historyRes, {
@@ -176,7 +186,9 @@ export default function () {
   // ==========================================
   group('5. Notification Audit & Queue Inspection', function () {
     const startNotif = Date.now();
-    const notifRes = http.get(`${BASE_URL}/api/v1/notifications/history?limit=5`, { headers: authHeaders });
+    const notifRes = http.get(`${BASE_URL}/api/v1/notifications/history?limit=5`, {
+      headers: authHeaders,
+    });
     notificationDuration.add(Date.now() - startNotif);
 
     check(notifRes, {

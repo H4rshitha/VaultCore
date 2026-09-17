@@ -1,9 +1,7 @@
 import { body, param, query } from 'express-validator';
 
 export const transferValidation = [
-  body('idempotencyKey')
-    .isUUID()
-    .withMessage('idempotencyKey must be a valid UUID'),
+  body('idempotencyKey').isUUID().withMessage('idempotencyKey must be a valid UUID'),
   body('sourceAccountNumber')
     .isLength({ min: 12, max: 12 })
     .isNumeric()
@@ -18,9 +16,7 @@ export const transferValidation = [
       }
       return true;
     }),
-  body('amount')
-    .isFloat({ gt: 0 })
-    .withMessage('Amount must be a positive number greater than 0'),
+  body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number greater than 0'),
   body('currency')
     .optional()
     .isLength({ min: 3, max: 3 })
@@ -34,16 +30,11 @@ export const transferValidation = [
 ];
 
 export const getPaymentParamsValidation = [
-  param('referenceId')
-    .trim()
-    .notEmpty()
-    .withMessage('referenceId parameter is required'),
+  param('referenceId').trim().notEmpty().withMessage('referenceId parameter is required'),
 ];
 
 export const listPaymentsQueryValidation = [
-  query('cursor')
-    .optional()
-    .isString(),
+  query('cursor').optional().isString(),
   query('limit')
     .optional()
     .isInt({ min: 1, max: 100 })
@@ -67,17 +58,9 @@ export const listPaymentsQueryValidation = [
     .isFloat({ min: 0 })
     .withMessage('maxAmount must be a non-negative number')
     .toFloat(),
-  query('startDate')
-    .optional()
-    .isISO8601()
-    .withMessage('startDate must be a valid ISO 8601 date'),
-  query('endDate')
-    .optional()
-    .isISO8601()
-    .withMessage('endDate must be a valid ISO 8601 date'),
-  query('referenceId')
-    .optional()
-    .trim(),
+  query('startDate').optional().isISO8601().withMessage('startDate must be a valid ISO 8601 date'),
+  query('endDate').optional().isISO8601().withMessage('endDate must be a valid ISO 8601 date'),
+  query('referenceId').optional().trim(),
 ];
 
 export const searchPaymentsQueryValidation = [
@@ -110,17 +93,9 @@ export const searchPaymentsQueryValidation = [
     .isFloat({ min: 0 })
     .withMessage('maxAmount must be a non-negative number')
     .toFloat(),
-  query('startDate')
-    .optional()
-    .isISO8601()
-    .withMessage('startDate must be a valid ISO 8601 date'),
-  query('endDate')
-    .optional()
-    .isISO8601()
-    .withMessage('endDate must be a valid ISO 8601 date'),
-  query('cursor')
-    .optional()
-    .isString(),
+  query('startDate').optional().isISO8601().withMessage('startDate must be a valid ISO 8601 date'),
+  query('endDate').optional().isISO8601().withMessage('endDate must be a valid ISO 8601 date'),
+  query('cursor').optional().isString(),
   query('limit')
     .optional()
     .isInt({ min: 1, max: 100 })
@@ -129,14 +104,8 @@ export const searchPaymentsQueryValidation = [
 ];
 
 export const getPaymentSummaryValidation = [
-  query('startDate')
-    .optional()
-    .isISO8601()
-    .withMessage('startDate must be a valid ISO 8601 date'),
-  query('endDate')
-    .optional()
-    .isISO8601()
-    .withMessage('endDate must be a valid ISO 8601 date'),
+  query('startDate').optional().isISO8601().withMessage('startDate must be a valid ISO 8601 date'),
+  query('endDate').optional().isISO8601().withMessage('endDate must be a valid ISO 8601 date'),
   query('accountNumber')
     .optional()
     .trim()

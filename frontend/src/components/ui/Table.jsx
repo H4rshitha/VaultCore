@@ -2,8 +2,13 @@ import React from 'react';
 
 export const Table = ({ children, className = '', containerClassName = '', ...props }) => {
   return (
-    <div className={`w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0D1322] shadow-sm dark:shadow-md ${containerClassName}`}>
-      <table className={`w-full text-left text-sm text-slate-800 dark:text-slate-200 divide-y divide-slate-200 dark:divide-slate-800/80 ${className}`} {...props}>
+    <div
+      className={`w-full overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#0D1322] shadow-sm dark:shadow-md ${containerClassName}`}
+    >
+      <table
+        className={`w-full text-left text-sm text-slate-800 dark:text-slate-200 divide-y divide-slate-200 dark:divide-slate-800/80 ${className}`}
+        {...props}
+      >
         {children}
       </table>
     </div>
@@ -12,7 +17,10 @@ export const Table = ({ children, className = '', containerClassName = '', ...pr
 
 export const TableHeader = ({ children, className = '', ...props }) => {
   return (
-    <thead className={`bg-slate-50 dark:bg-slate-900/60 uppercase text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider ${className}`} {...props}>
+    <thead
+      className={`bg-slate-50 dark:bg-slate-900/60 uppercase text-[11px] font-semibold text-slate-500 dark:text-slate-400 tracking-wider ${className}`}
+      {...props}
+    >
       {children}
     </thead>
   );
@@ -49,7 +57,10 @@ export const TableHead = ({ children, className = '', ...props }) => {
 
 export const TableCell = ({ children, className = '', ...props }) => {
   return (
-    <td className={`px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm ${className}`} {...props}>
+    <td
+      className={`px-4 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm ${className}`}
+      {...props}
+    >
       {children}
     </td>
   );

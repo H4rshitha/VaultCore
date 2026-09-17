@@ -32,7 +32,7 @@
           "userId": { "type": "string", "format": "uuid" },
           "type": { "type": "string", "enum": ["SAVINGS", "CHECKING", "INVESTMENT"] },
           "status": { "type": "string", "enum": ["ACTIVE", "FROZEN", "CLOSED"] },
-          "balance": { "type": "number", "example": 5000.00 },
+          "balance": { "type": "number", "example": 5000.0 },
           "currency": { "type": "string", "example": "USD" },
           "version": { "type": "integer", "example": 0 },
           "createdAt": { "type": "string", "format": "date-time" }
@@ -61,7 +61,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "type": { "type": "string", "enum": ["SAVINGS", "CHECKING", "INVESTMENT"], "default": "CHECKING" },
+                  "type": {
+                    "type": "string",
+                    "enum": ["SAVINGS", "CHECKING", "INVESTMENT"],
+                    "default": "CHECKING"
+                  },
                   "currency": { "type": "string", "default": "USD" },
                   "initialDeposit": { "type": "number", "default": 0 }
                 }
@@ -91,7 +95,12 @@
       "get": {
         "summary": "Fetch bank account details by 12-digit account number",
         "parameters": [
-          { "name": "accountNumber", "in": "path", "required": true, "schema": { "type": "string", "example": "100084729103" } }
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "100084729103" }
+          }
         ],
         "responses": {
           "200": { "description": "Account details object" },
@@ -105,7 +114,12 @@
       "get": {
         "summary": "Fetch current balance for a specific bank account",
         "parameters": [
-          { "name": "accountNumber", "in": "path", "required": true, "schema": { "type": "string", "example": "100084729103" } }
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "100084729103" }
+          }
         ],
         "responses": {
           "200": { "description": "Current balance payload" },

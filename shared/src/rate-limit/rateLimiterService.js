@@ -43,13 +43,15 @@ export class RateLimiterService {
     this.redisPort = options.redisPort || parseInt(process.env.REDIS_PORT || '6379', 10);
     this.db = REDIS_DATABASES.RATE_LIMIT; // Exclusively DB 0
 
-    this.redis = options.redis || new Redis({
-      host: this.redisHost,
-      port: this.redisPort,
-      db: this.db,
-      lazyConnect: true,
-      maxRetriesPerRequest: 2,
-    });
+    this.redis =
+      options.redis ||
+      new Redis({
+        host: this.redisHost,
+        port: this.redisPort,
+        db: this.db,
+        lazyConnect: true,
+        maxRetriesPerRequest: 2,
+      });
 
     this.isReady = false;
 
@@ -79,7 +81,9 @@ export class RateLimiterService {
     try {
       await this.redis.connect();
       this.isReady = true;
-      this.logger.info(`RateLimiterService connected to Redis DB${this.db} at ${this.redisHost}:${this.redisPort}`);
+      this.logger.info(
+        `RateLimiterService connected to Redis DB${this.db} at ${this.redisHost}:${this.redisPort}`
+      );
     } catch (error) {
       this.isReady = false;
       this.logger.warn(`RateLimiterService connection warning: ${error.message}`);
@@ -124,7 +128,9 @@ export class RateLimiterService {
       this.metrics.totalChecks += 1;
       this.metrics.totalLatencyMs += latencyMs;
       this.metrics.lastCheckLatencyMs = latencyMs;
-      this.metrics.avgLatencyMs = parseFloat((this.metrics.totalLatencyMs / this.metrics.totalChecks).toFixed(2));
+      this.metrics.avgLatencyMs = parseFloat(
+        (this.metrics.totalLatencyMs / this.metrics.totalChecks).toFixed(2)
+      );
 
       if (allowed) {
         this.metrics.allowedRequests += 1;

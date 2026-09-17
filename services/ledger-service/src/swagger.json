@@ -48,8 +48,8 @@
           "transactionId": { "type": "string", "format": "uuid" },
           "accountId": { "type": "string", "format": "uuid" },
           "type": { "type": "string", "enum": ["DEBIT", "CREDIT"] },
-          "amount": { "type": "number", "example": 150.00 },
-          "balanceAfter": { "type": "number", "example": 4850.00 },
+          "amount": { "type": "number", "example": 150.0 },
+          "balanceAfter": { "type": "number", "example": 4850.0 },
           "createdAt": { "type": "string", "format": "date-time" }
         }
       }
@@ -70,22 +70,29 @@
         "tags": ["Internal - Ledger Operations"],
         "summary": "[INTERNAL] Record double-entry financial transfer",
         "description": "Internal endpoint for Payment Service and trusted internal services to atomically write DEBIT/CREDIT records and update Account balances.",
-        "security": [
-          { "serviceApiKeyAuth": [] }
-        ],
+        "security": [{ "serviceApiKeyAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["idempotencyKey", "sourceAccountNumber", "targetAccountNumber", "amount"],
+                "required": [
+                  "idempotencyKey",
+                  "sourceAccountNumber",
+                  "targetAccountNumber",
+                  "amount"
+                ],
                 "properties": {
-                  "idempotencyKey": { "type": "string", "format": "uuid", "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d" },
+                  "idempotencyKey": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"
+                  },
                   "referenceId": { "type": "string", "example": "REF-2026-09-001" },
                   "sourceAccountNumber": { "type": "string", "example": "100010001001" },
                   "targetAccountNumber": { "type": "string", "example": "200020002001" },
-                  "amount": { "type": "number", "example": 150.00 },
+                  "amount": { "type": "number", "example": 150.0 },
                   "currency": { "type": "string", "default": "USD" },
                   "description": { "type": "string", "example": "Transfer memo" }
                 }
@@ -108,14 +115,26 @@
         "tags": ["Public - Account Ledger History"],
         "summary": "[PUBLIC] Fetch cursor-paginated ledger entries for an account",
         "description": "User-facing endpoint to inspect account audit trails and statement entries.",
-        "security": [
-          { "bearerAuth": [] }
-        ],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
-          { "name": "accountNumber", "in": "path", "required": true, "schema": { "type": "string", "example": "100010001001" } },
-          { "name": "cursor", "in": "query", "schema": { "type": "string" }, "description": "Pagination cursor ID" },
+          {
+            "name": "accountNumber",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "100010001001" }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Pagination cursor ID"
+          },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["DEBIT", "CREDIT"] } },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["DEBIT", "CREDIT"] }
+          },
           { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date" } },
           { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date" } },
           { "name": "referenceId", "in": "query", "schema": { "type": "string" } }

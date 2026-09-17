@@ -12,9 +12,13 @@ import {
   createServiceMetricsMiddleware,
   metricsEndpointHandler,
 } from '@vaultcore/shared';
+import fs from 'fs';
 import paymentRoutes from './routes/paymentRoutes.js';
 import outboxRoutes from './routes/outboxRoutes.js';
-import swaggerDocument from './swagger.json' with { type: 'json' };
+
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(new URL('./swagger.json', import.meta.url), 'utf8')
+);
 
 const logger = createLogger('payment-service');
 const app = express();
@@ -40,7 +44,11 @@ app.get(['/health', '/health/live'], (req, res) => {
 });
 
 app.get('/admin/circuit-breakers', (req, res) => {
-  return ApiResponse.success(res, 'Circuit breakers status retrieved successfully', circuitBreakerRegistry.getAllStatus());
+  return ApiResponse.success(
+    res,
+    'Circuit breakers status retrieved successfully',
+    circuitBreakerRegistry.getAllStatus()
+  );
 });
 
 app.use('/api/v1/outbox', outboxRoutes);

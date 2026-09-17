@@ -1,4 +1,9 @@
-import { RabbitMQClient, EVENT_EXCHANGES, EVENT_ROUTING_KEYS, rabbitmqCircuitBreaker } from '@vaultcore/shared';
+import {
+  RabbitMQClient,
+  EVENT_EXCHANGES,
+  EVENT_ROUTING_KEYS,
+  rabbitmqCircuitBreaker,
+} from '@vaultcore/shared';
 
 export class OutboxPublisher {
   constructor(logger) {
@@ -38,42 +43,43 @@ export class OutboxPublisher {
     return await rabbitmqCircuitBreaker.execute(
       async () => {
         const startTime = Date.now();
-    const eventPayload = typeof outboxEvent.payload === 'string'
-      ? JSON.parse(outboxEvent.payload)
-      : outboxEvent.payload || {};
+        const eventPayload =
+          typeof outboxEvent.payload === 'string'
+            ? JSON.parse(outboxEvent.payload)
+            : outboxEvent.payload || {};
 
-    const routingKey =
-      eventPayload.routingKey ||
-      outboxEvent.routingKey ||
-      (outboxEvent.eventType === 'PAYMENT_FAILED'
-        ? EVENT_ROUTING_KEYS.PAYMENT_FAILED
-        : EVENT_ROUTING_KEYS.PAYMENT_COMPLETED);
+        const routingKey =
+          eventPayload.routingKey ||
+          outboxEvent.routingKey ||
+          (outboxEvent.eventType === 'PAYMENT_FAILED'
+            ? EVENT_ROUTING_KEYS.PAYMENT_FAILED
+            : EVENT_ROUTING_KEYS.PAYMENT_COMPLETED);
 
-    const messageData = {
-      eventId: outboxEvent.id,
-      aggregateType: outboxEvent.aggregateType,
-      aggregateId: outboxEvent.aggregateId,
-      eventType: outboxEvent.eventType,
-      routingKey,
-      payload: eventPayload,
-      createdAt: outboxEvent.createdAt,
-      timestamp: new Date().toISOString(),
-    };
+        const messageData = {
+          eventId: outboxEvent.id,
+          aggregateType: outboxEvent.aggregateType,
+          aggregateId: outboxEvent.aggregateId,
+          eventType: outboxEvent.eventType,
+          routingKey,
+          payload: eventPayload,
+          createdAt: outboxEvent.createdAt,
+          timestamp: new Date().toISOString(),
+        };
 
-    const headers = {
-      traceId: traceId || eventPayload.traceId || `trace-${outboxEvent.id}`,
-      eventId: outboxEvent.id,
-      transactionId: outboxEvent.transactionId || outboxEvent.aggregateId,
-      eventType: outboxEvent.eventType,
-      routingKey,
-      retryAttempt: outboxEvent.retryCount || 0,
-    };
+        const headers = {
+          traceId: traceId || eventPayload.traceId || `trace-${outboxEvent.id}`,
+          eventId: outboxEvent.id,
+          transactionId: outboxEvent.transactionId || outboxEvent.aggregateId,
+          eventType: outboxEvent.eventType,
+          routingKey,
+          retryAttempt: outboxEvent.retryCount || 0,
+        };
 
-    await this.client.publishEvent(this.exchange, routingKey, messageData, {
-      messageId: outboxEvent.id,
-      correlationId: headers.traceId,
-      headers,
-    });
+        await this.client.publishEvent(this.exchange, routingKey, messageData, {
+          messageId: outboxEvent.id,
+          correlationId: headers.traceId,
+          headers,
+        });
 
         const latencyMs = Date.now() - startTime;
         return { success: true, latencyMs };

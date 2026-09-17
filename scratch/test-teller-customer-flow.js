@@ -80,8 +80,14 @@ async function runTests() {
       headers: { Authorization: `Bearer ${tellerToken}` },
     });
     const searchData1 = await searchRes1.json();
-    const hasResults1 = searchRes1.status === 200 && Array.isArray(searchData1.data) && searchData1.data.length > 0;
-    recordCheck(1, 'Teller can search customers', hasResults1, `Status: ${searchRes1.status}, Matches: ${searchData1.data?.length}`);
+    const hasResults1 =
+      searchRes1.status === 200 && Array.isArray(searchData1.data) && searchData1.data.length > 0;
+    recordCheck(
+      1,
+      'Teller can search customers',
+      hasResults1,
+      `Status: ${searchRes1.status}, Matches: ${searchData1.data?.length}`
+    );
 
     // Test 2: Search works by email
     console.log('\n--- Test 2: Search by email ---');
@@ -90,25 +96,46 @@ async function runTests() {
     });
     const searchData2 = await searchRes2.json();
     const matchEmail = searchData2.data?.find((c) => c.email === testCustomer.email);
-    recordCheck(2, 'Search works by email', Boolean(matchEmail), `Found: ${matchEmail?.fullName} (${matchEmail?.email})`);
+    recordCheck(
+      2,
+      'Search works by email',
+      Boolean(matchEmail),
+      `Found: ${matchEmail?.fullName} (${matchEmail?.email})`
+    );
 
     // Test 3: Search works by phone
     console.log('\n--- Test 3: Search by phone ---');
-    const searchRes3 = await fetch(`${GATEWAY_URL}/customers/search?phone=%2B1%20(555)%20019-2834`, {
-      headers: { Authorization: `Bearer ${tellerToken}` },
-    });
+    const searchRes3 = await fetch(
+      `${GATEWAY_URL}/customers/search?phone=%2B1%20(555)%20019-2834`,
+      {
+        headers: { Authorization: `Bearer ${tellerToken}` },
+      }
+    );
     const searchData3 = await searchRes3.json();
     const hasPhoneResults = searchRes3.status === 200 && Array.isArray(searchData3.data);
-    recordCheck(3, 'Search works by phone', hasPhoneResults, `Status: ${searchRes3.status}, Results count: ${searchData3.data?.length}`);
+    recordCheck(
+      3,
+      'Search works by phone',
+      hasPhoneResults,
+      `Status: ${searchRes3.status}, Results count: ${searchData3.data?.length}`
+    );
 
     // Test 4: Search works by customer ID
     console.log('\n--- Test 4: Search by customer ID ---');
-    const searchRes4 = await fetch(`${GATEWAY_URL}/customers/search?customerId=${testCustomer.id}`, {
-      headers: { Authorization: `Bearer ${tellerToken}` },
-    });
+    const searchRes4 = await fetch(
+      `${GATEWAY_URL}/customers/search?customerId=${testCustomer.id}`,
+      {
+        headers: { Authorization: `Bearer ${tellerToken}` },
+      }
+    );
     const searchData4 = await searchRes4.json();
     const matchId = searchData4.data?.find((c) => (c.customerId || c.id) === testCustomer.id);
-    recordCheck(4, 'Search works by customer ID', Boolean(matchId), `Matched customerId: ${matchId?.customerId || matchId?.id}`);
+    recordCheck(
+      4,
+      'Search works by customer ID',
+      Boolean(matchId),
+      `Matched customerId: ${matchId?.customerId || matchId?.id}`
+    );
 
     // Test 5: CUSTOMER role gets 403 on search endpoint
     console.log('\n--- Test 5: RBAC Forbidden for Customer role ---');
@@ -116,7 +143,12 @@ async function runTests() {
       headers: { Authorization: `Bearer ${customerToken}` },
     });
     const isForbidden = searchResCustomer.status === 403;
-    recordCheck(5, 'CUSTOMER role gets 403 on search endpoint', isForbidden, `Status: ${searchResCustomer.status} Forbidden`);
+    recordCheck(
+      5,
+      'CUSTOMER role gets 403 on search endpoint',
+      isForbidden,
+      `Status: ${searchResCustomer.status} Forbidden`
+    );
 
     // Test 6: customerId included in POST /accounts by Teller
     console.log('\n--- Test 6: Teller creates account with customerId ---');
@@ -136,7 +168,12 @@ async function runTests() {
     const createAccountData = await createAccountRes.json();
     const isCreated = createAccountRes.status === 201;
     const createdAccount = createAccountData.data;
-    recordCheck(6, 'customerId included in POST /accounts', isCreated, `Status: ${createAccountRes.status}, Account: ${createdAccount?.accountNumber}`);
+    recordCheck(
+      6,
+      'customerId included in POST /accounts',
+      isCreated,
+      `Status: ${createAccountRes.status}, Account: ${createdAccount?.accountNumber}`
+    );
 
     // Test 7: Created account belongs to selected customer
     console.log('\n--- Test 7: Verify account ownership in DB ---');
@@ -144,7 +181,12 @@ async function runTests() {
       where: { accountNumber: createdAccount.accountNumber },
     });
     const belongsToCustomer = dbAccount && dbAccount.userId === testCustomer.id;
-    recordCheck(7, 'Created account belongs to selected customer', Boolean(belongsToCustomer), `Account ${dbAccount?.accountNumber} userId: ${dbAccount?.userId}`);
+    recordCheck(
+      7,
+      'Created account belongs to selected customer',
+      Boolean(belongsToCustomer),
+      `Account ${dbAccount?.accountNumber} userId: ${dbAccount?.userId}`
+    );
 
     // Test 8: Customer dashboard / list shows new account
     console.log('\n--- Test 8: Customer views their accounts list ---');
@@ -153,8 +195,15 @@ async function runTests() {
     });
     const customerAccountsData = await customerAccountsRes.json();
     const accountsList = customerAccountsData.data?.accounts || customerAccountsData.data || [];
-    const customerHasAccount = accountsList.some((a) => a.accountNumber === createdAccount.accountNumber);
-    recordCheck(8, 'Customer dashboard shows new account', customerHasAccount, `Customer account count: ${accountsList.length}`);
+    const customerHasAccount = accountsList.some(
+      (a) => a.accountNumber === createdAccount.accountNumber
+    );
+    recordCheck(
+      8,
+      'Customer dashboard shows new account',
+      customerHasAccount,
+      `Customer account count: ${accountsList.length}`
+    );
 
     // Test 9: Teller dashboard does not own customer account
     console.log('\n--- Test 9: Teller views their own accounts list ---');
@@ -163,8 +212,15 @@ async function runTests() {
     });
     const tellerAccountsData = await tellerAccountsRes.json();
     const tellerAccountsList = tellerAccountsData.data?.accounts || tellerAccountsData.data || [];
-    const tellerDoesNotOwn = !tellerAccountsList.some((a) => a.accountNumber === createdAccount.accountNumber);
-    recordCheck(9, 'Teller dashboard does not own customer account', tellerDoesNotOwn, `Teller account count: ${tellerAccountsList.length}`);
+    const tellerDoesNotOwn = !tellerAccountsList.some(
+      (a) => a.accountNumber === createdAccount.accountNumber
+    );
+    recordCheck(
+      9,
+      'Teller dashboard does not own customer account',
+      tellerDoesNotOwn,
+      `Teller account count: ${tellerAccountsList.length}`
+    );
 
     // Test 10: ADMIN workflow continues working
     console.log('\n--- Test 10: Admin account creation workflow ---');
@@ -183,7 +239,12 @@ async function runTests() {
     });
     const adminCreateData = await adminCreateRes.json();
     const adminSuccess = adminCreateRes.status === 201;
-    recordCheck(10, 'ADMIN workflow continues working', adminSuccess, `Status: ${adminCreateRes.status}, Account: ${adminCreateData.data?.accountNumber}`);
+    recordCheck(
+      10,
+      'ADMIN workflow continues working',
+      adminSuccess,
+      `Status: ${adminCreateRes.status}, Account: ${adminCreateData.data?.accountNumber}`
+    );
 
     console.log('\n======================================================');
     const allPassed = checks.every((c) => c.pass);

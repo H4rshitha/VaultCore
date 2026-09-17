@@ -66,12 +66,18 @@ export const Modal = ({
           <div className="px-6 py-5 border-b border-slate-200 dark:border-slate-800/80 flex items-center justify-between">
             <div>
               {title && (
-                <h3 id="modal-title" className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                <h3
+                  id="modal-title"
+                  className="text-lg font-bold text-slate-900 dark:text-white tracking-tight"
+                >
                   {title}
                 </h3>
               )}
               {description && (
-                <p id="modal-description" className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p
+                  id="modal-description"
+                  className="text-xs text-slate-500 dark:text-slate-400 mt-1"
+                >
                   {description}
                 </p>
               )}

@@ -51,7 +51,9 @@ async function run() {
   console.log(`GET /metrics: ${metricsRes.status}, body length: ${metricsRes.body.length}`);
 
   const v1MetricsRes = await request('http://localhost:3000/api/v1/metrics');
-  console.log(`GET /api/v1/metrics: ${v1MetricsRes.status}, body length: ${v1MetricsRes.body.length}`);
+  console.log(
+    `GET /api/v1/metrics: ${v1MetricsRes.status}, body length: ${v1MetricsRes.body.length}`
+  );
 
   // 3. Circuit Breakers
   const cbRes = await request('http://localhost:3000/admin/circuit-breakers');
@@ -62,7 +64,9 @@ async function run() {
 
   // 4. Outbox Status
   const outboxRes = await request('http://localhost:3000/api/v1/outbox/status');
-  console.log(`GET /api/v1/outbox/status: ${outboxRes.status}, body: ${outboxRes.body.slice(0, 100)}`);
+  console.log(
+    `GET /api/v1/outbox/status: ${outboxRes.status}, body: ${outboxRes.body.slice(0, 100)}`
+  );
 
   // 5. Admin Notification Status & JWT test
   const adminToken = jwt.sign(
@@ -78,7 +82,9 @@ async function run() {
   const notifRes = await request('http://localhost:3000/api/v1/notifications/admin/status', {
     headers: { Authorization: `Bearer ${adminToken}` },
   });
-  console.log(`GET /api/v1/notifications/admin/status: ${notifRes.status}, body: ${notifRes.body.slice(0, 100)}`);
+  console.log(
+    `GET /api/v1/notifications/admin/status: ${notifRes.status}, body: ${notifRes.body.slice(0, 100)}`
+  );
 
   // 6. Test Prometheus metrics parsing function
   const { parsePrometheusText } = await import('../frontend/src/hooks/useAdmin.js');

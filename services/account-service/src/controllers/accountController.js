@@ -14,7 +14,9 @@ export class AccountController {
 
       if (requestingUserRole === 'TELLER' || requestingUserRole === 'ADMIN') {
         if (!customerId) {
-          throw new BadRequestError('customerId is required when creating an account as Teller or Admin');
+          throw new BadRequestError(
+            'customerId is required when creating an account as Teller or Admin'
+          );
         }
         targetUserId = customerId;
       } else {
@@ -41,7 +43,12 @@ export class AccountController {
   static async getAccountDetails(req, res, next) {
     try {
       const { accountNumber } = req.params;
-      const account = await accountService.getAccountDetails(accountNumber, req.user.userId, req.user.role, req.traceId);
+      const account = await accountService.getAccountDetails(
+        accountNumber,
+        req.user.userId,
+        req.user.role,
+        req.traceId
+      );
       return ApiResponse.success(res, 'Account details retrieved', account);
     } catch (error) {
       next(error);
@@ -51,7 +58,12 @@ export class AccountController {
   static async getAccountBalance(req, res, next) {
     try {
       const { accountNumber } = req.params;
-      const balanceInfo = await accountService.getAccountBalance(accountNumber, req.user.userId, req.user.role, req.traceId);
+      const balanceInfo = await accountService.getAccountBalance(
+        accountNumber,
+        req.user.userId,
+        req.user.role,
+        req.traceId
+      );
       return ApiResponse.success(res, 'Current account balance retrieved', balanceInfo);
     } catch (error) {
       next(error);

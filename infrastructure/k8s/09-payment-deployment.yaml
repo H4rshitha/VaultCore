@@ -31,7 +31,7 @@ spec:
               containerPort: 3003
           env:
             - name: PORT
-              value: "3003"
+              value: '3003'
           envFrom:
             - configMapRef:
                 name: vaultcore-config
@@ -64,13 +64,13 @@ spec:
           image: vaultcore/payment-service:latest
           imagePullPolicy: IfNotPresent
           command:
-            - "node"
-            - "src/workers/outboxWorkerRunner.js"
+            - 'node'
+            - 'src/workers/outboxWorkerRunner.js'
           env:
             - name: OUTBOX_POLL_INTERVAL_MS
-              value: "1000"
+              value: '1000'
             - name: OUTBOX_BATCH_SIZE
-              value: "50"
+              value: '50'
           envFrom:
             - configMapRef:
                 name: vaultcore-config

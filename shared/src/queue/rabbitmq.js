@@ -10,7 +10,10 @@ export class RabbitMQClient {
 
   async connect(uri) {
     if (this.channel) return;
-    const amqpUri = uri || process.env.RABBITMQ_URI || `amqp://${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}`;
+    const amqpUri =
+      uri ||
+      process.env.RABBITMQ_URI ||
+      `amqp://${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}`;
     try {
       this.isConnecting = true;
       this.connection = await amqp.connect(amqpUri);
@@ -89,7 +92,9 @@ export class RabbitMQClient {
 
     const published = this.channel.publish(exchange, routingKey, payload, publishOptions);
     if (!published) {
-      throw new Error(`RabbitMQ buffer full, failed to publish to exchange [${exchange}] with key [${routingKey}]`);
+      throw new Error(
+        `RabbitMQ buffer full, failed to publish to exchange [${exchange}] with key [${routingKey}]`
+      );
     }
     return published;
   }

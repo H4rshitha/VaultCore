@@ -34,7 +34,11 @@ export class PaymentController {
         role: req.user.role,
       };
 
-      const payment = await paymentService.getPaymentByReference(referenceId, userContext, req.traceId);
+      const payment = await paymentService.getPaymentByReference(
+        referenceId,
+        userContext,
+        req.traceId
+      );
       return ApiResponse.success(res, 'Payment details retrieved', payment);
     } catch (error) {
       next(error);
@@ -88,7 +92,11 @@ export class PaymentController {
       };
 
       const searchResults = await paymentService.searchPayments(userContext, filters, req.traceId);
-      return ApiResponse.success(res, 'Payment search results retrieved successfully', searchResults);
+      return ApiResponse.success(
+        res,
+        'Payment search results retrieved successfully',
+        searchResults
+      );
     } catch (error) {
       next(error);
     }
@@ -109,7 +117,11 @@ export class PaymentController {
       };
 
       const summary = await paymentService.getFinancialSummary(userContext, filters, req.traceId);
-      return ApiResponse.success(res, 'Financial dashboard summary retrieved successfully', summary);
+      return ApiResponse.success(
+        res,
+        'Financial dashboard summary retrieved successfully',
+        summary
+      );
     } catch (error) {
       next(error);
     }

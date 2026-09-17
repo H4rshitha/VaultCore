@@ -51,10 +51,13 @@ export const RealtimeProvider = ({ children }) => {
 
     if (updates.length === 1) {
       const { accountNumber, balance, currency } = updates[0];
-      toast(`💰 Balance updated for ${maskAccountNumber(accountNumber)}: ${formatCurrency(balance, currency)}`, {
-        icon: '💳',
-        duration: 4000,
-      });
+      toast(
+        `💰 Balance updated for ${maskAccountNumber(accountNumber)}: ${formatCurrency(balance, currency)}`,
+        {
+          icon: '💳',
+          duration: 4000,
+        }
+      );
     } else {
       toast(`💰 ${updates.length} account balances updated in real time.`, {
         icon: '💳',
@@ -135,7 +138,9 @@ export const RealtimeProvider = ({ children }) => {
           queryClient.invalidateQueries({ queryKey: ['payment-summary'] });
           queryClient.invalidateQueries({ queryKey: ['ledger-entries'] });
 
-          const amt = event.amount ? formatCurrency(event.amount, event.currency || 'USD') : 'Transfer';
+          const amt = event.amount
+            ? formatCurrency(event.amount, event.currency || 'USD')
+            : 'Transfer';
           const ref = event.referenceId ? ` (Ref: ${event.referenceId})` : '';
           toast.success(`Payment Completed: ${amt}${ref}`, { duration: 4500 });
           break;
@@ -176,7 +181,11 @@ export const RealtimeProvider = ({ children }) => {
             });
 
             // Queue for batched toast notification (300ms debounce)
-            balanceUpdateBatchRef.current.set(accountNumber, { accountNumber, balance: numBal, currency });
+            balanceUpdateBatchRef.current.set(accountNumber, {
+              accountNumber,
+              balance: numBal,
+              currency,
+            });
 
             if (balanceUpdateTimerRef.current) {
               clearTimeout(balanceUpdateTimerRef.current);

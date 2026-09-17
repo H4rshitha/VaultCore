@@ -36,7 +36,9 @@ async function main() {
     },
   });
 
-  console.log(`✅ Created Users: ${alice.firstName} (${alice.email}), ${bob.firstName} (${bob.email})`);
+  console.log(
+    `✅ Created Users: ${alice.firstName} (${alice.email}), ${bob.firstName} (${bob.email})`
+  );
 
   // 2. Create Accounts
   const aliceChecking = await prisma.account.create({
@@ -45,7 +47,7 @@ async function main() {
       userId: alice.id,
       type: 'CHECKING',
       status: 'ACTIVE',
-      balance: 5000.00,
+      balance: 5000.0,
       currency: 'USD',
       version: 0,
     },
@@ -57,7 +59,7 @@ async function main() {
       userId: alice.id,
       type: 'SAVINGS',
       status: 'ACTIVE',
-      balance: 12500.00,
+      balance: 12500.0,
       currency: 'USD',
       version: 0,
     },
@@ -69,7 +71,7 @@ async function main() {
       userId: bob.id,
       type: 'CHECKING',
       status: 'ACTIVE',
-      balance: 8200.00,
+      balance: 8200.0,
       currency: 'USD',
       version: 0,
     },
@@ -81,7 +83,7 @@ async function main() {
       userId: bob.id,
       type: 'INVESTMENT',
       status: 'ACTIVE',
-      balance: 25000.00,
+      balance: 25000.0,
       currency: 'USD',
       version: 0,
     },

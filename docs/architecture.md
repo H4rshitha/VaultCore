@@ -5,7 +5,7 @@ VaultCore is designed as an event-driven, production-ready microservices banking
 ```mermaid
 graph TD
     Client[Client / Web / Mobile] --> Gateway[API Gateway :3000]
-    
+
     Gateway --> Auth[Auth Service :3001]
     Gateway --> Account[Account Service :3002]
     Gateway --> Payment[Payment Service :3003]
@@ -31,14 +31,14 @@ graph TD
 
 ## Microservice Architecture & Responsibilities
 
-| Service | Port | Database Schema | Primary Responsibility |
-| :--- | :--- | :--- | :--- |
-| **API Gateway** | 3000 | N/A | Reverse proxy, rate limiting, request routing, Swagger aggregation |
-| **Auth Service** | 3001 | `auth` | User registration, authentication, JWT token lifecycle |
-| **Account Service** | 3002 | `account` | Customer bank account lifecycle & real-time balances |
-| **Payment Service** | 3003 | `payment` | Payment transfer processing, idempotency, event publishing |
-| **Ledger Service** | 3004 | `ledger` | Double-entry financial bookkeeping & audit journal entries |
-| **Notification Service** | 3005 | N/A | Asynchronous RabbitMQ consumer for email/SMS notifications |
+| Service                  | Port | Database Schema | Primary Responsibility                                             |
+| :----------------------- | :--- | :-------------- | :----------------------------------------------------------------- |
+| **API Gateway**          | 3000 | N/A             | Reverse proxy, rate limiting, request routing, Swagger aggregation |
+| **Auth Service**         | 3001 | `auth`          | User registration, authentication, JWT token lifecycle             |
+| **Account Service**      | 3002 | `account`       | Customer bank account lifecycle & real-time balances               |
+| **Payment Service**      | 3003 | `payment`       | Payment transfer processing, idempotency, event publishing         |
+| **Ledger Service**       | 3004 | `ledger`        | Double-entry financial bookkeeping & audit journal entries         |
+| **Notification Service** | 3005 | N/A             | Asynchronous RabbitMQ consumer for email/SMS notifications         |
 
 ## Core Principles
 

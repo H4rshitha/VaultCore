@@ -68,7 +68,9 @@ export const CreateAccountModal = ({ isOpen, onClose }) => {
       ...(isTellerOrAdmin && selectedCustomer
         ? {
             customerId: selectedCustomer.customerId || selectedCustomer.id,
-            _customerName: selectedCustomer.fullName || `${selectedCustomer.firstName} ${selectedCustomer.lastName}`.trim(),
+            _customerName:
+              selectedCustomer.fullName ||
+              `${selectedCustomer.firstName} ${selectedCustomer.lastName}`.trim(),
           }
         : {}),
     };
@@ -90,7 +92,8 @@ export const CreateAccountModal = ({ isOpen, onClose }) => {
     });
   };
 
-  const isSubmitDisabled = createAccountMutation.isPending || (isTellerOrAdmin && !selectedCustomer);
+  const isSubmitDisabled =
+    createAccountMutation.isPending || (isTellerOrAdmin && !selectedCustomer);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -204,12 +207,16 @@ export const CreateAccountModal = ({ isOpen, onClose }) => {
                 })}
                 placeholder="0.00"
                 className={`w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border ${
-                  errors.initialDeposit ? 'border-red-500' : 'border-slate-300 dark:border-slate-800'
+                  errors.initialDeposit
+                    ? 'border-red-500'
+                    : 'border-slate-300 dark:border-slate-800'
                 } rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
               />
             </div>
             {errors.initialDeposit && (
-              <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.initialDeposit.message}</p>
+              <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+                {errors.initialDeposit.message}
+              </p>
             )}
           </div>
 

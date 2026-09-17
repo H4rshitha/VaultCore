@@ -19,7 +19,7 @@ export class AccountRepository {
         userId: data.userId,
         type: data.type || 'CHECKING',
         currency: data.currency || 'USD',
-        balance: data.balance || 0.00,
+        balance: data.balance || 0.0,
         status: 'ACTIVE',
         version: 0,
       },

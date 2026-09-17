@@ -88,8 +88,11 @@ export const AdminPage = () => {
         </div>
         <h2 className="text-xl font-bold text-white mb-2">Admin Access Required</h2>
         <p className="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
-          Your current authenticated session (<span className="font-mono text-brand-400">{currentUser?.email}</span>) has the role{' '}
-          <strong className="text-white uppercase">{currentUser?.role || 'CUSTOMER'}</strong>. Access to the Admin & Circuit Breaker console requires <strong className="text-red-300">ADMIN</strong> privileges.
+          Your current authenticated session (
+          <span className="font-mono text-brand-400">{currentUser?.email}</span>) has the role{' '}
+          <strong className="text-white uppercase">{currentUser?.role || 'CUSTOMER'}</strong>.
+          Access to the Admin & Circuit Breaker console requires{' '}
+          <strong className="text-red-300">ADMIN</strong> privileges.
         </p>
         <button
           onClick={() => navigate('/dashboard')}
@@ -108,37 +111,40 @@ export const AdminPage = () => {
       id: 'ledger',
       name: 'Ledger Service',
       desc: 'Double-entry journal entries & account transactions',
-      data: cbServices.ledger || cbServices['ledger-service'] || {
-        state: 'CLOSED',
-        failureCount: 0,
-        failFastCount: 0,
-        recoveryCount: 0,
-        lastStateChange: new Date().toISOString(),
-      },
+      data: cbServices.ledger ||
+        cbServices['ledger-service'] || {
+          state: 'CLOSED',
+          failureCount: 0,
+          failFastCount: 0,
+          recoveryCount: 0,
+          lastStateChange: new Date().toISOString(),
+        },
     },
     {
       id: 'rabbitmq',
       name: 'RabbitMQ Publisher',
       desc: 'Asynchronous event bus and message broker',
-      data: cbServices.rabbitmq || cbServices['rabbitmq-publisher'] || {
-        state: 'CLOSED',
-        failureCount: 0,
-        failFastCount: 0,
-        recoveryCount: 0,
-        lastStateChange: new Date().toISOString(),
-      },
+      data: cbServices.rabbitmq ||
+        cbServices['rabbitmq-publisher'] || {
+          state: 'CLOSED',
+          failureCount: 0,
+          failFastCount: 0,
+          recoveryCount: 0,
+          lastStateChange: new Date().toISOString(),
+        },
     },
     {
       id: 'notification',
       name: 'Notification Service',
       desc: 'Multi-channel email & SMS worker queue',
-      data: cbServices.notification || cbServices['notification-service'] || {
-        state: 'CLOSED',
-        failureCount: 0,
-        failFastCount: 0,
-        recoveryCount: 0,
-        lastStateChange: new Date().toISOString(),
-      },
+      data: cbServices.notification ||
+        cbServices['notification-service'] || {
+          state: 'CLOSED',
+          failureCount: 0,
+          failFastCount: 0,
+          recoveryCount: 0,
+          lastStateChange: new Date().toISOString(),
+        },
     },
   ];
 
@@ -224,7 +230,8 @@ export const AdminPage = () => {
             System Resilience & Observability
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Real-time circuit breaker telemetry, Prometheus cluster metrics, and infrastructure health.
+            Real-time circuit breaker telemetry, Prometheus cluster metrics, and infrastructure
+            health.
           </p>
         </div>
 
@@ -234,7 +241,9 @@ export const AdminPage = () => {
             disabled={isGlobalFetching}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isGlobalFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isGlobalFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+            />
             <span>Refresh All</span>
           </button>
         </div>
@@ -250,73 +259,93 @@ export const AdminPage = () => {
           {/* Card 1: Total HTTP Requests */}
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total HTTP Requests</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Total HTTP Requests
+              </span>
               <Activity className="w-4 h-4 text-brand-600 dark:text-brand-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {isLoadingMetrics
                 ? '—'
-                : metricsData?.httpRequestsTotal !== undefined && metricsData?.httpRequestsTotal !== 'Unavailable'
-                ? (typeof metricsData.httpRequestsTotal === 'number'
+                : metricsData?.httpRequestsTotal !== undefined &&
+                    metricsData?.httpRequestsTotal !== 'Unavailable'
+                  ? typeof metricsData.httpRequestsTotal === 'number'
                     ? metricsData.httpRequestsTotal.toLocaleString()
-                    : metricsData.httpRequestsTotal)
-                : 'Unavailable'}
+                    : metricsData.httpRequestsTotal
+                  : 'Unavailable'}
             </p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">Gateway Ingress</p>
+            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 font-medium">
+              Gateway Ingress
+            </p>
           </div>
 
           {/* Card 2: HTTP Errors */}
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">HTTP 4xx / 5xx Errors</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                HTTP 4xx / 5xx Errors
+              </span>
               <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {isLoadingMetrics
                 ? '—'
-                : metricsData?.httpErrorsTotal !== undefined && metricsData?.httpErrorsTotal !== 'Unavailable'
-                ? (typeof metricsData.httpErrorsTotal === 'number'
+                : metricsData?.httpErrorsTotal !== undefined &&
+                    metricsData?.httpErrorsTotal !== 'Unavailable'
+                  ? typeof metricsData.httpErrorsTotal === 'number'
                     ? metricsData.httpErrorsTotal.toLocaleString()
-                    : metricsData.httpErrorsTotal)
-                : 'Unavailable'}
+                    : metricsData.httpErrorsTotal
+                  : 'Unavailable'}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Error Response Rate</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+              Error Response Rate
+            </p>
           </div>
 
           {/* Card 3: Active Requests */}
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Active Requests</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Active Requests
+              </span>
               <Zap className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {isLoadingMetrics
                 ? '—'
-                : metricsData?.httpActiveRequests !== undefined && metricsData?.httpActiveRequests !== 'Unavailable'
-                ? (typeof metricsData.httpActiveRequests === 'number'
+                : metricsData?.httpActiveRequests !== undefined &&
+                    metricsData?.httpActiveRequests !== 'Unavailable'
+                  ? typeof metricsData.httpActiveRequests === 'number'
                     ? metricsData.httpActiveRequests.toLocaleString()
-                    : metricsData.httpActiveRequests)
-                : 'Unavailable'}
+                    : metricsData.httpActiveRequests
+                  : 'Unavailable'}
             </p>
-            <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium">In-Flight Concurrency</p>
+            <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 font-medium">
+              In-Flight Concurrency
+            </p>
           </div>
 
           {/* Card 4: Rate Limiting Blocks */}
           <div className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl backdrop-blur-xl">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Rate Limit Blocked</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                Rate Limit Blocked
+              </span>
               <Lock className="w-4 h-4 text-red-500 dark:text-red-400" />
             </div>
             <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {isLoadingMetrics
                 ? '—'
-                : metricsData?.rateLimitBlockedTotal !== undefined && metricsData?.rateLimitBlockedTotal !== 'Unavailable'
-                ? (typeof metricsData.rateLimitBlockedTotal === 'number'
+                : metricsData?.rateLimitBlockedTotal !== undefined &&
+                    metricsData?.rateLimitBlockedTotal !== 'Unavailable'
+                  ? typeof metricsData.rateLimitBlockedTotal === 'number'
                     ? metricsData.rateLimitBlockedTotal.toLocaleString()
-                    : metricsData.rateLimitBlockedTotal)
-                : 'Unavailable'}
+                    : metricsData.rateLimitBlockedTotal
+                  : 'Unavailable'}
             </p>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Redis Sliding Window Quota</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+              Redis Sliding Window Quota
+            </p>
           </div>
         </div>
       </div>
@@ -328,7 +357,9 @@ export const AdminPage = () => {
             <Radio className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             Downstream Circuit Breakers
           </h2>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">Threshold: 5 fails | Timeout: 30s</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400">
+            Threshold: 5 fails | Timeout: 30s
+          </span>
         </div>
 
         {isLoadingCB ? (
@@ -346,7 +377,9 @@ export const AdminPage = () => {
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">{breaker.name}</h3>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      {breaker.name}
+                    </h3>
                     {getCircuitStateChip(breaker.data.state)}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">{breaker.desc}</p>
@@ -403,47 +436,67 @@ export const AdminPage = () => {
               },
               {
                 label: 'PostgreSQL DB',
-                status: healthData?.readiness?.infrastructure?.postgres?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.infrastructure?.postgres?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Storage',
               },
               {
                 label: 'Redis DB0',
-                status: healthData?.readiness?.infrastructure?.redis?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.infrastructure?.redis?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Cache/Lock',
               },
               {
                 label: 'RabbitMQ',
-                status: healthData?.readiness?.infrastructure?.rabbitmq?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.infrastructure?.rabbitmq?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Event Bus',
               },
               {
                 label: 'Auth Service',
-                status: healthData?.readiness?.microservices?.auth?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.microservices?.auth?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'JWT',
               },
               {
                 label: 'Account Service',
-                status: healthData?.readiness?.microservices?.account?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.microservices?.account?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Core',
               },
               {
                 label: 'Payment Service',
-                status: healthData?.readiness?.microservices?.payment?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.microservices?.payment?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Transfers',
               },
               {
                 label: 'Ledger Service',
-                status: healthData?.readiness?.microservices?.ledger?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.microservices?.ledger?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'ACID',
               },
               {
                 label: 'Notification',
-                status: healthData?.readiness?.microservices?.notification?.status || (isLoadingHealth ? '—' : 'UP'),
+                status:
+                  healthData?.readiness?.microservices?.notification?.status ||
+                  (isLoadingHealth ? '—' : 'UP'),
                 type: 'Queue',
               },
               {
                 label: 'Outbox Worker',
-                status: healthData?.outbox?.status ? 'ACTIVE' : (healthData?.readiness?.microservices?.payment?.status === 'UP' ? 'ACTIVE' : 'DEGRADED'),
+                status: healthData?.outbox?.status
+                  ? 'ACTIVE'
+                  : healthData?.readiness?.microservices?.payment?.status === 'UP'
+                    ? 'ACTIVE'
+                    : 'DEGRADED',
                 type: 'Cron',
               },
             ].map((dep) => {
@@ -459,7 +512,9 @@ export const AdminPage = () => {
                     </span>
                     {display.icon}
                   </div>
-                  <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">{dep.label}</p>
+                  <p className="text-xs font-bold text-slate-900 dark:text-white leading-tight">
+                    {dep.label}
+                  </p>
                   <span className={`text-[11px] font-medium mt-1 ${display.textClass}`}>
                     {display.label}
                   </span>
@@ -472,4 +527,3 @@ export const AdminPage = () => {
     </div>
   );
 };
-

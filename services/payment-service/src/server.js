@@ -9,7 +9,7 @@ const outboxWorker = new OutboxWorker(logger, {
 
 const server = app.listen(config.port, async () => {
   logger.info(`Payment Service running on port ${config.port} in ${config.nodeEnv} mode`);
-  
+
   // Start the background outbox worker
   try {
     await outboxWorker.start();

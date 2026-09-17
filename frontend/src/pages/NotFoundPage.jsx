@@ -20,9 +20,12 @@ export const NotFoundPage = () => {
             <span>•</span>
             <span>Not Found</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Page Not Found</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">
+            Page Not Found
+          </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-            The requested VaultCore microservice route or resource does not exist or has been relocated.
+            The requested VaultCore microservice route or resource does not exist or has been
+            relocated.
           </p>
         </div>
 

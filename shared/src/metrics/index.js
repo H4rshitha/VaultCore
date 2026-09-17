@@ -274,8 +274,8 @@ export const syncAllCircuitBreakers = () => {
         status.state === CIRCUIT_STATES.CLOSED
           ? 0
           : status.state === CIRCUIT_STATES.HALF_OPEN
-          ? 1
-          : 2;
+            ? 1
+            : 2;
 
       circuitBreakerStateGauge.set({ service: breaker.name }, stateVal);
     }

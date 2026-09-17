@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: rabbitmq
     app.kubernetes.io/part-of: vaultcore-platform
 spec:
-  serviceName: "rabbitmq-service"
+  serviceName: 'rabbitmq-service'
   replicas: 1
   selector:
     matchLabels:
@@ -48,9 +48,9 @@ spec:
           livenessProbe:
             exec:
               command:
-                - "/bin/sh"
-                - "-c"
-                - "rabbitmq-diagnostics -q check_running"
+                - '/bin/sh'
+                - '-c'
+                - 'rabbitmq-diagnostics -q check_running'
             initialDelaySeconds: 20
             periodSeconds: 15
             timeoutSeconds: 5
@@ -58,9 +58,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - "/bin/sh"
-                - "-c"
-                - "rabbitmq-diagnostics -q check_local_alarms"
+                - '/bin/sh'
+                - '-c'
+                - 'rabbitmq-diagnostics -q check_local_alarms'
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
@@ -74,7 +74,7 @@ spec:
         labels:
           app: rabbitmq
       spec:
-        accessModes: ["ReadWriteOnce"]
+        accessModes: ['ReadWriteOnce']
         resources:
           requests:
             storage: 5Gi

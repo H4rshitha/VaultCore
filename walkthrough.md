@@ -41,22 +41,24 @@ Located in [`RateLimiterService`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/Va
 
 Defined in [`RATE_LIMIT_CONFIG`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/shared/src/constants/index.js) and wired in [`app.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/gateway/src/app.js):
 
-| Tier | Routes | Limit | Window | Key Strategy |
-| :--- | :--- | :--- | :--- | :--- |
-| **AUTH** | `/api/v1/auth/*`, `/auth/*` | **10 req** | 60s | `rate:ip:{ipAddress}` |
-| **PAYMENT** | `/api/v1/payments/*`, `/payments/*`, `/api/v1/outbox/*` | **20 req** | 60s | `rate:user:{userId}` (or IP if unauthed) |
-| **GENERAL** | `/api/v1/accounts/*`, `/api/v1/ledger/*`, `/api/v1/notifications/*` | **100 req** | 60s | `rate:user:{userId}` (or IP if unauthed) |
+| Tier        | Routes                                                              | Limit       | Window | Key Strategy                             |
+| :---------- | :------------------------------------------------------------------ | :---------- | :----- | :--------------------------------------- |
+| **AUTH**    | `/api/v1/auth/*`, `/auth/*`                                         | **10 req**  | 60s    | `rate:ip:{ipAddress}`                    |
+| **PAYMENT** | `/api/v1/payments/*`, `/payments/*`, `/api/v1/outbox/*`             | **20 req**  | 60s    | `rate:user:{userId}` (or IP if unauthed) |
+| **GENERAL** | `/api/v1/accounts/*`, `/api/v1/ledger/*`, `/api/v1/notifications/*` | **100 req** | 60s    | `rate:user:{userId}` (or IP if unauthed) |
 
 ---
 
 ## 4. HTTP Headers & Error Response
 
 On every request, the gateway sets:
+
 - `X-RateLimit-Limit`: Maximum requests permitted per window
 - `X-RateLimit-Remaining`: Remaining quota in current sliding window
 - `X-RateLimit-Reset`: Unix timestamp in seconds when quota resets
 
 When exceeded, returns **HTTP 429 Too Many Requests**:
+
 - `Retry-After`: Number of seconds before next attempt is permitted
 - Body:
   ```json

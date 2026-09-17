@@ -1,6 +1,7 @@
 # VaultCore P17.1 — GitHub Actions CI Workflow Foundation
 
 ## Overview
+
 Implemented the enterprise-grade Continuous Integration (CI) foundation for VaultCore in [`.github/workflows/ci.yml`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/.github/workflows/ci.yml) and verified it using [`scratch/test-ci-workflow.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/scratch/test-ci-workflow.js).
 
 ---
@@ -17,7 +18,7 @@ Implemented the enterprise-grade Continuous Integration (CI) foundation for Vaul
 ```mermaid
 flowchart TD
     Trigger([Push to branches / PRs]) --> Job1[1. Code Quality, Schema & Security]
-    
+
     subgraph Job1_Steps [Quality Gate]
         J1_1[Checkout] --> J1_2[Setup Node.js 22 + npm cache]
         J1_2 --> J1_3[npm ci]
@@ -66,25 +67,26 @@ flowchart TD
 
 ## Key Pipeline Specifications
 
-| Section | Specification | Details |
-| :--- | :--- | :--- |
-| **Triggers** | `push` & `pull_request` | Triggers on all branches; ignores release tags (`v*`) |
-| **Runtime** | Node.js `22` | Configured with `actions/setup-node@v4` and `cache: 'npm'` |
-| **Dependencies** | Deterministic Install | Runs `npm ci` for workspace dependencies |
-| **Schema Validation** | Prisma Schema | Validates with `prisma validate` and generates client with `prisma generate` |
-| **Lint & Formatting** | ESLint & Prettier | Executes `eslint` across `services/*`, `shared`, `frontend` and `prettier --check` |
-| **Backend Unit Tests** | Matrix Strategy | Parallel matrix test execution across all 6 services (`gateway`, `auth-service`, `account-service`, `payment-service`, `ledger-service`, `notification-service`) |
-| **Frontend Validation**| Vite Production Build | Verifies frontend bundle integrity and asset compilation |
-| **Integration Tests** | Multi-Container Testing | Runs integration test suites against live PostgreSQL, Redis, and RabbitMQ container services |
-| **Coverage Artifacts** | `actions/upload-artifact@v4` | Retains unit, frontend, and integration coverage artifacts for 14 days |
-| **Security Audit** | `npm audit --omit=dev` | Scans production dependencies for vulnerabilities |
-| **Summary Report** | `$GITHUB_STEP_SUMMARY` | Publishes structured Markdown summary tables directly to GitHub Actions run page |
+| Section                 | Specification                | Details                                                                                                                                                          |
+| :---------------------- | :--------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Triggers**            | `push` & `pull_request`      | Triggers on all branches; ignores release tags (`v*`)                                                                                                            |
+| **Runtime**             | Node.js `22`                 | Configured with `actions/setup-node@v4` and `cache: 'npm'`                                                                                                       |
+| **Dependencies**        | Deterministic Install        | Runs `npm ci` for workspace dependencies                                                                                                                         |
+| **Schema Validation**   | Prisma Schema                | Validates with `prisma validate` and generates client with `prisma generate`                                                                                     |
+| **Lint & Formatting**   | ESLint & Prettier            | Executes `eslint` across `services/*`, `shared`, `frontend` and `prettier --check`                                                                               |
+| **Backend Unit Tests**  | Matrix Strategy              | Parallel matrix test execution across all 6 services (`gateway`, `auth-service`, `account-service`, `payment-service`, `ledger-service`, `notification-service`) |
+| **Frontend Validation** | Vite Production Build        | Verifies frontend bundle integrity and asset compilation                                                                                                         |
+| **Integration Tests**   | Multi-Container Testing      | Runs integration test suites against live PostgreSQL, Redis, and RabbitMQ container services                                                                     |
+| **Coverage Artifacts**  | `actions/upload-artifact@v4` | Retains unit, frontend, and integration coverage artifacts for 14 days                                                                                           |
+| **Security Audit**      | `npm audit --omit=dev`       | Scans production dependencies for vulnerabilities                                                                                                                |
+| **Summary Report**      | `$GITHUB_STEP_SUMMARY`       | Publishes structured Markdown summary tables directly to GitHub Actions run page                                                                                 |
 
 ---
 
 ## Verification Results
 
 Executing [`scratch/test-ci-workflow.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/scratch/test-ci-workflow.js):
+
 ```
 === VaultCore CI Workflow Foundation Verification ===
 

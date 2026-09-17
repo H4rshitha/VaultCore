@@ -37,7 +37,11 @@ export class NotificationController {
       const consumerMetrics = this.consumer ? this.consumer.getMetrics() : { isRunning: false };
       const statusData = await this.service.getAdminStatus(consumerMetrics);
 
-      return ApiResponse.success(res, 'Notification admin status and queue metrics retrieved', statusData);
+      return ApiResponse.success(
+        res,
+        'Notification admin status and queue metrics retrieved',
+        statusData
+      );
     } catch (error) {
       next(error);
     }
@@ -46,7 +50,11 @@ export class NotificationController {
   markAsRead = async (req, res, next) => {
     try {
       const { id } = req.params;
-      return ApiResponse.success(res, 'Notification marked as read', { id, read: true, status: 'READ' });
+      return ApiResponse.success(res, 'Notification marked as read', {
+        id,
+        read: true,
+        status: 'READ',
+      });
     } catch (error) {
       next(error);
     }

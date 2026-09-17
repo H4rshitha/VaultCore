@@ -67,7 +67,9 @@ function runTests() {
   assert.ok(pgContent.includes('storage: 10Gi'), 'Postgres PVC must be 10Gi');
   assert.ok(pgContent.includes('pg_isready'), 'Postgres must have pg_isready health probe');
   assert.ok(pgContent.includes('name: postgres-service'));
-  console.log('  ✔ PostgreSQL StatefulSet (10Gi PVC, pg_isready probes, postgres-service) verified');
+  console.log(
+    '  ✔ PostgreSQL StatefulSet (10Gi PVC, pg_isready probes, postgres-service) verified'
+  );
 
   const redisContent = fs.readFileSync(path.join(k8sDir, '04-redis-statefulset.yaml'), 'utf-8');
   assert.ok(redisContent.includes('kind: StatefulSet'));
@@ -82,33 +84,83 @@ function runTests() {
   assert.ok(rabbitContent.includes('storage: 5Gi'), 'RabbitMQ PVC must be 5Gi');
   assert.ok(rabbitContent.includes('5672'), 'RabbitMQ AMQP port 5672 configured');
   assert.ok(rabbitContent.includes('15672'), 'RabbitMQ Management port 15672 configured');
-  assert.ok(rabbitContent.includes('rabbitmq-diagnostics'), 'RabbitMQ diagnostics probe configured');
+  assert.ok(
+    rabbitContent.includes('rabbitmq-diagnostics'),
+    'RabbitMQ diagnostics probe configured'
+  );
   assert.ok(rabbitContent.includes('name: rabbitmq-service'));
   console.log('  ✔ RabbitMQ StatefulSet (5Gi PVC, Management UI, AMQP, rabbitmq-service) verified');
 
   // 3. Test Microservice Deployments, Zero-Downtime Rolling Updates & Health Probes
   console.log('\n[3. Testing Microservices Deployments, Probes & Zero-Downtime Strategy]');
   const microserviceFiles = [
-    { file: '06-gateway-deployment.yaml', name: 'gateway-deployment', port: 3000, liveness: '/health/live', readiness: '/health/ready' },
-    { file: '07-auth-deployment.yaml', name: 'auth-deployment', port: 3001, liveness: '/health', readiness: '/health' },
-    { file: '08-account-deployment.yaml', name: 'account-deployment', port: 3002, liveness: '/health', readiness: '/health' },
-    { file: '09-payment-deployment.yaml', name: 'payment-deployment', port: 3003, liveness: '/health', readiness: '/health' },
-    { file: '10-ledger-deployment.yaml', name: 'ledger-deployment', port: 3004, liveness: '/health', readiness: '/health' },
-    { file: '11-notification-deployment.yaml', name: 'notification-deployment', port: 3005, liveness: '/health', readiness: '/health' },
+    {
+      file: '06-gateway-deployment.yaml',
+      name: 'gateway-deployment',
+      port: 3000,
+      liveness: '/health/live',
+      readiness: '/health/ready',
+    },
+    {
+      file: '07-auth-deployment.yaml',
+      name: 'auth-deployment',
+      port: 3001,
+      liveness: '/health',
+      readiness: '/health',
+    },
+    {
+      file: '08-account-deployment.yaml',
+      name: 'account-deployment',
+      port: 3002,
+      liveness: '/health',
+      readiness: '/health',
+    },
+    {
+      file: '09-payment-deployment.yaml',
+      name: 'payment-deployment',
+      port: 3003,
+      liveness: '/health',
+      readiness: '/health',
+    },
+    {
+      file: '10-ledger-deployment.yaml',
+      name: 'ledger-deployment',
+      port: 3004,
+      liveness: '/health',
+      readiness: '/health',
+    },
+    {
+      file: '11-notification-deployment.yaml',
+      name: 'notification-deployment',
+      port: 3005,
+      liveness: '/health',
+      readiness: '/health',
+    },
   ];
 
   for (const ms of microserviceFiles) {
     const content = fs.readFileSync(path.join(k8sDir, ms.file), 'utf-8');
     assert.ok(content.includes('kind: Deployment'), `${ms.name} has Deployment`);
     assert.ok(content.includes('type: RollingUpdate'), `${ms.name} has RollingUpdate strategy`);
-    assert.ok(content.includes('maxUnavailable: 0'), `${ms.name} enforces maxUnavailable: 0 for zero-downtime`);
+    assert.ok(
+      content.includes('maxUnavailable: 0'),
+      `${ms.name} enforces maxUnavailable: 0 for zero-downtime`
+    );
     assert.ok(content.includes('maxSurge: 1'), `${ms.name} sets maxSurge: 1`);
     assert.ok(content.includes(`port: ${ms.port}`), `${ms.name} targets port ${ms.port}`);
-    assert.ok(content.includes(`path: ${ms.liveness}`), `${ms.name} has livenessProbe at ${ms.liveness}`);
-    assert.ok(content.includes(`path: ${ms.readiness}`), `${ms.name} has readinessProbe at ${ms.readiness}`);
+    assert.ok(
+      content.includes(`path: ${ms.liveness}`),
+      `${ms.name} has livenessProbe at ${ms.liveness}`
+    );
+    assert.ok(
+      content.includes(`path: ${ms.readiness}`),
+      `${ms.name} has readinessProbe at ${ms.readiness}`
+    );
     assert.ok(content.includes('resources:'), `${ms.name} specifies CPU/Memory requests & limits`);
     assert.ok(content.includes('kind: Service'), `${ms.name} defines ClusterIP Service`);
-    console.log(`  ✔ ${ms.name} verified: RollingUpdate, Probes (${ms.liveness}/${ms.readiness}), ClusterIP Service`);
+    console.log(
+      `  ✔ ${ms.name} verified: RollingUpdate, Probes (${ms.liveness}/${ms.readiness}), ClusterIP Service`
+    );
   }
 
   // 4. Test Ingress Networking
@@ -122,7 +174,9 @@ function runTests() {
   assert.ok(ingressContent.includes('api.vaultcore.local'));
   assert.ok(ingressContent.includes('name: gateway-service'));
   assert.ok(ingressContent.includes('number: 3000'));
-  console.log('  ✔ NGINX Ingress verified: Host routing, proxy headers, timeout annotations, gateway backend');
+  console.log(
+    '  ✔ NGINX Ingress verified: Host routing, proxy headers, timeout annotations, gateway backend'
+  );
 
   // 5. Test Horizontal Pod Autoscalers (HPA)
   console.log('\n[5. Testing Horizontal Pod Autoscaling (HPA) Bounds]');
@@ -131,7 +185,10 @@ function runTests() {
 
   // Gateway: 2 -> 10 replicas
   assert.ok(hpaContent.includes('name: gateway-hpa'));
-  assert.ok(hpaContent.includes('minReplicas: 2') && hpaContent.includes('maxReplicas: 10'), 'Gateway HPA is 2-10 replicas');
+  assert.ok(
+    hpaContent.includes('minReplicas: 2') && hpaContent.includes('maxReplicas: 10'),
+    'Gateway HPA is 2-10 replicas'
+  );
 
   // Payment: 2 -> 5 replicas
   assert.ok(hpaContent.includes('name: payment-hpa'));
@@ -140,7 +197,9 @@ function runTests() {
   // Notification: 1 -> 3 replicas
   assert.ok(hpaContent.includes('name: notification-hpa'));
   assert.ok(hpaContent.includes('maxReplicas: 3'), 'Notification HPA is 1-3 replicas');
-  console.log('  ✔ HPA quotas verified: Gateway (2 → 10), Payment Service (2 → 5), Notification Service (1 → 3)');
+  console.log(
+    '  ✔ HPA quotas verified: Gateway (2 → 10), Payment Service (2 → 5), Notification Service (1 → 3)'
+  );
 
   // 6. Test Kustomization Manifest
   console.log('\n[6. Testing Kustomization Manifest Bundle]');

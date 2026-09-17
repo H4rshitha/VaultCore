@@ -24,16 +24,26 @@ export class CircuitBreakerOpenError extends Error {
 export class CircuitBreaker {
   constructor(options = {}) {
     this.name = options.name || 'default-service';
-    this.failureThreshold = options.failureThreshold || CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD || 5;
-    this.successThreshold = options.successThreshold || CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD || 3;
+    this.failureThreshold =
+      options.failureThreshold || CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD || 5;
+    this.successThreshold =
+      options.successThreshold || CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD || 3;
     this.openTimeoutMs = options.openTimeoutMs || CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS || 30000;
     this.logger = options.logger || defaultLogger;
-    this.isFailure = options.isFailure || ((err) => {
-      if (err.statusCode && err.statusCode >= 400 && err.statusCode < 500 && err.statusCode !== 408 && err.statusCode !== 429) {
-        return false;
-      }
-      return true;
-    });
+    this.isFailure =
+      options.isFailure ||
+      ((err) => {
+        if (
+          err.statusCode &&
+          err.statusCode >= 400 &&
+          err.statusCode < 500 &&
+          err.statusCode !== 408 &&
+          err.statusCode !== 429
+        ) {
+          return false;
+        }
+        return true;
+      });
 
     this.state = CIRCUIT_STATES.CLOSED;
     this.consecutiveFailures = 0;
@@ -88,12 +98,15 @@ export class CircuitBreaker {
       this.openedAt = null;
     }
 
-    this.logger.info(`Circuit breaker [${this.name}] transitioned from ${fromState} to ${newState}`, {
-      serviceName: this.name,
-      circuitState: newState,
-      previousState: fromState,
-      transitionReason: reason,
-    });
+    this.logger.info(
+      `Circuit breaker [${this.name}] transitioned from ${fromState} to ${newState}`,
+      {
+        serviceName: this.name,
+        circuitState: newState,
+        previousState: fromState,
+        transitionReason: reason,
+      }
+    );
   }
 
   /**
@@ -112,7 +125,10 @@ export class CircuitBreaker {
     if (this.state === CIRCUIT_STATES.OPEN) {
       const timeSinceOpen = Date.now() - (this.openedAt || 0);
       if (timeSinceOpen >= this.openTimeoutMs) {
-        this._transitionTo(CIRCUIT_STATES.HALF_OPEN, `Open timeout of ${this.openTimeoutMs}ms expired`);
+        this._transitionTo(
+          CIRCUIT_STATES.HALF_OPEN,
+          `Open timeout of ${this.openTimeoutMs}ms expired`
+        );
       } else {
         // Fast fail immediately
         this.stats.failFastCount++;
@@ -128,7 +144,9 @@ export class CircuitBreaker {
         });
 
         if (typeof fallback === 'function') {
-          return await fallback(new CircuitBreakerOpenError(this.name, retryAfterSec, this.lastFailureReason));
+          return await fallback(
+            new CircuitBreakerOpenError(this.name, retryAfterSec, this.lastFailureReason)
+          );
         }
 
         throw new CircuitBreakerOpenError(this.name, retryAfterSec, this.lastFailureReason);
@@ -145,16 +163,22 @@ export class CircuitBreaker {
 
       if (this.state === CIRCUIT_STATES.HALF_OPEN) {
         this.halfOpenSuccessCount++;
-        this.logger.info(`Circuit breaker [${this.name}] probe request successful (${this.halfOpenSuccessCount}/${this.successThreshold})`, {
-          traceId,
-          serviceName: this.name,
-          circuitState: this.state,
-          halfOpenSuccessCount: this.halfOpenSuccessCount,
-        });
+        this.logger.info(
+          `Circuit breaker [${this.name}] probe request successful (${this.halfOpenSuccessCount}/${this.successThreshold})`,
+          {
+            traceId,
+            serviceName: this.name,
+            circuitState: this.state,
+            halfOpenSuccessCount: this.halfOpenSuccessCount,
+          }
+        );
 
         if (this.halfOpenSuccessCount >= this.successThreshold) {
           this.stats.recoveryCount++;
-          this._transitionTo(CIRCUIT_STATES.CLOSED, `Success threshold of ${this.successThreshold} consecutive successes achieved in HALF_OPEN`);
+          this._transitionTo(
+            CIRCUIT_STATES.CLOSED,
+            `Success threshold of ${this.successThreshold} consecutive successes achieved in HALF_OPEN`
+          );
         }
       } else if (this.state === CIRCUIT_STATES.CLOSED) {
         this.consecutiveFailures = 0;
@@ -175,24 +199,33 @@ export class CircuitBreaker {
       if (this.state === CIRCUIT_STATES.HALF_OPEN) {
         // Any failure in HALF_OPEN immediately trips circuit back to OPEN
         this._transitionTo(CIRCUIT_STATES.OPEN, `Failure during HALF_OPEN trial: ${error.message}`);
-        this.logger.error(`Circuit breaker [${this.name}] failed probe in HALF_OPEN, reopened circuit`, {
-          traceId,
-          serviceName: this.name,
-          circuitState: CIRCUIT_STATES.OPEN,
-          failureReason: error.message,
-        });
+        this.logger.error(
+          `Circuit breaker [${this.name}] failed probe in HALF_OPEN, reopened circuit`,
+          {
+            traceId,
+            serviceName: this.name,
+            circuitState: CIRCUIT_STATES.OPEN,
+            failureReason: error.message,
+          }
+        );
       } else if (this.state === CIRCUIT_STATES.CLOSED) {
         this.consecutiveFailures++;
-        this.logger.warn(`Circuit breaker [${this.name}] recorded failure (${this.consecutiveFailures}/${this.failureThreshold})`, {
-          traceId,
-          serviceName: this.name,
-          circuitState: this.state,
-          consecutiveFailures: this.consecutiveFailures,
-          failureReason: error.message,
-        });
+        this.logger.warn(
+          `Circuit breaker [${this.name}] recorded failure (${this.consecutiveFailures}/${this.failureThreshold})`,
+          {
+            traceId,
+            serviceName: this.name,
+            circuitState: this.state,
+            consecutiveFailures: this.consecutiveFailures,
+            failureReason: error.message,
+          }
+        );
 
         if (this.consecutiveFailures >= this.failureThreshold) {
-          this._transitionTo(CIRCUIT_STATES.OPEN, `Failure threshold of ${this.failureThreshold} reached in CLOSED state`);
+          this._transitionTo(
+            CIRCUIT_STATES.OPEN,
+            `Failure threshold of ${this.failureThreshold} reached in CLOSED state`
+          );
         }
       }
 
@@ -297,20 +330,29 @@ export class CircuitBreakerRegistry {
 export const circuitBreakerRegistry = new CircuitBreakerRegistry();
 
 // Initialize default protected circuit breakers
-export const ledgerCircuitBreaker = circuitBreakerRegistry.getOrCreate(CIRCUIT_BREAKER_CONFIG.SERVICES.LEDGER, {
-  failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
-  successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
-  openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
-});
+export const ledgerCircuitBreaker = circuitBreakerRegistry.getOrCreate(
+  CIRCUIT_BREAKER_CONFIG.SERVICES.LEDGER,
+  {
+    failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
+    successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
+    openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
+  }
+);
 
-export const rabbitmqCircuitBreaker = circuitBreakerRegistry.getOrCreate(CIRCUIT_BREAKER_CONFIG.SERVICES.RABBITMQ, {
-  failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
-  successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
-  openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
-});
+export const rabbitmqCircuitBreaker = circuitBreakerRegistry.getOrCreate(
+  CIRCUIT_BREAKER_CONFIG.SERVICES.RABBITMQ,
+  {
+    failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
+    successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
+    openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
+  }
+);
 
-export const notificationCircuitBreaker = circuitBreakerRegistry.getOrCreate(CIRCUIT_BREAKER_CONFIG.SERVICES.NOTIFICATION, {
-  failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
-  successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
-  openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
-});
+export const notificationCircuitBreaker = circuitBreakerRegistry.getOrCreate(
+  CIRCUIT_BREAKER_CONFIG.SERVICES.NOTIFICATION,
+  {
+    failureThreshold: CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD,
+    successThreshold: CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD,
+    openTimeoutMs: CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
+  }
+);

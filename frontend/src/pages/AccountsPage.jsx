@@ -86,7 +86,9 @@ export const AccountsPage = () => {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh accounts"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+            />
             <span>Sync</span>
           </button>
           <button
@@ -105,9 +107,13 @@ export const AccountsPage = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-200">Failed to load accounts</p>
+              <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                Failed to load accounts
+              </p>
               <p className="text-xs text-red-600 dark:text-red-400/80">
-                {error?.response?.data?.message || error?.message || 'Error communicating with Account Service'}
+                {error?.response?.data?.message ||
+                  error?.message ||
+                  'Error communicating with Account Service'}
               </p>
             </div>
           </div>
@@ -132,7 +138,9 @@ export const AccountsPage = () => {
           <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4">
             <Wallet className="w-8 h-8" />
           </div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">No Active Bank Accounts</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">
+            No Active Bank Accounts
+          </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
             Get started by opening your first VaultCore Checking, Savings, or Commercial account.
           </p>
@@ -171,7 +179,9 @@ export const AccountsPage = () => {
                   <Shield className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white">Account Details</h3>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Account Details
+                  </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     {maskAccountNumber(selectedAccountNumber)}
                   </p>
@@ -261,10 +271,7 @@ export const AccountsPage = () => {
       )}
 
       {/* 5. Create Account Modal */}
-      <CreateAccountModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      <CreateAccountModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
     </div>
   );
 };

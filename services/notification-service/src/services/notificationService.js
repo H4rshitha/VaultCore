@@ -55,7 +55,9 @@ export class NotificationService {
       case 'notification.sms':
         return {
           subject: 'VaultCore SMS Alert',
-          body: payload.message || `VaultCore Alert: Payment ${referenceId} of ${amount} ${currency} processed.`,
+          body:
+            payload.message ||
+            `VaultCore Alert: Payment ${referenceId} of ${amount} ${currency} processed.`,
           template: 'SMS_ALERT_TEMPLATE',
         };
 
@@ -63,7 +65,8 @@ export class NotificationService {
       default:
         return {
           subject: payload.subject || 'VaultCore Account Notification',
-          body: payload.message || payload.body || `Notification regarding transaction ${referenceId}.`,
+          body:
+            payload.message || payload.body || `Notification regarding transaction ${referenceId}.`,
           template: 'GENERIC_NOTIFICATION_TEMPLATE',
         };
     }
@@ -94,7 +97,9 @@ export class NotificationService {
     };
 
     if (this.logger) {
-      this.logger.info(`Notification simulated dispatch [${notificationType}] to ${recipient}: "${subject}"`);
+      this.logger.info(
+        `Notification simulated dispatch [${notificationType}] to ${recipient}: "${subject}"`
+      );
     }
 
     return deliveryResult;

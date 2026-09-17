@@ -11,8 +11,12 @@ import {
   createServiceMetricsMiddleware,
   metricsEndpointHandler,
 } from '@vaultcore/shared';
+import fs from 'fs';
 import notificationRoutes from './routes/notificationRoutes.js';
-import swaggerDocument from './swagger.json' with { type: 'json' };
+
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(new URL('./swagger.json', import.meta.url), 'utf8')
+);
 
 const logger = createLogger('notification-service');
 const app = express();

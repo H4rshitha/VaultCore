@@ -14,8 +14,17 @@ export const useAccounts = (params = {}, options = {}) => {
       const res = await accountApi.getAccounts(params);
       const data = res?.data || res;
       // Handle both structured { accounts: [], pagination: {} } and direct array
-      const accounts = Array.isArray(data?.accounts) ? data.accounts : Array.isArray(data) ? data : [];
-      const pagination = data?.pagination || { page: 1, limit: 10, totalCount: accounts.length, totalPages: 1 };
+      const accounts = Array.isArray(data?.accounts)
+        ? data.accounts
+        : Array.isArray(data)
+          ? data
+          : [];
+      const pagination = data?.pagination || {
+        page: 1,
+        limit: 10,
+        totalCount: accounts.length,
+        totalPages: 1,
+      };
       return { accounts, pagination };
     },
     staleTime: 60000,
@@ -67,7 +76,9 @@ export const useCustomerSearch = (query = '', options = {}) => {
     queryKey: ['customer-search', trimmedQuery],
     queryFn: async () => {
       if (!trimmedQuery) return [];
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(trimmedQuery);
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        trimmedQuery
+      );
       const params = isUUID
         ? { customerId: trimmedQuery, query: trimmedQuery }
         : trimmedQuery.includes('@')

@@ -4,7 +4,4 @@ export const USER_ROLES = {
   ADMIN: 'ADMIN',
 };
 
-export const AUTH_ROUTES = [
-  '/login',
-  '/signup',
-];
+export const AUTH_ROUTES = ['/login', '/signup'];

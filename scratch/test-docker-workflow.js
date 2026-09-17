@@ -45,10 +45,22 @@ const content = fs.readFileSync(dockerWorkflowPath, 'utf8');
 
 // 2. YAML syntax is valid
 const yamlValidation = validateYamlStructure(content);
-recordCheck(2, 'YAML syntax is valid', yamlValidation.valid, yamlValidation.error || 'Indentation and formatting valid');
+recordCheck(
+  2,
+  'YAML syntax is valid',
+  yamlValidation.valid,
+  yamlValidation.error || 'Indentation and formatting valid'
+);
 
 // 3. Matrix contains all six services
-const services = ['gateway', 'auth-service', 'account-service', 'payment-service', 'ledger-service', 'notification-service'];
+const services = [
+  'gateway',
+  'auth-service',
+  'account-service',
+  'payment-service',
+  'ledger-service',
+  'notification-service',
+];
 const allServicesInMatrix = services.every((s) => new RegExp(`-\\s+${s}`).test(content));
 recordCheck(
   3,
@@ -58,16 +70,33 @@ recordCheck(
 );
 
 // 4. BuildKit is enabled
-const hasBuildKit = /DOCKER_BUILDKIT:\s*1/.test(content) || /docker\/setup-buildx-action@v\d+/.test(content);
-recordCheck(4, 'BuildKit is enabled', hasBuildKit, 'DOCKER_BUILDKIT: 1 & docker/setup-buildx-action@v3');
+const hasBuildKit =
+  /DOCKER_BUILDKIT:\s*1/.test(content) || /docker\/setup-buildx-action@v\d+/.test(content);
+recordCheck(
+  4,
+  'BuildKit is enabled',
+  hasBuildKit,
+  'DOCKER_BUILDKIT: 1 & docker/setup-buildx-action@v3'
+);
 
 // 5. Cache configuration exists
 const hasCache = /cache-from:\s*type=gha/.test(content) && /cache-to:\s*type=gha/.test(content);
-recordCheck(5, 'Cache configuration exists', hasCache, 'cache-from: type=gha, cache-to: type=gha,mode=max');
+recordCheck(
+  5,
+  'Cache configuration exists',
+  hasCache,
+  'cache-from: type=gha, cache-to: type=gha,mode=max'
+);
 
 // 6. GHCR login step exists
-const hasGhcrLogin = /docker\/login-action@v\d+/.test(content) && /registry:\s*ghcr\.io/.test(content);
-recordCheck(6, 'GHCR login step exists', hasGhcrLogin, 'docker/login-action@v3 with registry: ghcr.io and GITHUB_TOKEN');
+const hasGhcrLogin =
+  /docker\/login-action@v\d+/.test(content) && /registry:\s*ghcr\.io/.test(content);
+recordCheck(
+  6,
+  'GHCR login step exists',
+  hasGhcrLogin,
+  'docker/login-action@v3 with registry: ghcr.io and GITHUB_TOKEN'
+);
 
 // 7. Push step exists
 const hasPush = /docker\/build-push-action@v\d+/.test(content) && /push:\s*true/.test(content);
@@ -76,20 +105,38 @@ recordCheck(7, 'Push step exists', hasPush, 'docker/build-push-action@v5 with pu
 // 8. Tags include latest and Git SHA
 const hasLatestTag = /value=latest/.test(content) || /type=raw,\s*value=latest/.test(content);
 const hasGitShaTag = /value=\${{\s*github\.sha\s*}}/.test(content) || /type=sha/.test(content);
-recordCheck(8, 'Tags include latest and Git SHA', hasLatestTag && hasGitShaTag, 'latest and ${{ github.sha }}');
+recordCheck(
+  8,
+  'Tags include latest and Git SHA',
+  hasLatestTag && hasGitShaTag,
+  'latest and ${{ github.sha }}'
+);
 
 // 9. Semantic version tagging logic exists
 const hasSemver = /type=semver/.test(content) && /pattern=\{\{version\}\}/.test(content);
-recordCheck(9, 'Semantic version tagging logic exists', hasSemver, 'docker/metadata-action@v5 with semver patterns');
+recordCheck(
+  9,
+  'Semantic version tagging logic exists',
+  hasSemver,
+  'docker/metadata-action@v5 with semver patterns'
+);
 
 // 10. Build metadata artifact upload exists
-const hasMetadataArtifact = /actions\/upload-artifact@v\d+/.test(content) && /build-metadata/i.test(content);
-recordCheck(10, 'Build metadata artifact upload exists', hasMetadataArtifact, 'actions/upload-artifact@v4 for build metadata JSON');
+const hasMetadataArtifact =
+  /actions\/upload-artifact@v\d+/.test(content) && /build-metadata/i.test(content);
+recordCheck(
+  10,
+  'Build metadata artifact upload exists',
+  hasMetadataArtifact,
+  'actions/upload-artifact@v4 for build metadata JSON'
+);
 
 console.log('\n======================================================');
 const allPassed = checks.every((c) => c.pass);
 if (allPassed) {
-  console.log(`🎉 All ${checks.length}/${checks.length} Docker build pipeline requirements PASSED!`);
+  console.log(
+    `🎉 All ${checks.length}/${checks.length} Docker build pipeline requirements PASSED!`
+  );
   process.exit(0);
 } else {
   const failed = checks.filter((c) => !c.pass);

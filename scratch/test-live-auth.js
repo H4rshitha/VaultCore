@@ -19,12 +19,14 @@ async function testAuth() {
     const testEmail = `testuser_${Date.now()}@vaultcore.io`;
 
     // 1. Test Signup via Gateway
-    console.log(`\n[1/3] Testing POST http://127.0.0.1:3000/api/v1/auth/signup for ${testEmail}...`);
+    console.log(
+      `\n[1/3] Testing POST http://127.0.0.1:3000/api/v1/auth/signup for ${testEmail}...`
+    );
     const signupRes = await fetch('http://127.0.0.1:3000/api/v1/auth/signup', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Origin': 'http://localhost:5173',
+        Origin: 'http://localhost:5173',
       },
       body: JSON.stringify({
         firstName: 'Harshitha',
@@ -54,7 +56,7 @@ async function testAuth() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Origin': 'http://localhost:5173',
+        Origin: 'http://localhost:5173',
       },
       body: JSON.stringify({
         email: testEmail,
@@ -77,7 +79,7 @@ async function testAuth() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Origin': 'http://localhost:5173',
+        Origin: 'http://localhost:5173',
       },
       body: JSON.stringify({
         refreshToken,

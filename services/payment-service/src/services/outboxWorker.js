@@ -39,12 +39,16 @@ export class OutboxWorker {
       await this.publisher.init(amqpUri);
     } catch (err) {
       if (this.logger) {
-        this.logger.warn(`OutboxWorker could not connect to RabbitMQ on startup: ${err.message}. Will retry during polling cycle.`);
+        this.logger.warn(
+          `OutboxWorker could not connect to RabbitMQ on startup: ${err.message}. Will retry during polling cycle.`
+        );
       }
     }
 
     if (this.logger) {
-      this.logger.info(`OutboxWorker started with poll interval ${this.pollIntervalMs}ms and max retries ${this.maxRetries}`);
+      this.logger.info(
+        `OutboxWorker started with poll interval ${this.pollIntervalMs}ms and max retries ${this.maxRetries}`
+      );
     }
 
     // Run first batch immediately
@@ -109,13 +113,14 @@ export class OutboxWorker {
           continue;
         }
 
-        const payload = typeof event.payload === 'string'
-          ? JSON.parse(event.payload)
-          : event.payload || {};
+        const payload =
+          typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload || {};
 
         const traceId = payload.traceId || `trace-${event.id}`;
         const transactionId = event.transactionId || event.aggregateId || payload.transactionId;
-        const routingKey = payload.routingKey || (event.eventType === 'PAYMENT_FAILED' ? 'payment.failed' : 'payment.completed');
+        const routingKey =
+          payload.routingKey ||
+          (event.eventType === 'PAYMENT_FAILED' ? 'payment.failed' : 'payment.completed');
         const currentRetry = event.retryCount || 0;
 
         // Exponential backoff check: if event failed previously, ensure sufficient time has elapsed
@@ -174,14 +179,17 @@ export class OutboxWorker {
             await this.repository.incrementRetry(event.id, publishError.message, nextRetry);
 
             if (this.logger) {
-              this.logger.warn(`Outbox event publish failed, scheduled for retry (attempt ${nextRetry}/${this.maxRetries})`, {
-                traceId,
-                eventId: event.id,
-                transactionId,
-                routingKey,
-                retryAttempt: nextRetry,
-                error: publishError.message,
-              });
+              this.logger.warn(
+                `Outbox event publish failed, scheduled for retry (attempt ${nextRetry}/${this.maxRetries})`,
+                {
+                  traceId,
+                  eventId: event.id,
+                  transactionId,
+                  routingKey,
+                  retryAttempt: nextRetry,
+                  error: publishError.message,
+                }
+              );
             }
           }
         }

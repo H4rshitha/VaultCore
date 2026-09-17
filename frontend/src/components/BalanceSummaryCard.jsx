@@ -10,7 +10,6 @@ export const BalanceSummaryCard = ({ accounts = [], isLoading = false }) => {
   const totalAccounts = accounts.length;
   const activeAccounts = accounts.filter((acc) => acc.status === ACCOUNT_STATUS.ACTIVE).length;
 
-
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
@@ -72,7 +71,9 @@ export const BalanceSummaryCard = ({ accounts = [], isLoading = false }) => {
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {totalAccounts}
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Checking & Savings Accounts</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Checking & Savings Accounts
+            </p>
           </div>
           <button
             onClick={() => navigate('/accounts')}
@@ -96,7 +97,10 @@ export const BalanceSummaryCard = ({ accounts = [], isLoading = false }) => {
         <div className="flex items-baseline justify-between">
           <div>
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              {activeAccounts} <span className="text-sm font-normal text-slate-400 dark:text-slate-500">/ {totalAccounts}</span>
+              {activeAccounts}{' '}
+              <span className="text-sm font-normal text-slate-400 dark:text-slate-500">
+                / {totalAccounts}
+              </span>
             </h3>
             <p className="text-xs text-emerald-600 dark:text-emerald-400/90 mt-1 font-medium flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>

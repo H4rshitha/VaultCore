@@ -1,15 +1,7 @@
 import React from 'react';
 import { TransferForm } from '../components/TransferForm.jsx';
 import { useAccounts } from '../hooks/useAccounts.js';
-import {
-  ShieldCheck,
-  Zap,
-  Lock,
-  ArrowRight,
-  Wallet,
-  Clock,
-  Landmark,
-} from 'lucide-react';
+import { ShieldCheck, Zap, Lock, ArrowRight, Wallet, Clock, Landmark } from 'lucide-react';
 import { formatCurrency, maskAccountNumber } from '../utils/currency.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -26,7 +18,8 @@ export const TransferPage = () => {
           Money Transfer
         </h1>
         <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Execute instant, ACID-compliant money transfers orchestrated across distributed Redis locks and double-entry ledger.
+          Execute instant, ACID-compliant money transfers orchestrated across distributed Redis
+          locks and double-entry ledger.
         </p>
       </div>
 
@@ -90,19 +83,28 @@ export const TransferPage = () => {
               <li className="flex items-start gap-2">
                 <Zap className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-slate-800 dark:text-slate-200 font-medium">Distributed Redlock:</strong> Prevents concurrent double-spending via Redis DB0 locking.
+                  <strong className="text-slate-800 dark:text-slate-200 font-medium">
+                    Distributed Redlock:
+                  </strong>{' '}
+                  Prevents concurrent double-spending via Redis DB0 locking.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Landmark className="w-3.5 h-3.5 text-brand-500 dark:text-brand-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-slate-800 dark:text-slate-200 font-medium">Double-Entry Ledger:</strong> Immutable debit and credit journal entries guarantees balance conservation.
+                  <strong className="text-slate-800 dark:text-slate-200 font-medium">
+                    Double-Entry Ledger:
+                  </strong>{' '}
+                  Immutable debit and credit journal entries guarantees balance conservation.
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <Lock className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-slate-800 dark:text-slate-200 font-medium">Idempotent Execution:</strong> UUID-backed transfer requests prevent duplicate billing on network retries.
+                  <strong className="text-slate-800 dark:text-slate-200 font-medium">
+                    Idempotent Execution:
+                  </strong>{' '}
+                  UUID-backed transfer requests prevent duplicate billing on network retries.
                 </span>
               </li>
             </ul>

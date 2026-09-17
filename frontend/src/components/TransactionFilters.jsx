@@ -46,11 +46,17 @@ export const TransactionFilters = ({ filters, onFilterChange, onReset }) => {
   };
 
   const handleStartDateChange = (e) => {
-    onFilterChange({ ...filters, startDate: e.target.value ? new Date(e.target.value).toISOString() : undefined });
+    onFilterChange({
+      ...filters,
+      startDate: e.target.value ? new Date(e.target.value).toISOString() : undefined,
+    });
   };
 
   const handleEndDateChange = (e) => {
-    onFilterChange({ ...filters, endDate: e.target.value ? new Date(e.target.value).toISOString() : undefined });
+    onFilterChange({
+      ...filters,
+      endDate: e.target.value ? new Date(e.target.value).toISOString() : undefined,
+    });
   };
 
   return (

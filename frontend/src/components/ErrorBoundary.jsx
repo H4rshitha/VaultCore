@@ -48,7 +48,8 @@ export class ErrorBoundary extends React.Component {
                 Unexpected Application Error
               </h2>
               <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 leading-relaxed">
-                VaultCore caught an unhandled rendering error. Your financial data and active sessions remain secure.
+                VaultCore caught an unhandled rendering error. Your financial data and active
+                sessions remain secure.
               </p>
             </div>
 

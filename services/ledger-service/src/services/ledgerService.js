@@ -33,19 +33,32 @@ export class LedgerService {
   /**
    * Fetch ledger history for account with authorization and cursor pagination
    */
-  async getAccountLedgerHistory(accountNumber, requestingUserId, requestingUserRole, filters, traceId) {
+  async getAccountLedgerHistory(
+    accountNumber,
+    requestingUserId,
+    requestingUserRole,
+    filters,
+    traceId
+  ) {
     const account = await ledgerRepository.findAccountByNumber(accountNumber);
     if (!account) {
       throw new NotFoundError(`Account ${accountNumber} not found`);
     }
 
     // Ownership authorization check
-    if (account.userId !== requestingUserId && requestingUserRole !== 'ADMIN' && requestingUserRole !== 'TELLER') {
-      logger.warn(`Unauthorized ledger access attempt: User ${requestingUserId} requested ${accountNumber}`, {
-        traceId,
-        accountNumber,
-        userId: requestingUserId,
-      });
+    if (
+      account.userId !== requestingUserId &&
+      requestingUserRole !== 'ADMIN' &&
+      requestingUserRole !== 'TELLER'
+    ) {
+      logger.warn(
+        `Unauthorized ledger access attempt: User ${requestingUserId} requested ${accountNumber}`,
+        {
+          traceId,
+          accountNumber,
+          userId: requestingUserId,
+        }
+      );
       throw new ForbiddenError('Access denied: You do not own this bank account');
     }
 
@@ -55,7 +68,10 @@ export class LedgerService {
       traceId,
     });
 
-    const { entries, nextCursor } = await ledgerRepository.getAccountLedgerEntries(account.id, filters);
+    const { entries, nextCursor } = await ledgerRepository.getAccountLedgerEntries(
+      account.id,
+      filters
+    );
 
     return {
       accountNumber: account.accountNumber,

@@ -1,6 +1,11 @@
 import axios from 'axios';
 import { generateTraceId } from '../utils/trace.js';
-import { getMemoryAccessToken, setMemoryAccessToken, clearMemoryAccessToken, storage } from '../utils/storage.js';
+import {
+  getMemoryAccessToken,
+  setMemoryAccessToken,
+  clearMemoryAccessToken,
+  storage,
+} from '../utils/storage.js';
 import { API_BASE_URL } from '../utils/env.js';
 
 // Global Event Emitter for Developer Request Inspector
@@ -93,7 +98,10 @@ apiClient.interceptors.response.use(
     requestInspectorEmitter.emit({
       id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       traceId: traceId || 'N/A',
-      responseTime: responseTime !== undefined ? `${responseTime}ms` : response.headers?.['x-response-time'] || 'N/A',
+      responseTime:
+        responseTime !== undefined
+          ? `${responseTime}ms`
+          : response.headers?.['x-response-time'] || 'N/A',
       responseTimeMs: responseTime,
       method: (config.method || 'GET').toUpperCase(),
       url: config.url || '',
@@ -110,7 +118,9 @@ apiClient.interceptors.response.use(
     const method = (originalRequest.method || 'GET').toUpperCase();
 
     // Record error telemetry for Developer Inspector
-    const responseTime = originalRequest._startTime ? Date.now() - originalRequest._startTime : undefined;
+    const responseTime = originalRequest._startTime
+      ? Date.now() - originalRequest._startTime
+      : undefined;
     const traceId =
       error.response?.headers?.['x-trace-id'] ||
       originalRequest.headers?.['X-Trace-ID'] ||
@@ -119,7 +129,10 @@ apiClient.interceptors.response.use(
     requestInspectorEmitter.emit({
       id: `req-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`,
       traceId: traceId || 'N/A',
-      responseTime: responseTime !== undefined ? `${responseTime}ms` : error.response?.headers?.['x-response-time'] || 'N/A',
+      responseTime:
+        responseTime !== undefined
+          ? `${responseTime}ms`
+          : error.response?.headers?.['x-response-time'] || 'N/A',
       responseTimeMs: responseTime,
       method,
       url: originalRequest.url || '',

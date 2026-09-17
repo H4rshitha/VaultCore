@@ -11,8 +11,12 @@ import {
   createServiceMetricsMiddleware,
   metricsEndpointHandler,
 } from '@vaultcore/shared';
+import fs from 'fs';
 import ledgerRoutes from './routes/ledgerRoutes.js';
-import swaggerDocument from './swagger.json' with { type: 'json' };
+
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(new URL('./swagger.json', import.meta.url), 'utf8')
+);
 
 const logger = createLogger('ledger-service');
 const app = express();

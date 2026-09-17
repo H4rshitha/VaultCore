@@ -122,18 +122,17 @@ export class NotificationRepository {
    * Get admin aggregated statistics
    */
   async getAdminStatistics() {
-    const [sentCount, failedCount, pendingCount, deliveredCount, recentFailed] =
-      await Promise.all([
-        prisma.notificationAudit.count({ where: { status: 'SENT' } }),
-        prisma.notificationAudit.count({ where: { status: 'FAILED' } }),
-        prisma.notificationAudit.count({ where: { status: 'PENDING' } }),
-        prisma.notificationAudit.count({ where: { status: 'DELIVERED' } }),
-        prisma.notificationAudit.findMany({
-          where: { status: 'FAILED' },
-          take: 10,
-          orderBy: { createdAt: 'desc' },
-        }),
-      ]);
+    const [sentCount, failedCount, pendingCount, deliveredCount, recentFailed] = await Promise.all([
+      prisma.notificationAudit.count({ where: { status: 'SENT' } }),
+      prisma.notificationAudit.count({ where: { status: 'FAILED' } }),
+      prisma.notificationAudit.count({ where: { status: 'PENDING' } }),
+      prisma.notificationAudit.count({ where: { status: 'DELIVERED' } }),
+      prisma.notificationAudit.findMany({
+        where: { status: 'FAILED' },
+        take: 10,
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
 
     return {
       sent: sentCount,

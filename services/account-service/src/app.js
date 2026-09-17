@@ -2,10 +2,20 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import swaggerUi from 'swagger-ui-express';
-import { createLogger, errorHandler, requestLogger, traceMiddleware, ApiResponse } from '@vaultcore/shared';
+import {
+  createLogger,
+  errorHandler,
+  requestLogger,
+  traceMiddleware,
+  ApiResponse,
+} from '@vaultcore/shared';
+import fs from 'fs';
 import accountRoutes from './routes/accountRoutes.js';
 import customerRoutes from './routes/customerRoutes.js';
-import swaggerDocument from './swagger.json' with { type: 'json' };
+
+const swaggerDocument = JSON.parse(
+  fs.readFileSync(new URL('./swagger.json', import.meta.url), 'utf8')
+);
 
 const logger = createLogger('account-service');
 const app = express();

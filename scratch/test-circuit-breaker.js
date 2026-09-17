@@ -27,7 +27,11 @@ async function runTests() {
   console.log('[1. Testing Circuit Breaker Configuration & Initial States]');
   assert.strictEqual(CIRCUIT_BREAKER_CONFIG.FAILURE_THRESHOLD, 5, 'Failure threshold must be 5');
   assert.strictEqual(CIRCUIT_BREAKER_CONFIG.SUCCESS_THRESHOLD, 3, 'Success threshold must be 3');
-  assert.strictEqual(CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS, 30000, 'Open timeout must be 30,000ms');
+  assert.strictEqual(
+    CIRCUIT_BREAKER_CONFIG.OPEN_TIMEOUT_MS,
+    30000,
+    'Open timeout must be 30,000ms'
+  );
 
   const testBreaker = new CircuitBreaker({
     name: 'test-resilience-service',
@@ -37,7 +41,9 @@ async function runTests() {
   });
 
   assert.strictEqual(testBreaker.state, CIRCUIT_STATES.CLOSED, 'Initial state must be CLOSED');
-  console.log('  ✔ Circuit breaker initialized in CLOSED state with 5-failure threshold and 3-success recovery');
+  console.log(
+    '  ✔ Circuit breaker initialized in CLOSED state with 5-failure threshold and 3-success recovery'
+  );
 
   // 2. CLOSED State Execution & Consecutive Failure Tripping
   console.log('\n[2. Testing CLOSED -> OPEN State Transition on 5 Failures]');
@@ -56,10 +62,13 @@ async function runTests() {
   // 2.2 Trigger 4 consecutive failures -> should still remain CLOSED
   for (let i = 1; i <= 4; i++) {
     try {
-      await testBreaker.execute(async () => {
-        executionCount++;
-        throw new Error(`Transient failure ${i}`);
-      }, { traceId: `trace-fail-${i}` });
+      await testBreaker.execute(
+        async () => {
+          executionCount++;
+          throw new Error(`Transient failure ${i}`);
+        },
+        { traceId: `trace-fail-${i}` }
+      );
       assert.fail('Should have thrown error');
     } catch (err) {
       assert.strictEqual(err.message, `Transient failure ${i}`);
@@ -71,16 +80,23 @@ async function runTests() {
 
   // 2.3 5th consecutive failure -> must trip circuit to OPEN
   try {
-    await testBreaker.execute(async () => {
-      executionCount++;
-      throw new Error('5th fatal failure');
-    }, { traceId: 'trace-fail-5' });
+    await testBreaker.execute(
+      async () => {
+        executionCount++;
+        throw new Error('5th fatal failure');
+      },
+      { traceId: 'trace-fail-5' }
+    );
     assert.fail('Should have tripped circuit');
   } catch (err) {
     assert.strictEqual(err.message, '5th fatal failure');
   }
 
-  assert.strictEqual(testBreaker.state, CIRCUIT_STATES.OPEN, 'Circuit must trip to OPEN on 5th failure');
+  assert.strictEqual(
+    testBreaker.state,
+    CIRCUIT_STATES.OPEN,
+    'Circuit must trip to OPEN on 5th failure'
+  );
   assert.strictEqual(testBreaker.stats.failedRequests, 5);
   console.log('  ✔ 5th consecutive failure tripped circuit to OPEN state');
 
@@ -90,13 +106,20 @@ async function runTests() {
 
   for (let i = 1; i <= 3; i++) {
     try {
-      await testBreaker.execute(async () => {
-        executionCount++;
-        return 'should-not-run';
-      }, { traceId: `trace-fast-fail-${i}` });
+      await testBreaker.execute(
+        async () => {
+          executionCount++;
+          return 'should-not-run';
+        },
+        { traceId: `trace-fast-fail-${i}` }
+      );
       assert.fail('Should have failed fast with CircuitBreakerOpenError');
     } catch (err) {
-      assert.strictEqual(err instanceof CircuitBreakerOpenError, true, 'Error must be instance of CircuitBreakerOpenError');
+      assert.strictEqual(
+        err instanceof CircuitBreakerOpenError,
+        true,
+        'Error must be instance of CircuitBreakerOpenError'
+      );
       assert.strictEqual(err.statusCode, 503, 'CircuitBreakerOpenError status code is 503');
       assert.strictEqual(err.circuitState, CIRCUIT_STATES.OPEN);
       assert.strictEqual(err.serviceName, 'test-resilience-service');
@@ -104,9 +127,19 @@ async function runTests() {
     }
   }
 
-  assert.strictEqual(executionCount, countBeforeFailFast, 'Downstream action MUST NOT be executed during OPEN state');
-  assert.strictEqual(testBreaker.stats.failFastCount, 3, 'Fail-fast counter tracked 3 blocked requests');
-  console.log('  ✔ OPEN state failed fast immediately without invoking downstream dependency (Fail-fast count: 3)');
+  assert.strictEqual(
+    executionCount,
+    countBeforeFailFast,
+    'Downstream action MUST NOT be executed during OPEN state'
+  );
+  assert.strictEqual(
+    testBreaker.stats.failFastCount,
+    3,
+    'Fail-fast counter tracked 3 blocked requests'
+  );
+  console.log(
+    '  ✔ OPEN state failed fast immediately without invoking downstream dependency (Fail-fast count: 3)'
+  );
 
   // 4. OPEN -> HALF_OPEN on Timeout Expiry & Re-trip on Failure
   console.log('\n[4. Testing OPEN -> HALF_OPEN Timeout & Immediate Re-trip on Probe Failure]');
@@ -115,17 +148,26 @@ async function runTests() {
 
   // In HALF_OPEN: test failure causes immediate trip back to OPEN
   try {
-    await testBreaker.execute(async () => {
-      executionCount++;
-      throw new Error('Downstream still unhealthy');
-    }, { traceId: 'trace-half-open-fail' });
+    await testBreaker.execute(
+      async () => {
+        executionCount++;
+        throw new Error('Downstream still unhealthy');
+      },
+      { traceId: 'trace-half-open-fail' }
+    );
     assert.fail('Should have thrown probe error');
   } catch (err) {
     assert.strictEqual(err.message, 'Downstream still unhealthy');
   }
 
-  assert.strictEqual(testBreaker.state, CIRCUIT_STATES.OPEN, 'Failure in HALF_OPEN must immediately reopen circuit');
-  console.log('  ✔ Timeout transitioned to HALF_OPEN; probe failure immediately tripped back to OPEN');
+  assert.strictEqual(
+    testBreaker.state,
+    CIRCUIT_STATES.OPEN,
+    'Failure in HALF_OPEN must immediately reopen circuit'
+  );
+  console.log(
+    '  ✔ Timeout transitioned to HALF_OPEN; probe failure immediately tripped back to OPEN'
+  );
 
   // 5. HALF_OPEN -> CLOSED Recovery (3 Consecutive Successes)
   console.log('\n[5. Testing HALF_OPEN -> CLOSED Recovery on 3 Consecutive Successes]');
@@ -133,30 +175,43 @@ async function runTests() {
   await new Promise((resolve) => setTimeout(resolve, 250));
 
   // Probe request 1
-  const p1 = await testBreaker.execute(async () => {
-    executionCount++;
-    return 'probe-1-success';
-  }, { traceId: 'trace-probe-1' });
+  const p1 = await testBreaker.execute(
+    async () => {
+      executionCount++;
+      return 'probe-1-success';
+    },
+    { traceId: 'trace-probe-1' }
+  );
   assert.strictEqual(p1, 'probe-1-success');
   assert.strictEqual(testBreaker.state, CIRCUIT_STATES.HALF_OPEN);
   assert.strictEqual(testBreaker.halfOpenSuccessCount, 1);
 
   // Probe request 2
-  const p2 = await testBreaker.execute(async () => {
-    executionCount++;
-    return 'probe-2-success';
-  }, { traceId: 'trace-probe-2' });
+  const p2 = await testBreaker.execute(
+    async () => {
+      executionCount++;
+      return 'probe-2-success';
+    },
+    { traceId: 'trace-probe-2' }
+  );
   assert.strictEqual(p2, 'probe-2-success');
   assert.strictEqual(testBreaker.state, CIRCUIT_STATES.HALF_OPEN);
   assert.strictEqual(testBreaker.halfOpenSuccessCount, 2);
 
   // Probe request 3 -> meets threshold of 3 -> recovers to CLOSED
-  const p3 = await testBreaker.execute(async () => {
-    executionCount++;
-    return 'probe-3-success';
-  }, { traceId: 'trace-probe-3' });
+  const p3 = await testBreaker.execute(
+    async () => {
+      executionCount++;
+      return 'probe-3-success';
+    },
+    { traceId: 'trace-probe-3' }
+  );
   assert.strictEqual(p3, 'probe-3-success');
-  assert.strictEqual(testBreaker.state, CIRCUIT_STATES.CLOSED, 'Circuit must recover to CLOSED after 3 successes');
+  assert.strictEqual(
+    testBreaker.state,
+    CIRCUIT_STATES.CLOSED,
+    'Circuit must recover to CLOSED after 3 successes'
+  );
   assert.strictEqual(testBreaker.stats.recoveryCount, 1, 'Recovery count is 1');
   console.log('  ✔ 3 consecutive successful probe requests recovered circuit back to CLOSED state');
 
@@ -171,7 +226,9 @@ async function runTests() {
   assert.strictEqual(ledgerCircuitBreaker.name, 'ledger-service');
   assert.strictEqual(rabbitmqCircuitBreaker.name, 'rabbitmq-publisher');
   assert.strictEqual(notificationCircuitBreaker.name, 'notification-service');
-  console.log('  ✔ Protected services verified in Registry: ledger-service, rabbitmq-publisher, notification-service');
+  console.log(
+    '  ✔ Protected services verified in Registry: ledger-service, rabbitmq-publisher, notification-service'
+  );
 
   // 7. Test HTTP Health Endpoint & Prometheus Metrics Exposition
   console.log('\n[7. Testing GET /admin/circuit-breakers & Prometheus Metrics]');
@@ -204,7 +261,9 @@ async function runTests() {
     assert.ok(metricsOutput.includes('vaultcore_circuit_breaker_failures_total'));
     assert.ok(metricsOutput.includes('vaultcore_circuit_breaker_transitions_total'));
     assert.ok(metricsOutput.includes('vaultcore_circuit_breaker_recoveries_total'));
-    console.log('  ✔ Prometheus metrics tracked state, fail-fast, failures, transitions, and recoveries');
+    console.log(
+      '  ✔ Prometheus metrics tracked state, fail-fast, failures, transitions, and recoveries'
+    );
   } finally {
     await new Promise((resolve) => testServer.close(resolve));
     await Promise.allSettled([

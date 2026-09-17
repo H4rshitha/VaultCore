@@ -22,24 +22,28 @@ const tests = [];
   tests.push({
     name: '1. Inspector visible in dev (import.meta.env.DEV === true) and absent in production/preview',
     passed: checksDevOnly,
-    details: 'DevInspector returns null when import.meta.env.DEV is falsy (preview/production build)',
+    details:
+      'DevInspector returns null when import.meta.env.DEV is falsy (preview/production build)',
   });
 }
 
 // 2. Trace IDs and Response time captured in Axios interceptors and displayed in DevInspector
 {
-  const capturesTrace = clientCode.includes('traceId') && clientCode.includes('requestInspectorEmitter.emit');
+  const capturesTrace =
+    clientCode.includes('traceId') && clientCode.includes('requestInspectorEmitter.emit');
   const displaysTrace = devInspectorCode.includes('log.traceId');
   tests.push({
     name: '2. Trace ID captured in Axios interceptors and rendered in UI',
     passed: capturesTrace && displaysTrace,
-    details: 'X-Trace-ID emitted by Axios response interceptor and rendered in DevInspector log items',
+    details:
+      'X-Trace-ID emitted by Axios response interceptor and rendered in DevInspector log items',
   });
 }
 
 // 3. Response time captured and displayed
 {
-  const capturesResponseTime = clientCode.includes('responseTime') && clientCode.includes('_startTime');
+  const capturesResponseTime =
+    clientCode.includes('responseTime') && clientCode.includes('_startTime');
   const displaysResponseTime = devInspectorCode.includes('log.responseTime');
   tests.push({
     name: '3. Response time (ms) measured from request start to response and displayed',
@@ -51,8 +55,7 @@ const tests = [];
 // 4. Copy-to-clipboard for Trace ID
 {
   const hasCopyFunction =
-    devInspectorCode.includes('navigator.clipboard') &&
-    devInspectorCode.includes('handleCopy');
+    devInspectorCode.includes('navigator.clipboard') && devInspectorCode.includes('handleCopy');
   tests.push({
     name: '4. Copy-to-clipboard for Trace ID supported',
     passed: hasCopyFunction,
@@ -63,8 +66,7 @@ const tests = [];
 // 5. Stores only the latest 20 requests
 {
   const limitsTo20 =
-    devInspectorCode.includes('.slice(0, 20)') &&
-    devInspectorCode.includes('/20 calls');
+    devInspectorCode.includes('.slice(0, 20)') && devInspectorCode.includes('/20 calls');
   tests.push({
     name: '5. Stores only latest 20 requests with auto-scroll',
     passed: limitsTo20,
@@ -85,7 +87,8 @@ const tests = [];
     addLog({ id: `req-${i}`, url: `/api/test-${i}`, method: 'GET', status: 200 });
   }
 
-  const correctlyRetained = logs.length === 20 && logs[0].id === 'req-35' && logs[19].id === 'req-16';
+  const correctlyRetained =
+    logs.length === 20 && logs[0].id === 'req-35' && logs[19].id === 'req-16';
   tests.push({
     name: '6. Buffer retention simulation verified (20 most recent items retained)',
     passed: correctlyRetained,

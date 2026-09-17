@@ -30,8 +30,7 @@ const checks = [
   {
     name: '5. Filter change and reset handlers reset pagination stack to page 1',
     passed:
-      txCode.includes('setCursorHistory([null])') &&
-      txCode.includes('setCurrentPageIndex(0)'),
+      txCode.includes('setCursorHistory([null])') && txCode.includes('setCurrentPageIndex(0)'),
   },
   {
     name: '6. Renders Next and Previous buttons in Ledger style footer',
@@ -56,5 +55,7 @@ checks.forEach((c) => {
   console.log(`[${c.passed ? 'PASS' : 'FAIL'}] ${c.name}`);
 });
 
-console.log(`\nResult: ${allPassed ? 'ALL TRANSACTION PAGINATION CHECKS PASSED ✅' : 'FAILURES DETECTED ❌'}`);
+console.log(
+  `\nResult: ${allPassed ? 'ALL TRANSACTION PAGINATION CHECKS PASSED ✅' : 'FAILURES DETECTED ❌'}`
+);
 if (!allPassed) process.exit(1);

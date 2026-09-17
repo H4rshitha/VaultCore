@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Search, User, Mail, Phone, Layers, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react';
+import {
+  Search,
+  User,
+  Mail,
+  Phone,
+  Layers,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  X,
+} from 'lucide-react';
 import { useCustomerSearch } from '../hooks/useAccounts.js';
 
 export const CustomerSearch = ({ selectedCustomer, onSelectCustomer, onClearSelection }) => {
@@ -14,7 +24,12 @@ export const CustomerSearch = ({ selectedCustomer, onSelectCustomer, onClearSele
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { data: searchResults = [], isLoading, isError, error } = useCustomerSearch(debouncedQuery, {
+  const {
+    data: searchResults = [],
+    isLoading,
+    isError,
+    error,
+  } = useCustomerSearch(debouncedQuery, {
     enabled: Boolean(debouncedQuery && !selectedCustomer),
   });
 
@@ -53,7 +68,8 @@ export const CustomerSearch = ({ selectedCustomer, onSelectCustomer, onClearSele
               <div>
                 <div className="flex items-center gap-2">
                   <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                    {selectedCustomer.fullName || `${selectedCustomer.firstName} ${selectedCustomer.lastName}`}
+                    {selectedCustomer.fullName ||
+                      `${selectedCustomer.firstName} ${selectedCustomer.lastName}`}
                   </h4>
                   <span className="px-1.5 py-0.5 text-[10px] font-semibold rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
                     {selectedCustomer.status || 'ACTIVE'}
@@ -74,9 +90,15 @@ export const CustomerSearch = ({ selectedCustomer, onSelectCustomer, onClearSele
             <div className="text-right">
               <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1 justify-end">
                 <Layers className="w-3 h-3" />
-                {selectedCustomer.existingAccountCount ?? selectedCustomer.accountCount ?? (selectedCustomer.accounts?.length || 0)} Accounts
+                {selectedCustomer.existingAccountCount ??
+                  selectedCustomer.accountCount ??
+                  (selectedCustomer.accounts?.length || 0)}{' '}
+                Accounts
               </span>
-              <span className="text-[10px] text-slate-400 font-mono block mt-0.5 truncate max-w-[140px]" title={selectedCustomer.customerId || selectedCustomer.id}>
+              <span
+                className="text-[10px] text-slate-400 font-mono block mt-0.5 truncate max-w-[140px]"
+                title={selectedCustomer.customerId || selectedCustomer.id}
+              >
                 ID: {(selectedCustomer.customerId || selectedCustomer.id)?.slice(0, 8)}...
               </span>
             </div>
@@ -125,12 +147,17 @@ export const CustomerSearch = ({ selectedCustomer, onSelectCustomer, onClearSele
               {searchResults.length === 0 ? (
                 <div className="p-4 text-center text-xs text-slate-500 dark:text-slate-400">
                   <User className="w-6 h-6 mx-auto mb-1.5 text-slate-400 dark:text-slate-600" />
-                  No customer matching <span className="font-semibold text-slate-700 dark:text-slate-300">"{debouncedQuery}"</span> found.
+                  No customer matching{' '}
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                    "{debouncedQuery}"
+                  </span>{' '}
+                  found.
                 </div>
               ) : (
                 searchResults.map((cust) => {
                   const custId = cust.customerId || cust.id;
-                  const count = cust.existingAccountCount ?? cust.accountCount ?? (cust.accounts?.length || 0);
+                  const count =
+                    cust.existingAccountCount ?? cust.accountCount ?? (cust.accounts?.length || 0);
                   return (
                     <button
                       key={custId}

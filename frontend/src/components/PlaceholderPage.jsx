@@ -1,7 +1,12 @@
 import React from 'react';
 import { Clock, Sparkles } from 'lucide-react';
 
-export const PlaceholderPage = ({ title, subtitle, icon: Icon, badge = 'Phase 2 Architecture' }) => {
+export const PlaceholderPage = ({
+  title,
+  subtitle,
+  icon: Icon,
+  badge = 'Phase 2 Architecture',
+}) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[70vh] px-4">
       <div className="w-full max-w-xl p-8 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-900/40 border border-slate-800 backdrop-blur-xl shadow-2xl text-center relative overflow-hidden">
@@ -21,11 +26,10 @@ export const PlaceholderPage = ({ title, subtitle, icon: Icon, badge = 'Phase 2 
         </div>
 
         {/* Headings */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-3">
-          {title}
-        </h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-3">{title}</h1>
         <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-8 max-w-md mx-auto">
-          {subtitle || 'This business module is currently under construction as part of the next phase.'}
+          {subtitle ||
+            'This business module is currently under construction as part of the next phase.'}
         </p>
 
         {/* Status Callout Card */}

@@ -21,7 +21,9 @@ function recordCheck(number, name, pass, details = '') {
 
 // 1. All workflow YAML files exist
 const workflowFiles = ['ci.yml', 'docker-build.yml', 'deploy.yml', 'rollback.yml', 'release.yml'];
-const allWorkflowsExist = workflowFiles.every((file) => fs.existsSync(path.join(workflowsDir, file)));
+const allWorkflowsExist = workflowFiles.every((file) =>
+  fs.existsSync(path.join(workflowsDir, file))
+);
 recordCheck(
   1,
   'All workflow YAML files exist',
@@ -45,7 +47,12 @@ const hasReusableLogic =
   /workflow_call/i.test(rollbackContent) ||
   /workflow_call/i.test(dockerContent) ||
   /actions\/checkout@v4/i.test(ciContent);
-recordCheck(2, 'Reusable workflow logic exists', hasReusableLogic, 'workflow_call and standardized step helpers present');
+recordCheck(
+  2,
+  'Reusable workflow logic exists',
+  hasReusableLogic,
+  'workflow_call and standardized step helpers present'
+);
 
 // 3. GitHub Environments referenced
 const hasEnvironments =
@@ -53,7 +60,12 @@ const hasEnvironments =
   /development/i.test(deployContent) &&
   /staging/i.test(deployContent) &&
   /production/i.test(deployContent);
-recordCheck(3, 'GitHub Environments referenced', hasEnvironments, 'development, staging, and production environments configured');
+recordCheck(
+  3,
+  'GitHub Environments referenced',
+  hasEnvironments,
+  'development, staging, and production environments configured'
+);
 
 // 4. No hardcoded secrets
 const allWorkflowText = `${ciContent}\n${dockerContent}\n${deployContent}\n${rollbackContent}\n${releaseContent}`;
@@ -63,25 +75,42 @@ const usesSecretSyntax =
 const noHardcodedPasswords =
   !/DATABASE_URL:\s*['"]?postgresql:\/\/[^$]/i.test(deployContent) &&
   !/KUBE_CONFIG:\s*['"]?apiVersion/i.test(deployContent);
-recordCheck(4, 'No hardcoded secrets', usesSecretSyntax && noHardcodedPasswords, 'Zero plain-text credentials in workflows');
+recordCheck(
+  4,
+  'No hardcoded secrets',
+  usesSecretSyntax && noHardcodedPasswords,
+  'Zero plain-text credentials in workflows'
+);
 
 // 5. release.yml triggers only on version tags
 const hasTagTriggerOnly =
   /push:\s*tags:\s*-\s*['"]?v/i.test(releaseContent) &&
   !/branches:\s*-\s*['"]?main['"]?/i.test(releaseContent);
-recordCheck(5, 'release.yml triggers only on version tags', hasTagTriggerOnly, "Triggers on 'v*' and 'v*.*.*' tags only");
+recordCheck(
+  5,
+  'release.yml triggers only on version tags',
+  hasTagTriggerOnly,
+  "Triggers on 'v*' and 'v*.*.*' tags only"
+);
 
 // 6. Changelog generation exists
-const hasChangelog =
-  /git\s+log/i.test(releaseContent) &&
-  /changelog/i.test(releaseContent);
-recordCheck(6, 'Changelog generation exists', hasChangelog, 'Automatic git log changelog generator');
+const hasChangelog = /git\s+log/i.test(releaseContent) && /changelog/i.test(releaseContent);
+recordCheck(
+  6,
+  'Changelog generation exists',
+  hasChangelog,
+  'Automatic git log changelog generator'
+);
 
 // 7. GitHub Release creation exists
 const hasReleaseCreation =
-  /action-gh-release/i.test(releaseContent) ||
-  /create-release/i.test(releaseContent);
-recordCheck(7, 'GitHub Release creation exists', hasReleaseCreation, 'softprops/action-gh-release integration');
+  /action-gh-release/i.test(releaseContent) || /create-release/i.test(releaseContent);
+recordCheck(
+  7,
+  'GitHub Release creation exists',
+  hasReleaseCreation,
+  'softprops/action-gh-release integration'
+);
 
 // 8. Deployment metadata included
 const hasMetadata =
@@ -89,7 +118,12 @@ const hasMetadata =
   /gitSha/i.test(releaseContent) &&
   /releaseTimestamp/i.test(releaseContent) &&
   /dockerImages/i.test(releaseContent);
-recordCheck(8, 'Deployment metadata included', hasMetadata, 'Git SHA, timestamp, environment, Docker tags');
+recordCheck(
+  8,
+  'Deployment metadata included',
+  hasMetadata,
+  'Git SHA, timestamp, environment, Docker tags'
+);
 
 // 9. Documentation file exists
 const docExists = fs.existsSync(docPath);

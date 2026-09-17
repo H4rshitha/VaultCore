@@ -55,7 +55,9 @@ export const Sidebar = ({ isOpen, onClose }) => {
                 PROD
               </span>
             </span>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Distributed Banking</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+              Distributed Banking
+            </p>
           </div>
         </div>
 
@@ -99,7 +101,9 @@ export const Sidebar = ({ isOpen, onClose }) => {
           <div className="rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/60 p-3">
             <div className="flex items-center gap-2 mb-1.5">
               <Layers className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
-              <span className="text-xs font-semibold text-slate-800 dark:text-slate-300">Cluster Status</span>
+              <span className="text-xs font-semibold text-slate-800 dark:text-slate-300">
+                Cluster Status
+              </span>
             </div>
             <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span>PostgreSQL & Redis</span>

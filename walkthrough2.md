@@ -17,6 +17,7 @@ stateDiagram-v2
 ```
 
 ### State Behaviors
+
 - **`CLOSED`**: Normal execution. Tracks consecutive failures. Tripped to `OPEN` when failure count reaches **5 failures**.
 - **`OPEN`**: Immediate fail-fast. No downstream network calls are attempted during the 30-second window. Requests throw `CircuitBreakerOpenError` / HTTP 503 with `Retry-After: <seconds>`.
 - **`HALF_OPEN`**: Automatically probes downstream after **30 seconds**. Requires **3 consecutive successful requests** to recover to `CLOSED`. Any failure immediately returns the circuit to `OPEN`.
@@ -25,19 +26,21 @@ stateDiagram-v2
 
 ## 2. Protected Services & Integration Points
 
-| Protected Dependency | Integration Layer | File | Protection Mechanism |
-| :--- | :--- | :--- | :--- |
-| **Ledger Service** | `Payment Service → LedgerClient` | [`ledgerClient.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/payment-service/src/clients/ledgerClient.js) | Wrapped with `ledgerCircuitBreaker.execute()`. 4xx validation errors bypass tripping. |
-| **RabbitMQ Publisher** | `Outbox Worker → OutboxPublisher` | [`outboxPublisher.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/payment-service/src/services/outboxPublisher.js) | Wrapped with `rabbitmqCircuitBreaker.execute()`. Prevents thundering herd on message broker. |
-| **Notification Service** | `Gateway Proxy → Notification Service` | [`proxyFactory.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/gateway/src/middleware/proxyFactory.js) | Circuit breaker on reverse proxy; returns fast 503 when circuit is `OPEN`. |
+| Protected Dependency     | Integration Layer                      | File                                                                                                                                   | Protection Mechanism                                                                         |
+| :----------------------- | :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------- |
+| **Ledger Service**       | `Payment Service → LedgerClient`       | [`ledgerClient.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/payment-service/src/clients/ledgerClient.js)        | Wrapped with `ledgerCircuitBreaker.execute()`. 4xx validation errors bypass tripping.        |
+| **RabbitMQ Publisher**   | `Outbox Worker → OutboxPublisher`      | [`outboxPublisher.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/payment-service/src/services/outboxPublisher.js) | Wrapped with `rabbitmqCircuitBreaker.execute()`. Prevents thundering herd on message broker. |
+| **Notification Service** | `Gateway Proxy → Notification Service` | [`proxyFactory.js`](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/gateway/src/middleware/proxyFactory.js)             | Circuit breaker on reverse proxy; returns fast 503 when circuit is `OPEN`.                   |
 
 ---
 
 ## 3. Observability, Metrics & Admin Health API
 
 ### Admin Circuit Breaker Endpoint
+
 - `GET /admin/circuit-breakers` and `GET /api/v1/admin/circuit-breakers`
 - Returns comprehensive status of every downstream circuit breaker:
+
 ```json
 {
   "success": true,
@@ -66,6 +69,7 @@ stateDiagram-v2
 ```
 
 ### Prometheus Metrics ([metrics.js](file:///c:/Users/HARSHITHA/OneDrive/Desktop/VaultCore/services/gateway/src/middleware/metrics.js))
+
 - `vaultcore_circuit_breaker_state{service="ledger-service|rabbitmq-publisher|notification-service"}` (0=CLOSED, 1=HALF_OPEN, 2=OPEN)
 - `vaultcore_circuit_breaker_fail_fast_total{service="..."}`
 - `vaultcore_circuit_breaker_failures_total{service="..."}`
@@ -73,6 +77,7 @@ stateDiagram-v2
 - `vaultcore_circuit_breaker_recoveries_total{service="..."}`
 
 ### Structured Logging
+
 All state transitions, failures, and fail-fast events emit structured logs with `traceId`, `serviceName`, `circuitState`, `failureReason`, and `failFastCount`.
 
 ---

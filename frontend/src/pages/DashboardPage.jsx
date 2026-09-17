@@ -119,7 +119,9 @@ export const DashboardPage = () => {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh All Accounts"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+            />
             <span className="hidden sm:inline">Refresh</span>
           </button>
           <button
@@ -138,9 +140,13 @@ export const DashboardPage = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-200">Unable to load accounts</p>
+              <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                Unable to load accounts
+              </p>
               <p className="text-xs text-red-600 dark:text-red-400/80">
-                {error?.response?.data?.message || error?.message || 'Network error communicating with Gateway'}
+                {error?.response?.data?.message ||
+                  error?.message ||
+                  'Network error communicating with Gateway'}
               </p>
             </div>
           </div>
@@ -152,7 +158,6 @@ export const DashboardPage = () => {
           </button>
         </div>
       )}
-
 
       {/* 3. Summary Stats Cards */}
       <BalanceSummaryCard accounts={accounts} isLoading={isLoading} />
@@ -172,8 +177,12 @@ export const DashboardPage = () => {
               <ArrowLeftRight className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white block">Transfer Money</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Instant ACID payment</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                Transfer Money
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Instant ACID payment
+              </span>
             </div>
           </button>
 
@@ -186,8 +195,12 @@ export const DashboardPage = () => {
               <Wallet className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white block">View Accounts</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Manage all portfolios</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                View Accounts
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Manage all portfolios
+              </span>
             </div>
           </button>
 
@@ -200,8 +213,12 @@ export const DashboardPage = () => {
               <ReceiptText className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white block">Transactions</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">History & audit logs</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                Transactions
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                History & audit logs
+              </span>
             </div>
           </button>
 
@@ -214,8 +231,12 @@ export const DashboardPage = () => {
               <Bell className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-xs font-bold text-slate-900 dark:text-white block">Notifications</span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Email & SMS alerts</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                Notifications
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Email & SMS alerts
+              </span>
             </div>
           </button>
         </div>
@@ -226,7 +247,9 @@ export const DashboardPage = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Recent Accounts</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Your most active bank accounts</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Your most active bank accounts
+            </p>
           </div>
           {accounts.length > 0 && (
             <button
@@ -249,9 +272,12 @@ export const DashboardPage = () => {
             <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mb-3">
               <Wallet className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">No Bank Accounts Found</h3>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">
+              No Bank Accounts Found
+            </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
-              You haven't opened any bank accounts yet. Create your first Checking or Savings account to begin transferring funds.
+              You haven't opened any bank accounts yet. Create your first Checking or Savings
+              account to begin transferring funds.
             </p>
             <button
               onClick={() => setIsCreateModalOpen(true)}
@@ -275,10 +301,7 @@ export const DashboardPage = () => {
       </div>
 
       {/* 6. Create Account Modal */}
-      <CreateAccountModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
+      <CreateAccountModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
     </div>
   );
 };

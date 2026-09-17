@@ -16,9 +16,29 @@ const router = Router();
 router.use(authenticateToken);
 
 router.post('/transfer', transferValidation, validateRequest, PaymentController.transfer);
-router.get('/history', listPaymentsQueryValidation, validateRequest, PaymentController.getPaymentHistory);
-router.get('/search', searchPaymentsQueryValidation, validateRequest, PaymentController.searchPayments);
-router.get('/summary', getPaymentSummaryValidation, validateRequest, PaymentController.getPaymentSummary);
-router.get('/:referenceId', getPaymentParamsValidation, validateRequest, PaymentController.getPaymentByReference);
+router.get(
+  '/history',
+  listPaymentsQueryValidation,
+  validateRequest,
+  PaymentController.getPaymentHistory
+);
+router.get(
+  '/search',
+  searchPaymentsQueryValidation,
+  validateRequest,
+  PaymentController.searchPayments
+);
+router.get(
+  '/summary',
+  getPaymentSummaryValidation,
+  validateRequest,
+  PaymentController.getPaymentSummary
+);
+router.get(
+  '/:referenceId',
+  getPaymentParamsValidation,
+  validateRequest,
+  PaymentController.getPaymentByReference
+);
 
 export default router;

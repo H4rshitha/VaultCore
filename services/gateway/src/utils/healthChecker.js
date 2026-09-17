@@ -77,7 +77,7 @@ const checkMicroserviceLive = async (serviceName, baseUrl, timeoutMs = 2000) => 
       status: res && res.ok ? 'UP' : 'DOWN',
       statusCode: res ? res.status : 500,
       latencyMs,
-      endpoint: res && res.ok ? (res.url || url) : url,
+      endpoint: res && res.ok ? res.url || url : url,
     };
   } catch (error) {
     return {
@@ -100,7 +100,10 @@ export class HealthChecker {
         await prisma.$queryRaw`SELECT 1`;
         return { status: 'UP', latencyMs: Date.now() - startTime };
       }
-      return await checkTcp(process.env.DB_HOST || 'localhost', parseInt(process.env.DB_PORT || '5433', 10));
+      return await checkTcp(
+        process.env.DB_HOST || 'localhost',
+        parseInt(process.env.DB_PORT || '5433', 10)
+      );
     } catch (error) {
       return { status: 'DOWN', error: error.message, latencyMs: Date.now() - startTime };
     }
@@ -146,18 +149,20 @@ export class HealthChecker {
    * Enhanced Readiness probe checking PostgreSQL, Redis, RabbitMQ, and all 5 microservices
    */
   static async getReadiness() {
-    const [postgres, redis, rabbitmq, auth, account, payment, ledger, notification] = await Promise.all([
-      HealthChecker.checkPostgres(),
-      HealthChecker.checkRedis(),
-      HealthChecker.checkRabbitMQ(),
-      checkMicroserviceLive('auth', config.services.auth),
-      checkMicroserviceLive('account', config.services.account),
-      checkMicroserviceLive('payment', config.services.payment),
-      checkMicroserviceLive('ledger', config.services.ledger),
-      checkMicroserviceLive('notification', config.services.notification),
-    ]);
+    const [postgres, redis, rabbitmq, auth, account, payment, ledger, notification] =
+      await Promise.all([
+        HealthChecker.checkPostgres(),
+        HealthChecker.checkRedis(),
+        HealthChecker.checkRabbitMQ(),
+        checkMicroserviceLive('auth', config.services.auth),
+        checkMicroserviceLive('account', config.services.account),
+        checkMicroserviceLive('payment', config.services.payment),
+        checkMicroserviceLive('ledger', config.services.ledger),
+        checkMicroserviceLive('notification', config.services.notification),
+      ]);
 
-    const infraHealthy = postgres.status === 'UP' && redis.status === 'UP' && rabbitmq.status === 'UP';
+    const infraHealthy =
+      postgres.status === 'UP' && redis.status === 'UP' && rabbitmq.status === 'UP';
     const isReady = infraHealthy;
 
     return {

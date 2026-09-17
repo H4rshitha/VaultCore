@@ -9,7 +9,9 @@ export const authenticateInternalService = (req, res, next) => {
   const serviceApiKey = req.headers['x-service-api-key'];
 
   if (!serviceApiKey) {
-    return next(new UnauthorizedError('Missing required internal service API key (x-service-api-key)'));
+    return next(
+      new UnauthorizedError('Missing required internal service API key (x-service-api-key)')
+    );
   }
 
   if (serviceApiKey !== config.internalApiKey) {

@@ -23,11 +23,17 @@ export const TransactionCard = ({ transaction }) => {
   const referenceId = transaction.referenceId || transaction.id || transaction._id || 'TX-UNKNOWN';
   const status = (transaction.status || 'COMPLETED').toUpperCase();
   const type = (transaction.type || 'TRANSFER').toUpperCase();
-  const amount = typeof transaction.amount === 'number' ? transaction.amount : parseFloat(transaction.amount) || 0;
+  const amount =
+    typeof transaction.amount === 'number'
+      ? transaction.amount
+      : parseFloat(transaction.amount) || 0;
   const currency = transaction.currency || 'USD';
-  const createdAt = transaction.createdAt || transaction.timestamp || transaction.date || new Date().toISOString();
-  const sourceAccount = transaction.sourceAccountNumber || transaction.sourceAccount || transaction.fromAccount;
-  const targetAccount = transaction.targetAccountNumber || transaction.targetAccount || transaction.toAccount;
+  const createdAt =
+    transaction.createdAt || transaction.timestamp || transaction.date || new Date().toISOString();
+  const sourceAccount =
+    transaction.sourceAccountNumber || transaction.sourceAccount || transaction.fromAccount;
+  const targetAccount =
+    transaction.targetAccountNumber || transaction.targetAccount || transaction.toAccount;
   const description = transaction.description || transaction.note || transaction.reference;
 
   // Determine Debit vs Credit visual layout
@@ -110,18 +116,20 @@ export const TransactionCard = ({ transaction }) => {
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5 max-w-[200px] sm:max-w-md">
-              {description || (sourceAccount && targetAccount ? `Transfer to ${maskAccountNumber(targetAccount)}` : 'Payment Transaction')}
+              {description ||
+                (sourceAccount && targetAccount
+                  ? `Transfer to ${maskAccountNumber(targetAccount)}`
+                  : 'Payment Transaction')}
             </p>
           </div>
         </div>
 
         <div className="text-right flex-shrink-0">
           <div className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white tracking-tight">
-            {isDebit ? '-' : '+'}{formatCurrency(amount, currency)}
+            {isDebit ? '-' : '+'}
+            {formatCurrency(amount, currency)}
           </div>
-          <div className="mt-1 flex items-center justify-end gap-2">
-            {getStatusChip(status)}
-          </div>
+          <div className="mt-1 flex items-center justify-end gap-2">{getStatusChip(status)}</div>
         </div>
       </div>
 
@@ -133,13 +141,19 @@ export const TransactionCard = ({ transaction }) => {
               Reference ID
             </span>
             <div className="flex items-center gap-2 mt-1">
-              <span className="font-mono text-slate-800 dark:text-slate-300 select-all">{referenceId}</span>
+              <span className="font-mono text-slate-800 dark:text-slate-300 select-all">
+                {referenceId}
+              </span>
               <button
                 onClick={handleCopy}
                 className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                 title="Copy Reference ID"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
           </div>

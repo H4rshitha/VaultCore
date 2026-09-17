@@ -56,10 +56,10 @@ export function parsePrometheusText(text) {
 
   return {
     httpRequestsTotal: foundRequests ? httpRequestsTotal : 'Unavailable',
-    httpErrorsTotal: foundErrors ? httpErrorsTotal : (foundRequests ? 0 : 'Unavailable'),
+    httpErrorsTotal: foundErrors ? httpErrorsTotal : foundRequests ? 0 : 'Unavailable',
     httpActiveRequests: foundActive ? httpActiveRequests : 'Unavailable',
     rateLimitAllowedTotal,
-    rateLimitBlockedTotal: foundBlocked ? rateLimitBlockedTotal : (foundRequests ? 0 : 'Unavailable'),
+    rateLimitBlockedTotal: foundBlocked ? rateLimitBlockedTotal : foundRequests ? 0 : 'Unavailable',
     raw: text,
   };
 }
@@ -102,10 +102,14 @@ export const useAdminHealth = (options = {}) => {
         adminApi.getNotificationStatus(),
       ]);
 
-      const overview = overviewRes.status === 'fulfilled' ? overviewRes.value?.data || overviewRes.value : {};
-      const readiness = readinessRes.status === 'fulfilled' ? readinessRes.value?.data || readinessRes.value : {};
-      const outbox = outboxRes.status === 'fulfilled' ? outboxRes.value?.data || outboxRes.value : {};
-      const notification = notifRes.status === 'fulfilled' ? notifRes.value?.data || notifRes.value : {};
+      const overview =
+        overviewRes.status === 'fulfilled' ? overviewRes.value?.data || overviewRes.value : {};
+      const readiness =
+        readinessRes.status === 'fulfilled' ? readinessRes.value?.data || readinessRes.value : {};
+      const outbox =
+        outboxRes.status === 'fulfilled' ? outboxRes.value?.data || outboxRes.value : {};
+      const notification =
+        notifRes.status === 'fulfilled' ? notifRes.value?.data || notifRes.value : {};
 
       return {
         overview,
@@ -137,7 +141,7 @@ export const useMetrics = (options = {}) => {
     queryKey: ['admin', 'metrics'],
     queryFn: async () => {
       const res = await adminApi.getMetrics();
-      const rawText = typeof res === 'string' ? res : (res?.data || '');
+      const rawText = typeof res === 'string' ? res : res?.data || '';
       return parsePrometheusText(rawText);
     },
     staleTime: 10000,

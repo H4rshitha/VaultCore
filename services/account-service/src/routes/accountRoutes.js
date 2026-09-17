@@ -15,7 +15,17 @@ router.use(authenticateToken);
 
 router.post('/', createAccountValidation, validateRequest, AccountController.createAccount);
 router.get('/', listAccountsQueryValidation, validateRequest, AccountController.getUserAccounts);
-router.get('/:accountNumber', getAccountParamsValidation, validateRequest, AccountController.getAccountDetails);
-router.get('/:accountNumber/balance', getAccountParamsValidation, validateRequest, AccountController.getAccountBalance);
+router.get(
+  '/:accountNumber',
+  getAccountParamsValidation,
+  validateRequest,
+  AccountController.getAccountDetails
+);
+router.get(
+  '/:accountNumber/balance',
+  getAccountParamsValidation,
+  validateRequest,
+  AccountController.getAccountBalance
+);
 
 export default router;

@@ -36,7 +36,9 @@ console.log(`  isRead(${testId2}): ${notificationStorage.isRead(testId2, now)} (
 // 4. New notification created after markAll
 const futureTime = new Date(Date.now() + 100000).toISOString();
 const newId = 'notif-103';
-console.log(`  New notification created after markAll (${newId}): ${notificationStorage.isRead(newId, futureTime)} (Expected: false)`);
+console.log(
+  `  New notification created after markAll (${newId}): ${notificationStorage.isRead(newId, futureTime)} (Expected: false)`
+);
 
 const pass =
   notificationStorage.isRead(testId1) === true &&

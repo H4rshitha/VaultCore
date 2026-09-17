@@ -24,6 +24,7 @@ VaultCore is organized into dedicated microservices, each built with **Productio
 - `notification-service` (Port `3005`): Asynchronous RabbitMQ subscriber for dispatching customer notifications.
 
 ### Supporting Directories
+
 - `shared/`: Common middleware, HTTP error handling, Winston logging, Redis, and RabbitMQ wrappers.
 - `infrastructure/`: Production Dockerfiles and Kubernetes manifests (Deployments, StatefulSets, ConfigMaps, Ingress).
 - `monitoring/`: Prometheus scrape configuration and Grafana dashboard provisioning.
@@ -70,6 +71,7 @@ docker compose up --build
 ## Documentation
 
 For complete detailed guides:
+
 - [Architecture Overview](docs/architecture.md)
 - [API Specifications](docs/api-spec.md)
 - [Getting Started & Local Development](docs/getting-started.md)

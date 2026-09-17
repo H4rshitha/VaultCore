@@ -6,7 +6,9 @@ import { NotificationService } from '../services/notification-service/src/servic
 import { NotificationConsumer } from '../services/notification-service/src/services/notificationConsumer.js';
 import { createLogger, NOTIFICATION_QUEUES } from '@vaultcore/shared';
 
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public';
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public';
 
 const prisma = new PrismaClient();
 const logger = createLogger('test-notification');
@@ -37,7 +39,9 @@ async function runTests() {
   assert.strictEqual(typeof consumer.stop, 'function');
   assert.strictEqual(typeof consumer.getMetrics, 'function');
   assert.strictEqual(typeof consumer.sendToDLQ, 'function');
-  console.log('  ✔ All required methods exist on NotificationRepository, NotificationService, and NotificationConsumer');
+  console.log(
+    '  ✔ All required methods exist on NotificationRepository, NotificationService, and NotificationConsumer'
+  );
 
   // 2. Test Message Template Formatting & Recipient Resolution
   console.log('\n[2. Testing Notification Template Formatting & Recipient Resolution]');
@@ -78,7 +82,9 @@ async function runTests() {
   assert.strictEqual(deliveryResult.notificationType, 'EMAIL');
   assert.strictEqual(deliveryResult.recipient, 'alice@example.com');
   assert.ok(deliveryResult.deliveryId);
-  console.log(`  ✔ Simulated delivery succeeded with deliveryId: ${deliveryResult.deliveryId}, latency: ${deliveryResult.latencyMs}ms`);
+  console.log(
+    `  ✔ Simulated delivery succeeded with deliveryId: ${deliveryResult.deliveryId}, latency: ${deliveryResult.latencyMs}ms`
+  );
 
   // 4. Test In-Memory Database / Mock Repository for Idempotency & Persistence
   console.log('\n[4. Testing NotificationAudit Persistence & Idempotency]');
@@ -138,7 +144,11 @@ async function runTests() {
   const existing1 = await testRepo.findByEventId(event1.eventId);
   assert.strictEqual(existing1, null);
 
-  const formatted1 = testService.formatMessage('PAYMENT_COMPLETED', event1.routingKey, event1.payload);
+  const formatted1 = testService.formatMessage(
+    'PAYMENT_COMPLETED',
+    event1.routingKey,
+    event1.payload
+  );
   await testService.deliverNotification({
     notificationType: 'EMAIL',
     recipient: event1.payload.recipient,
@@ -178,7 +188,12 @@ async function runTests() {
       dlqMessages.push({ queue, content: JSON.parse(content.toString()), options });
     },
     publish: (exchange, routingKey, content, options) => {
-      publishedRetries.push({ exchange, routingKey, content: JSON.parse(content.toString()), options });
+      publishedRetries.push({
+        exchange,
+        routingKey,
+        content: JSON.parse(content.toString()),
+        options,
+      });
     },
     ack: () => {},
   };
@@ -192,11 +207,13 @@ async function runTests() {
 
   // Simulate transient failure: Attempt 1 -> Retry 1
   const retryEvent = {
-    content: Buffer.from(JSON.stringify({
-      eventId: 'evt-retry-002',
-      transactionId: 'tx-002',
-      payload: { amount: 75, recipient: 'bob@example.com', simulateFailure: true },
-    })),
+    content: Buffer.from(
+      JSON.stringify({
+        eventId: 'evt-retry-002',
+        transactionId: 'tx-002',
+        payload: { amount: 75, recipient: 'bob@example.com', simulateFailure: true },
+      })
+    ),
     properties: { headers: { eventId: 'evt-retry-002', retryAttempt: 0 } },
     fields: { routingKey: 'payment.completed' },
   };
@@ -212,7 +229,9 @@ async function runTests() {
   assert.strictEqual(dlqMessages.length, 1);
   assert.strictEqual(dlqMessages[0].queue, NOTIFICATION_QUEUES.DLQ);
   assert.strictEqual(testConsumer.metrics.dlqCount, 1);
-  console.log('  ✔ Exceeded max retries (3) correctly routed message to DLQ queue: vaultcore.notifications.dlq');
+  console.log(
+    '  ✔ Exceeded max retries (3) correctly routed message to DLQ queue: vaultcore.notifications.dlq'
+  );
 
   // Record failed audit
   await testRepo.createAudit({

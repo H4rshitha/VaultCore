@@ -68,15 +68,15 @@ export const TopNavbar = ({ onOpenSidebar }) => {
             connectionStatus === 'CONNECTED'
               ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 shadow-sm'
               : connectionStatus === 'RECONNECTING'
-              ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20 animate-pulse'
-              : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/20'
+                ? 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-500/20 animate-pulse'
+                : 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-200 dark:border-rose-500/20 hover:bg-rose-100 dark:hover:bg-rose-500/20'
           }`}
           title={
             connectionStatus === 'CONNECTED'
               ? 'Real-Time SSE Connected: Banking events streaming live'
               : connectionStatus === 'RECONNECTING'
-              ? 'Reconnecting to live banking event stream...'
-              : 'Offline - Click to reconnect real-time stream'
+                ? 'Reconnecting to live banking event stream...'
+                : 'Offline - Click to reconnect real-time stream'
           }
         >
           <span
@@ -84,16 +84,16 @@ export const TopNavbar = ({ onOpenSidebar }) => {
               connectionStatus === 'CONNECTED'
                 ? 'bg-emerald-500 dark:bg-emerald-400 animate-pulse'
                 : connectionStatus === 'RECONNECTING'
-                ? 'bg-amber-500 dark:bg-amber-400 animate-ping'
-                : 'bg-rose-500 dark:bg-rose-400'
+                  ? 'bg-amber-500 dark:bg-amber-400 animate-ping'
+                  : 'bg-rose-500 dark:bg-rose-400'
             }`}
           />
           <span className="font-semibold text-[11px] capitalize">
             {connectionStatus === 'CONNECTED'
               ? 'Live'
               : connectionStatus === 'RECONNECTING'
-              ? 'Reconnecting'
-              : 'Offline'}
+                ? 'Reconnecting'
+                : 'Offline'}
           </span>
         </button>
 
@@ -127,7 +127,11 @@ export const TopNavbar = ({ onOpenSidebar }) => {
           aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
           title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-          {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
+          {isDark ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-700" />
+          )}
         </button>
 
         {/* User Avatar & Info */}

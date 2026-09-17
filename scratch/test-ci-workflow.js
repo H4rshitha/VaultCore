@@ -48,37 +48,69 @@ const content = fs.readFileSync(ciPath, 'utf8');
 
 // 2. YAML syntax valid
 const yamlValidation = validateYamlStructure(content);
-recordCheck('YAML syntax valid', yamlValidation.valid, yamlValidation.error || 'Indentation and structure valid');
+recordCheck(
+  'YAML syntax valid',
+  yamlValidation.valid,
+  yamlValidation.error || 'Indentation and structure valid'
+);
 
 // 3. Trigger configuration
 const hasPullRequest = /pull_request:\s*(branches:\s*-\s*['"]?\*\*['"]?)?/i.test(content);
 const hasPush = /push:\s*branches:\s*-\s*['"]?\*\*['"]?\s*tags-ignore:/i.test(content);
-recordCheck('Triggers: Pull Requests & Push (excluding tags)', hasPullRequest && hasPush, 'PRs and push to branches, tags-ignore');
+recordCheck(
+  'Triggers: Pull Requests & Push (excluding tags)',
+  hasPullRequest && hasPush,
+  'PRs and push to branches, tags-ignore'
+);
 
 // 4. Refinement 17.1A: Concurrency configuration
-const hasConcurrency = /concurrency:\s*group:\s*ci-\${{\s*github\.ref\s*}}\s*cancel-in-progress:\s*true/i.test(content);
-recordCheck('Refinement 17.1A — Concurrency control (ci-${{ github.ref }}, cancel-in-progress)', hasConcurrency, 'Cancels outdated CI runs for PRs');
+const hasConcurrency =
+  /concurrency:\s*group:\s*ci-\${{\s*github\.ref\s*}}\s*cancel-in-progress:\s*true/i.test(content);
+recordCheck(
+  'Refinement 17.1A — Concurrency control (ci-${{ github.ref }}, cancel-in-progress)',
+  hasConcurrency,
+  'Cancels outdated CI runs for PRs'
+);
 
 // 5. Refinement 17.1B: Prisma binary caching
-const hasPrismaCache = /actions\/cache@v4/i.test(content) &&
+const hasPrismaCache =
+  /actions\/cache@v4/i.test(content) &&
   /path:\s*~?\/?\.cache\/prisma/i.test(content) &&
-  /key:\s*prisma-\${{\s*runner\.os\s*}}-\${{\s*hashFiles\(['"]\*\*\/schema\.prisma['"]\)\s*}}/i.test(content);
-recordCheck('Refinement 17.1B — Cache Prisma engines (~/.cache/prisma)', hasPrismaCache, 'actions/cache@v4 for Prisma engine binaries');
+  /key:\s*prisma-\${{\s*runner\.os\s*}}-\${{\s*hashFiles\(['"]\*\*\/schema\.prisma['"]\)\s*}}/i.test(
+    content
+  );
+recordCheck(
+  'Refinement 17.1B — Cache Prisma engines (~/.cache/prisma)',
+  hasPrismaCache,
+  'actions/cache@v4 for Prisma engine binaries'
+);
 
 // 6. Node 22 setup & npm cache
 const hasNode22 = /node-version:\s*22/.test(content) && /actions\/setup-node@v4/.test(content);
 const hasNpmCache = /cache:\s*['"]npm['"]/.test(content);
-recordCheck('Node 22 runtime & npm cache', hasNode22 && hasNpmCache, 'actions/setup-node@v4 with Node 22 and npm cache');
+recordCheck(
+  'Node 22 runtime & npm cache',
+  hasNode22 && hasNpmCache,
+  'actions/setup-node@v4 with Node 22 and npm cache'
+);
 
 // 7. Prisma validation & generate step exists
 const hasPrismaValidate = /prisma\s+validate/i.test(content);
 const hasPrismaGenerate = /prisma\s+generate/i.test(content);
-recordCheck('Prisma schema validation & generate', hasPrismaValidate && hasPrismaGenerate, 'npx prisma validate & generate');
+recordCheck(
+  'Prisma schema validation & generate',
+  hasPrismaValidate && hasPrismaGenerate,
+  'npx prisma validate & generate'
+);
 
 // 8. ESLint & Prettier
 const hasEslint = /eslint/i.test(content);
 const hasPrettier = /prettier/i.test(content);
-recordCheck('Code quality (ESLint & Prettier)', hasEslint && hasPrettier, 'Zero lint errors & formatting checks');
+recordCheck(
+  'Code quality (ESLint & Prettier)',
+  hasEslint && hasPrettier,
+  'Zero lint errors & formatting checks'
+);
 
 // 9. npm security audit
 const hasNpmAudit = /npm\s+audit\s+--omit=dev/i.test(content);
@@ -93,16 +125,31 @@ const hasAllServices =
   /payment-service/.test(content) &&
   /ledger-service/.test(content) &&
   /notification-service/.test(content);
-recordCheck('Backend unit tests (6 services)', hasBackendTests && hasAllServices, 'gateway, auth, account, payment, ledger, notification');
+recordCheck(
+  'Backend unit tests (6 services)',
+  hasBackendTests && hasAllServices,
+  'gateway, auth, account, payment, ledger, notification'
+);
 
 // 11. Frontend tests & build
 const hasFrontendTests = /frontend-tests/i.test(content) && /run\s+build/i.test(content);
-recordCheck('Frontend tests & production build', hasFrontendTests, 'frontend-tests job with Vite production build');
+recordCheck(
+  'Frontend tests & production build',
+  hasFrontendTests,
+  'frontend-tests job with Vite production build'
+);
 
 // 12. Integration tests (PostgreSQL, Redis, RabbitMQ)
 const hasIntegrationTests = /integration-tests/i.test(content);
-const hasServices = /postgres:15-alpine/i.test(content) && /redis:7-alpine/i.test(content) && /rabbitmq:3-management-alpine/i.test(content);
-recordCheck('Integration tests with services', hasIntegrationTests && hasServices, 'postgres:15-alpine, redis:7-alpine, rabbitmq:3-management-alpine');
+const hasServices =
+  /postgres:15-alpine/i.test(content) &&
+  /redis:7-alpine/i.test(content) &&
+  /rabbitmq:3-management-alpine/i.test(content);
+recordCheck(
+  'Integration tests with services',
+  hasIntegrationTests && hasServices,
+  'postgres:15-alpine, redis:7-alpine, rabbitmq:3-management-alpine'
+);
 
 // 13. Refinement 17.1C: Upload test reports separately
 const hasBackendCoverageArtifact = /name:\s*backend-coverage/i.test(content);
@@ -121,7 +168,9 @@ recordCheck('GitHub Step Summary reporting', hasSummary, '$GITHUB_STEP_SUMMARY m
 console.log('\n======================================================');
 const allPassed = checks.every((c) => c.pass);
 if (allPassed) {
-  console.log(`🎉 All ${checks.length}/${checks.length} CI foundation and refinement checks PASSED!`);
+  console.log(
+    `🎉 All ${checks.length}/${checks.length} CI foundation and refinement checks PASSED!`
+  );
   process.exit(0);
 } else {
   const failed = checks.filter((c) => !c.pass);

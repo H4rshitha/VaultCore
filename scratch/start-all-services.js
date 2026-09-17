@@ -35,7 +35,9 @@ function startService(svc) {
   child.on('exit', (code, signal) => {
     processMap.delete(svc.name);
     if (!isShuttingDown) {
-      console.warn(`[Cluster Supervisor] ${svc.name} exited (code: ${code}, signal: ${signal}). Auto-restarting in 1s...`);
+      console.warn(
+        `[Cluster Supervisor] ${svc.name} exited (code: ${code}, signal: ${signal}). Auto-restarting in 1s...`
+      );
       setTimeout(() => startService(svc), 1000);
     }
   });

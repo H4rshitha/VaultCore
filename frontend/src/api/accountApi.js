@@ -23,7 +23,10 @@ export const accountApi = {
     const payload = {
       type: normalizedType,
       currency: (data.currency || 'USD').toUpperCase(),
-      initialDeposit: typeof data.initialDeposit === 'number' ? data.initialDeposit : parseFloat(data.initialDeposit) || 0,
+      initialDeposit:
+        typeof data.initialDeposit === 'number'
+          ? data.initialDeposit
+          : parseFloat(data.initialDeposit) || 0,
       ...(data.customerId ? { customerId: data.customerId } : {}),
     };
 

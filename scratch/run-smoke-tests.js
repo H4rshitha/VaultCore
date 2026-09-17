@@ -32,7 +32,8 @@ async function executeTest(name, method, endpoint, options = {}) {
   };
 
   if (options.body) {
-    fetchOptions.body = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+    fetchOptions.body =
+      typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
   }
 
   let status = null;
@@ -161,8 +162,12 @@ async function runAllSmokeTests() {
 
     console.log(`   🏦 Using Account Number: ${accountNumber}`);
 
-    await executeTest('Get Account Details', 'GET', `/accounts/${accountNumber}`, { headers: authHeaders });
-    await executeTest('Get Account Balance', 'GET', `/accounts/${accountNumber}/balance`, { headers: authHeaders });
+    await executeTest('Get Account Details', 'GET', `/accounts/${accountNumber}`, {
+      headers: authHeaders,
+    });
+    await executeTest('Get Account Balance', 'GET', `/accounts/${accountNumber}/balance`, {
+      headers: authHeaders,
+    });
 
     // 4. Payment Flow
     console.log('\n--- 4. Payment & Transfer Flow ---');
@@ -171,16 +176,25 @@ async function runAllSmokeTests() {
 
     // 5. Notification Flow
     console.log('\n--- 5. Notification System Flow ---');
-    await executeTest('Get Notification History', 'GET', '/notifications/history', { headers: authHeaders });
-
-    // 6. Ledger Flow
-    console.log('\n--- 6. Core Ledger Audit Flow ---');
-    await executeTest('Get Ledger Entries for Account', 'GET', `/ledger/accounts/${accountNumber}/entries`, {
+    await executeTest('Get Notification History', 'GET', '/notifications/history', {
       headers: authHeaders,
     });
 
+    // 6. Ledger Flow
+    console.log('\n--- 6. Core Ledger Audit Flow ---');
+    await executeTest(
+      'Get Ledger Entries for Account',
+      'GET',
+      `/ledger/accounts/${accountNumber}/entries`,
+      {
+        headers: authHeaders,
+      }
+    );
+
     console.log('\n======================================================');
-    console.log(`🎉 All ${smokeResults.length}/${smokeResults.length} Smoke Tests Passed Successfully!`);
+    console.log(
+      `🎉 All ${smokeResults.length}/${smokeResults.length} Smoke Tests Passed Successfully!`
+    );
 
     const reportPath = path.join(logsDir, 'smoke-test-report.json');
     fs.writeFileSync(

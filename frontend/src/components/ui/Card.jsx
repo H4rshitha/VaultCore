@@ -4,7 +4,9 @@ export const Card = ({ children, className = '', hoverable = false, ...props }) 
   return (
     <div
       className={`bg-white dark:bg-[#0D1322] border border-slate-200 dark:border-slate-800/80 rounded-2xl shadow-sm dark:shadow-lg transition-all duration-200 ${
-        hoverable ? 'hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md dark:hover:shadow-xl' : ''
+        hoverable
+          ? 'hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md dark:hover:shadow-xl'
+          : ''
       } ${className}`}
       {...props}
     >

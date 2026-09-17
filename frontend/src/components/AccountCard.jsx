@@ -36,8 +36,11 @@ const getAccountIcon = (type = '') => {
 export const AccountCard = ({ account, onSelect }) => {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
-  const { data: balanceData, isFetching: isRefreshingBalance, refetch: refetchBalance } =
-    useAccountBalance(account.accountNumber);
+  const {
+    data: balanceData,
+    isFetching: isRefreshingBalance,
+    refetch: refetchBalance,
+  } = useAccountBalance(account.accountNumber);
 
   const currentBalance = balanceData?.balance !== undefined ? balanceData.balance : account.balance;
   const currentStatus = balanceData?.status || account.status || ACCOUNT_STATUS.ACTIVE;
@@ -53,7 +56,9 @@ export const AccountCard = ({ account, onSelect }) => {
 
   const handleRefresh = async (e) => {
     e.stopPropagation();
-    const toastId = toast.loading(`Refreshing balance for ${maskAccountNumber(account.accountNumber)}...`);
+    const toastId = toast.loading(
+      `Refreshing balance for ${maskAccountNumber(account.accountNumber)}...`
+    );
     try {
       const res = await refetchBalance();
       if (res.isError) {
@@ -65,7 +70,6 @@ export const AccountCard = ({ account, onSelect }) => {
       toast.error('Failed to refresh balance.', { id: toastId });
     }
   };
-
 
   const handleTransfer = (e) => {
     e.stopPropagation();
@@ -117,7 +121,11 @@ export const AccountCard = ({ account, onSelect }) => {
             title="Copy Account Number"
             aria-label="Copy Account Number"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
           </button>
         </div>
 
@@ -142,7 +150,9 @@ export const AccountCard = ({ account, onSelect }) => {
           className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-brand-600 dark:hover:text-brand-300 transition-colors disabled:opacity-50"
           title="Refresh real-time balance"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingBalance ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+          <RefreshCw
+            className={`w-3.5 h-3.5 ${isRefreshingBalance ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+          />
           <span>{isRefreshingBalance ? 'Syncing...' : 'Refresh Balance'}</span>
         </button>
 

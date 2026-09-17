@@ -7,7 +7,9 @@ export class CustomerController {
   static async searchCustomers(req, res, next) {
     try {
       if (req.user.role !== 'TELLER' && req.user.role !== 'ADMIN') {
-        throw new ForbiddenError('Access denied: Customer search is restricted to Tellers and Administrators');
+        throw new ForbiddenError(
+          'Access denied: Customer search is restricted to Tellers and Administrators'
+        );
       }
 
       const { customerId, email, phone, name, query } = req.query;
@@ -28,7 +30,9 @@ export class CustomerController {
   static async getCustomerById(req, res, next) {
     try {
       if (req.user.role !== 'TELLER' && req.user.role !== 'ADMIN') {
-        throw new ForbiddenError('Access denied: Customer details are restricted to Tellers and Administrators');
+        throw new ForbiddenError(
+          'Access denied: Customer details are restricted to Tellers and Administrators'
+        );
       }
 
       const { customerId } = req.params;

@@ -85,14 +85,19 @@ export class PaymentService {
       }
 
       if (sourceAccount.userId !== userId && role !== 'ADMIN') {
-        logger.warn(`Unauthorized transfer attempt: User ${userId} tried to debit account ${sourceAccountNumber}`, {
-          traceId,
-        });
+        logger.warn(
+          `Unauthorized transfer attempt: User ${userId} tried to debit account ${sourceAccountNumber}`,
+          {
+            traceId,
+          }
+        );
         throw new ForbiddenError('Access denied: You do not own the source bank account');
       }
 
       if (sourceAccount.status !== 'ACTIVE') {
-        throw new BadRequestError(`Source account ${sourceAccountNumber} is ${sourceAccount.status}`);
+        throw new BadRequestError(
+          `Source account ${sourceAccountNumber} is ${sourceAccount.status}`
+        );
       }
 
       // 5. Validate Target Account
@@ -102,7 +107,9 @@ export class PaymentService {
       }
 
       if (targetAccount.status !== 'ACTIVE') {
-        throw new BadRequestError(`Target account ${targetAccountNumber} is ${targetAccount.status}`);
+        throw new BadRequestError(
+          `Target account ${targetAccountNumber} is ${targetAccount.status}`
+        );
       }
 
       // 6. Validate Sufficient Balance
@@ -146,18 +153,21 @@ export class PaymentService {
         });
 
         // 10. On successful ledger posting: Update status to COMPLETED, write OutboxEvent and AuditLog
-        const { transaction: completedTransaction, outboxEvent, auditLog } =
-          await paymentRepository.finalizeSuccessfulTransaction({
-            transactionId: pendingTransaction.id,
-            referenceId,
-            sourceAccountId: sourceAccount.id,
-            targetAccountId: targetAccount.id,
-            amount,
-            currency,
-            userId,
-            ipAddress: ip,
-            userAgent,
-          });
+        const {
+          transaction: completedTransaction,
+          outboxEvent,
+          auditLog,
+        } = await paymentRepository.finalizeSuccessfulTransaction({
+          transactionId: pendingTransaction.id,
+          referenceId,
+          sourceAccountId: sourceAccount.id,
+          targetAccountId: targetAccount.id,
+          amount,
+          currency,
+          userId,
+          ipAddress: ip,
+          userAgent,
+        });
 
         // Invalidate Redis DB1 cached balance and details for both sender and receiver accounts
         await accountCache.invalidateAccounts([sourceAccountNumber, targetAccountNumber], traceId);
@@ -221,7 +231,9 @@ export class PaymentService {
     const isReceiver = transaction.targetAccount?.userId === userId;
 
     if (!isSender && !isReceiver && role !== 'ADMIN' && role !== 'TELLER') {
-      logger.warn(`Unauthorized payment lookup for reference ${referenceId} by user ${userId}`, { traceId });
+      logger.warn(`Unauthorized payment lookup for reference ${referenceId} by user ${userId}`, {
+        traceId,
+      });
       throw new ForbiddenError('Access denied: You are not authorized to view this payment');
     }
 

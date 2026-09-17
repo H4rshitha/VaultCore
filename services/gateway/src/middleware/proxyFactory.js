@@ -15,7 +15,12 @@ import { config } from '../config/index.js';
 export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) => {
   const timeoutKey = options.timeoutKey || serviceName.toLowerCase().split(' ')[0];
   const serviceTimeout = config.timeouts[timeoutKey] || config.proxyTimeout || 5000;
-  const customPathRewrite = typeof options === 'object' && options.pathRewrite ? options.pathRewrite : (options['^/'] ? options : undefined);
+  const customPathRewrite =
+    typeof options === 'object' && options.pathRewrite
+      ? options.pathRewrite
+      : options['^/']
+        ? options
+        : undefined;
   const breakerName = options.breakerName || `${timeoutKey}-service`;
   const breaker = circuitBreakerRegistry.getOrCreate(breakerName);
 
@@ -81,7 +86,10 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
         } else if (breaker.state === CIRCUIT_STATES.CLOSED) {
           breaker.consecutiveFailures++;
           if (breaker.consecutiveFailures >= breaker.failureThreshold) {
-            breaker._transitionTo(CIRCUIT_STATES.OPEN, `Proxy failure threshold of ${breaker.failureThreshold} reached: ${err.message}`);
+            breaker._transitionTo(
+              CIRCUIT_STATES.OPEN,
+              `Proxy failure threshold of ${breaker.failureThreshold} reached: ${err.message}`
+            );
           }
         }
 
@@ -97,13 +105,18 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
         }
 
         // Timeout Error -> HTTP 504 Gateway Timeout
-        if (err.code === 'ETIMEDOUT' || err.code === 'ESOCKETTIMEDOUT' || err.message?.includes('timeout') || err.message?.includes('ETIMEDOUT')) {
-          return ApiResponse.error(
-            res,
-            `Gateway timeout waiting for ${serviceName}`,
-            504,
-            { service: serviceName, code: 'GATEWAY_TIMEOUT', traceId, timeoutMs: serviceTimeout }
-          );
+        if (
+          err.code === 'ETIMEDOUT' ||
+          err.code === 'ESOCKETTIMEDOUT' ||
+          err.message?.includes('timeout') ||
+          err.message?.includes('ETIMEDOUT')
+        ) {
+          return ApiResponse.error(res, `Gateway timeout waiting for ${serviceName}`, 504, {
+            service: serviceName,
+            code: 'GATEWAY_TIMEOUT',
+            traceId,
+            timeoutMs: serviceTimeout,
+          });
         }
 
         // Downstream Unavailable -> HTTP 502 Bad Gateway
@@ -134,7 +147,10 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
       const timeSinceOpen = Date.now() - (breaker.openedAt || 0);
       if (timeSinceOpen < breaker.openTimeoutMs) {
         breaker.stats.failFastCount++;
-        const retryAfterSec = Math.max(1, Math.ceil((breaker.openTimeoutMs - timeSinceOpen) / 1000));
+        const retryAfterSec = Math.max(
+          1,
+          Math.ceil((breaker.openTimeoutMs - timeSinceOpen) / 1000)
+        );
         res.setHeader('Retry-After', retryAfterSec);
 
         return ApiResponse.error(
@@ -149,7 +165,10 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
           }
         );
       } else {
-        breaker._transitionTo(CIRCUIT_STATES.HALF_OPEN, `Open timeout of ${breaker.openTimeoutMs}ms expired`);
+        breaker._transitionTo(
+          CIRCUIT_STATES.HALF_OPEN,
+          `Open timeout of ${breaker.openTimeoutMs}ms expired`
+        );
       }
     }
 
@@ -163,7 +182,10 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
           breaker.halfOpenSuccessCount++;
           if (breaker.halfOpenSuccessCount >= breaker.successThreshold) {
             breaker.stats.recoveryCount++;
-            breaker._transitionTo(CIRCUIT_STATES.CLOSED, `Success threshold of ${breaker.successThreshold} met in HALF_OPEN`);
+            breaker._transitionTo(
+              CIRCUIT_STATES.CLOSED,
+              `Success threshold of ${breaker.successThreshold} met in HALF_OPEN`
+            );
           }
         } else if (breaker.state === CIRCUIT_STATES.CLOSED) {
           breaker.consecutiveFailures = 0;
@@ -174,4 +196,3 @@ export const createMicroserviceProxy = (targetUrl, serviceName, options = {}) =>
     return proxyInstance(req, res, next);
   };
 };
-

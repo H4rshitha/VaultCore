@@ -8,7 +8,12 @@ export class LedgerController {
     try {
       const result = await ledgerService.recordDoubleEntryTransfer(req.body, req.traceId);
       const statusCode = result.isIdempotent ? 200 : 201;
-      return ApiResponse.success(res, 'Double-entry transfer recorded successfully', result, statusCode);
+      return ApiResponse.success(
+        res,
+        'Double-entry transfer recorded successfully',
+        result,
+        statusCode
+      );
     } catch (error) {
       next(error);
     }

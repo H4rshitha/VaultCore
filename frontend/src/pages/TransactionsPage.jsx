@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import {
-  ReceiptText,
-  RefreshCw,
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-} from 'lucide-react';
+import { ReceiptText, RefreshCw, AlertCircle, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { useTransactions } from '../hooks/usePayments.js';
 import { TransactionCard } from '../components/TransactionCard.jsx';
 import { TransactionFilters } from '../components/TransactionFilters.jsx';
@@ -123,7 +116,9 @@ export const TransactionsPage = () => {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh Transactions"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+            />
             <span>Sync</span>
           </button>
           <button
@@ -142,9 +137,13 @@ export const TransactionsPage = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-200">Failed to load transactions</p>
+              <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                Failed to load transactions
+              </p>
               <p className="text-xs text-red-600 dark:text-red-400/80">
-                {error?.response?.data?.message || error?.message || 'Error communicating with Payment Service'}
+                {error?.response?.data?.message ||
+                  error?.message ||
+                  'Error communicating with Payment Service'}
               </p>
             </div>
           </div>
@@ -191,7 +190,9 @@ export const TransactionsPage = () => {
           <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-4">
             <ReceiptText className="w-8 h-8" />
           </div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">No Transactions Found</h2>
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-1.5">
+            No Transactions Found
+          </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
             {filters.status !== 'ALL' || filters.type !== 'ALL' || filters.referenceId
               ? 'No transactions match your selected filter criteria. Try clearing your filters.'
@@ -233,7 +234,10 @@ export const TransactionsPage = () => {
           {/* 5. Cursor Pagination Footer (Matching Ledger Audit page style) */}
           <div className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm text-xs">
             <span className="text-slate-500 dark:text-slate-400">
-              Page <strong className="text-slate-900 dark:text-white font-semibold">{currentPageIndex + 1}</strong>
+              Page{' '}
+              <strong className="text-slate-900 dark:text-white font-semibold">
+                {currentPageIndex + 1}
+              </strong>
             </span>
 
             <div className="flex items-center gap-2">

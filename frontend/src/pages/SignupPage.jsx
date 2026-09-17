@@ -90,7 +90,9 @@ export const SignupPage = () => {
   };
 
   const serverErrorMessage = signupMutation.error
-    ? signupMutation.error.response?.data?.message || signupMutation.error.message || 'Registration failed. Please try again.'
+    ? signupMutation.error.response?.data?.message ||
+      signupMutation.error.message ||
+      'Registration failed. Please try again.'
     : null;
 
   return (
@@ -109,7 +111,9 @@ export const SignupPage = () => {
         >
           <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="font-semibold block text-red-800 dark:text-red-200">Registration Error</span>
+            <span className="font-semibold block text-red-800 dark:text-red-200">
+              Registration Error
+            </span>
             <span>{serverErrorMessage}</span>
           </div>
         </div>
@@ -118,7 +122,10 @@ export const SignupPage = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5" noValidate>
         {/* Full Name */}
         <div>
-          <label htmlFor="fullName" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="fullName"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Full Name
           </label>
           <div className="relative">
@@ -138,7 +145,9 @@ export const SignupPage = () => {
               })}
               placeholder="Alexander Wright"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.fullName ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.fullName
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>
@@ -149,7 +158,10 @@ export const SignupPage = () => {
 
         {/* Email Address */}
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -169,7 +181,9 @@ export const SignupPage = () => {
               })}
               placeholder="alexander@vaultcore.io"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.email
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>
@@ -180,7 +194,10 @@ export const SignupPage = () => {
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="password"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Password
           </label>
           <div className="relative">
@@ -200,7 +217,9 @@ export const SignupPage = () => {
               })}
               placeholder="••••••••••••"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.password
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>
@@ -211,7 +230,10 @@ export const SignupPage = () => {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Confirm Password
           </label>
           <div className="relative">
@@ -224,23 +246,29 @@ export const SignupPage = () => {
               autoComplete="new-password"
               {...register('confirmPassword', {
                 required: 'Please confirm your password',
-                validate: (value) =>
-                  value === getValues('password') || 'Passwords do not match',
+                validate: (value) => value === getValues('password') || 'Passwords do not match',
               })}
               placeholder="••••••••••••"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.confirmPassword ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.confirmPassword
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-xs text-red-500 dark:text-red-400">{errors.confirmPassword.message}</p>
+            <p className="mt-1 text-xs text-red-500 dark:text-red-400">
+              {errors.confirmPassword.message}
+            </p>
           )}
         </div>
 
         {/* Role / Account Type */}
         <div>
-          <label htmlFor="role" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+          <label
+            htmlFor="role"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"
+          >
             Account Type
           </label>
           <select

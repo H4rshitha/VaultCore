@@ -31,7 +31,7 @@ spec:
               containerPort: 3004
           env:
             - name: PORT
-              value: "3004"
+              value: '3004'
           envFrom:
             - configMapRef:
                 name: vaultcore-config

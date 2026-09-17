@@ -28,10 +28,14 @@
         "type": "object",
         "required": ["idempotencyKey", "sourceAccountNumber", "targetAccountNumber", "amount"],
         "properties": {
-          "idempotencyKey": { "type": "string", "format": "uuid", "example": "a3b8c9d0-1234-4567-89ab-cdef01234567" },
+          "idempotencyKey": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a3b8c9d0-1234-4567-89ab-cdef01234567"
+          },
           "sourceAccountNumber": { "type": "string", "example": "100010001001" },
           "targetAccountNumber": { "type": "string", "example": "200020002001" },
-          "amount": { "type": "number", "example": 250.00 },
+          "amount": { "type": "number", "example": 250.0 },
           "currency": { "type": "string", "default": "USD" },
           "description": { "type": "string", "example": "Invoice #1042" }
         }
@@ -44,9 +48,12 @@
           "referenceId": { "type": "string", "example": "REF-20260915-A4F92C" },
           "sourceAccountId": { "type": "string", "format": "uuid" },
           "targetAccountId": { "type": "string", "format": "uuid" },
-          "amount": { "type": "number", "example": 250.00 },
+          "amount": { "type": "number", "example": 250.0 },
           "currency": { "type": "string", "example": "USD" },
-          "status": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"]
+          },
           "description": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" }
         }
@@ -69,7 +76,13 @@
         "summary": "Initiate secure funds transfer",
         "description": "Orchestrates money transfer: verifies ownership, creates PENDING state, calls internal Ledger Service with X-Trace-ID, writes OutboxEvent and AuditLog on success, or marks FAILED on ledger error.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" }, "description": "Correlation trace ID" }
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "Correlation trace ID"
+          }
         ],
         "requestBody": {
           "required": true,
@@ -95,19 +108,50 @@
       "get": {
         "summary": "Fetch cursor-paginated payment transfer history for authenticated user",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
-          { "name": "cursor", "in": "query", "schema": { "type": "string" }, "description": "Cursor pagination ID" },
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Cursor pagination ID"
+          },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] } },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] }
+          },
           { "name": "minAmount", "in": "query", "schema": { "type": "number" } },
           { "name": "maxAmount", "in": "query", "schema": { "type": "number" } },
-          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
-          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
           { "name": "referenceId", "in": "query", "schema": { "type": "string" } }
         ],
         "responses": {
-          "200": { "description": "List of user payment transactions with nextCursor, hasMore, and totalCount metadata" },
+          "200": {
+            "description": "List of user payment transactions with nextCursor, hasMore, and totalCount metadata"
+          },
           "401": { "description": "Unauthorized" }
         }
       }
@@ -117,15 +161,39 @@
         "summary": "Search transactions using multi-criteria filters",
         "description": "Filter by reference ID, account number, status, category, amount range, and date range.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
           { "name": "referenceId", "in": "query", "schema": { "type": "string" } },
           { "name": "accountNumber", "in": "query", "schema": { "type": "string" } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] } },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"]
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] }
+          },
           { "name": "minAmount", "in": "query", "schema": { "type": "number" } },
           { "name": "maxAmount", "in": "query", "schema": { "type": "number" } },
-          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
-          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
           { "name": "cursor", "in": "query", "schema": { "type": "string" } },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
         ],
@@ -140,9 +208,22 @@
         "summary": "Financial dashboard summary and monthly analytics",
         "description": "Returns total sent, total received, total volume, success/fail counts, and monthly breakdown.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
-          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
-          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
           { "name": "accountNumber", "in": "query", "schema": { "type": "string" } },
           { "name": "currency", "in": "query", "schema": { "type": "string", "default": "USD" } }
         ],
@@ -156,11 +237,23 @@
       "get": {
         "summary": "Fetch payment transaction details by Reference ID with ledger correlation",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
-          { "name": "referenceId", "in": "path", "required": true, "schema": { "type": "string", "example": "REF-20260915-A4F92C" } }
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "referenceId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "example": "REF-20260915-A4F92C" }
+          }
         ],
         "responses": {
-          "200": { "description": "Payment transaction details returned including participants and ledger entries" },
+          "200": {
+            "description": "Payment transaction details returned including participants and ledger entries"
+          },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden - User is not a participant in this transaction" },
           "404": { "description": "Payment not found" }
@@ -172,7 +265,12 @@
         "summary": "Outbox status and background worker statistics",
         "description": "Returns pending events, published events, failed events, queue publish latency, and retry metrics.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } }
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          }
         ],
         "responses": {
           "200": { "description": "Outbox monitoring statistics retrieved successfully" }

@@ -13,13 +13,38 @@ export const buildAggregatedSwaggerSpec = () => {
   if (!fs.existsSync(path.join(rootDir, 'services'))) {
     rootDir = process.cwd();
   }
-  
+
   const serviceSpecPaths = [
-    { service: 'auth', prefix: '/api/v1/auth', file: path.join(rootDir, 'services/auth-service/src/swagger.json'), tag: 'Authentication' },
-    { service: 'account', prefix: '/api/v1/accounts', file: path.join(rootDir, 'services/account-service/src/swagger.json'), tag: 'Accounts & Balances' },
-    { service: 'payment', prefix: '/api/v1/payments', file: path.join(rootDir, 'services/payment-service/src/swagger.json'), tag: 'Payment Orchestration' },
-    { service: 'ledger', prefix: '/api/v1/ledger', file: path.join(rootDir, 'services/ledger-service/src/swagger.json'), tag: 'Immutable Ledger' },
-    { service: 'notification', prefix: '/api/v1/notifications', file: path.join(rootDir, 'services/notification-service/src/swagger.json'), tag: 'Notifications & Alerts' },
+    {
+      service: 'auth',
+      prefix: '/api/v1/auth',
+      file: path.join(rootDir, 'services/auth-service/src/swagger.json'),
+      tag: 'Authentication',
+    },
+    {
+      service: 'account',
+      prefix: '/api/v1/accounts',
+      file: path.join(rootDir, 'services/account-service/src/swagger.json'),
+      tag: 'Accounts & Balances',
+    },
+    {
+      service: 'payment',
+      prefix: '/api/v1/payments',
+      file: path.join(rootDir, 'services/payment-service/src/swagger.json'),
+      tag: 'Payment Orchestration',
+    },
+    {
+      service: 'ledger',
+      prefix: '/api/v1/ledger',
+      file: path.join(rootDir, 'services/ledger-service/src/swagger.json'),
+      tag: 'Immutable Ledger',
+    },
+    {
+      service: 'notification',
+      prefix: '/api/v1/notifications',
+      file: path.join(rootDir, 'services/notification-service/src/swagger.json'),
+      tag: 'Notifications & Alerts',
+    },
   ];
 
   const aggregatedSpec = {
@@ -27,7 +52,8 @@ export const buildAggregatedSwaggerSpec = () => {
     info: {
       title: 'VaultCore Unified Distributed Banking API',
       version: '1.0.0',
-      description: 'Comprehensive unified OpenAPI documentation for VaultCore API Gateway aggregating Auth, Account, Payment, Ledger, and Notification microservices.',
+      description:
+        'Comprehensive unified OpenAPI documentation for VaultCore API Gateway aggregating Auth, Account, Payment, Ledger, and Notification microservices.',
     },
     servers: [
       {
@@ -48,7 +74,10 @@ export const buildAggregatedSwaggerSpec = () => {
     security: [{ bearerAuth: [] }],
     tags: [
       { name: 'Gateway', description: 'API Gateway Health, Readiness & Metrics' },
-      { name: 'Authentication', description: 'User Registration, Login, Token Refresh & Revocation' },
+      {
+        name: 'Authentication',
+        description: 'User Registration, Login, Token Refresh & Revocation',
+      },
       { name: 'Accounts & Balances', description: 'Bank Account Management & Balances' },
       { name: 'Payment Orchestration', description: 'Money Transfers, Outbox Events & History' },
       { name: 'Immutable Ledger', description: 'Double-Entry Bookkeeping & Audit Entries' },

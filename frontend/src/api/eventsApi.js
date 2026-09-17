@@ -63,7 +63,9 @@ export class EventStreamClient {
 
       const elapsed = Date.now() - this.lastHeartbeatTimestamp;
       if (elapsed > this.heartbeatTimeoutMs) {
-        console.warn(`[SSE] Heartbeat timeout (${elapsed}ms > ${this.heartbeatTimeoutMs}ms). Recovering connection...`);
+        console.warn(
+          `[SSE] Heartbeat timeout (${elapsed}ms > ${this.heartbeatTimeoutMs}ms). Recovering connection...`
+        );
         this.setStatus('OFFLINE');
         this.cleanupEventSource();
         this.scheduleReconnect(true); // Immediate reconnect

@@ -5,10 +5,14 @@ export const config = {
   port: process.env.GATEWAY_PORT || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
   jwtSecret: process.env.JWT_SECRET || 'super-secret-vaultcore-jwt-key-2026',
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public',
+  databaseUrl:
+    process.env.DATABASE_URL ||
+    'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public',
   redisHost: process.env.REDIS_HOST || 'localhost',
   redisPort: process.env.REDIS_PORT || 6379,
-  rabbitmqUri: process.env.RABBITMQ_URI || `amqp://${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}`,
+  rabbitmqUri:
+    process.env.RABBITMQ_URI ||
+    `amqp://${process.env.RABBITMQ_HOST || 'localhost'}:${process.env.RABBITMQ_PORT || 5672}`,
   proxyTimeout: parseInt(process.env.PROXY_TIMEOUT_MS || '10000', 10),
   timeouts: {
     auth: parseInt(process.env.AUTH_SERVICE_TIMEOUT_MS || '3000', 10),

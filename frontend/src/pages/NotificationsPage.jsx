@@ -101,14 +101,8 @@ export const NotificationsPage = () => {
     ...(endDate ? { endDate: new Date(`${endDate}T23:59:59.999Z`).toISOString() } : {}),
   };
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-    isFetching,
-  } = useNotificationHistory(apiFilters);
+  const { data, isLoading, isError, error, refetch, isFetching } =
+    useNotificationHistory(apiFilters);
 
   const markAsReadMutation = useMarkAsRead();
   const markAllAsReadMutation = useMarkAllAsRead();
@@ -230,7 +224,9 @@ export const NotificationsPage = () => {
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700 shadow-sm transition-colors disabled:opacity-50 cursor-pointer"
             title="Refresh notifications"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`} />
+            <RefreshCw
+              className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin text-brand-500 dark:text-brand-400' : ''}`}
+            />
             <span>Sync</span>
           </button>
 
@@ -253,9 +249,13 @@ export const NotificationsPage = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-red-800 dark:text-red-200">Failed to load notification history</p>
+              <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                Failed to load notification history
+              </p>
               <p className="text-xs text-red-600 dark:text-red-400/80">
-                {error?.response?.data?.message || error?.message || 'Error communicating with Notification Service'}
+                {error?.response?.data?.message ||
+                  error?.message ||
+                  'Error communicating with Notification Service'}
               </p>
             </div>
           </div>
@@ -383,7 +383,11 @@ export const NotificationsPage = () => {
           </div>
         </div>
 
-        {(channelFilter !== 'ALL' || deliveryStatusFilter !== 'ALL' || searchQuery || startDate || endDate) && (
+        {(channelFilter !== 'ALL' ||
+          deliveryStatusFilter !== 'ALL' ||
+          searchQuery ||
+          startDate ||
+          endDate) && (
           <div className="flex justify-end pt-1">
             <button
               onClick={handleResetFilters}
@@ -422,7 +426,9 @@ export const NotificationsPage = () => {
           <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mb-3">
             <Bell className="w-8 h-8" />
           </div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">No Notifications Found</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white mb-1">
+            No Notifications Found
+          </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             {readFilter === 'UNREAD'
               ? 'You have caught up on all unread notifications.'
@@ -436,7 +442,8 @@ export const NotificationsPage = () => {
               const channelMeta = CHANNEL_CONFIG[notification.channel] || CHANNEL_CONFIG.EMAIL;
               const ChannelIcon = channelMeta.icon;
               const statusMeta = STATUS_CONFIG[notification.status] || STATUS_CONFIG.SENT;
-              const hasFailed = notification.status === 'FAILED' || Boolean(notification.errorMessage);
+              const hasFailed =
+                notification.status === 'FAILED' || Boolean(notification.errorMessage);
               const refId = notification.referenceId || notification.payload?.referenceId;
 
               return (
@@ -534,7 +541,9 @@ export const NotificationsPage = () => {
                           <span>Mark Read</span>
                         </button>
                       ) : (
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Read</span>
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                          Read
+                        </span>
                       )}
                     </div>
                   </div>
@@ -553,7 +562,8 @@ export const NotificationsPage = () => {
                           Delivery Exception / Failure Details:
                         </span>
                         <span className="text-rose-600 dark:text-rose-300/90 font-mono text-[11px]">
-                          {notification.errorMessage || 'Network dispatch timeout or mail exchanger rejection.'}
+                          {notification.errorMessage ||
+                            'Network dispatch timeout or mail exchanger rejection.'}
                         </span>
                       </div>
                     </div>
@@ -566,7 +576,10 @@ export const NotificationsPage = () => {
           {/* 5. Cursor Pagination Footer */}
           <div className="flex items-center justify-between p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm text-xs">
             <span className="text-slate-500 dark:text-slate-400">
-              Page <strong className="text-slate-900 dark:text-white font-semibold">{currentPageIndex + 1}</strong>
+              Page{' '}
+              <strong className="text-slate-900 dark:text-white font-semibold">
+                {currentPageIndex + 1}
+              </strong>
             </span>
 
             <div className="flex items-center gap-2">

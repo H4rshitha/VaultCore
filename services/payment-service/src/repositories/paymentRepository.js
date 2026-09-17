@@ -172,16 +172,8 @@ export class PaymentRepository {
    */
   async buildTransactionWhereClause(userContext, filters = {}) {
     const { userId, role } = userContext;
-    const {
-      status,
-      type,
-      startDate,
-      endDate,
-      minAmount,
-      maxAmount,
-      referenceId,
-      accountNumber,
-    } = filters;
+    const { status, type, startDate, endDate, minAmount, maxAmount, referenceId, accountNumber } =
+      filters;
 
     const where = {};
 
@@ -205,10 +197,7 @@ export class PaymentRepository {
         { targetAccount: { accountNumber } },
       ];
       if (where.OR) {
-        where.AND = [
-          { OR: where.OR },
-          { OR: accFilter },
-        ];
+        where.AND = [{ OR: where.OR }, { OR: accFilter }];
         delete where.OR;
       } else {
         where.OR = accFilter;

@@ -39,7 +39,10 @@ async function runTests() {
       const res = await fetch(url);
       assert.strictEqual(res.status, 200, `${item.name} /metrics must return HTTP 200`);
       const body = await res.text();
-      assert.ok(body.includes('vaultcore_'), `${item.name} /metrics must expose vaultcore_ metrics`);
+      assert.ok(
+        body.includes('vaultcore_'),
+        `${item.name} /metrics must expose vaultcore_ metrics`
+      );
       console.log(`  ✔ ${item.name} /metrics endpoint responding with Prometheus telemetry`);
     } finally {
       await new Promise((resolve) => server.close(resolve));
@@ -76,14 +79,23 @@ async function runTests() {
     const raw = fs.readFileSync(dashPath, 'utf-8');
     const parsed = JSON.parse(raw);
     assert.ok(parsed.title, `Dashboard ${dashFile} must have a title`);
-    assert.ok(parsed.panels && parsed.panels.length > 0, `Dashboard ${dashFile} must contain panels`);
+    assert.ok(
+      parsed.panels && parsed.panels.length > 0,
+      `Dashboard ${dashFile} must contain panels`
+    );
     console.log(`  ✔ Grafana dashboard verified: ${parsed.title} (${parsed.panels.length} panels)`);
   }
 
   // 4. Test Grafana Provisioning Configs
   console.log('\n[4. Testing Grafana Provisioning Configuration]');
-  assert.strictEqual(fs.existsSync(path.join(rootDir, 'monitoring/grafana/provisioning/datasources/prometheus.yml')), true);
-  assert.strictEqual(fs.existsSync(path.join(rootDir, 'monitoring/grafana/provisioning/dashboards/dashboards.yml')), true);
+  assert.strictEqual(
+    fs.existsSync(path.join(rootDir, 'monitoring/grafana/provisioning/datasources/prometheus.yml')),
+    true
+  );
+  assert.strictEqual(
+    fs.existsSync(path.join(rootDir, 'monitoring/grafana/provisioning/dashboards/dashboards.yml')),
+    true
+  );
   console.log('  ✔ Datasource and dashboard provisioning configurations verified');
 
   // 5. Test k6 Performance Test Scripts
@@ -99,7 +111,9 @@ async function runTests() {
   assert.ok(k6Script.includes('/api/v1/payments/transfer'));
   assert.ok(k6Script.includes('/api/v1/payments/history'));
   assert.ok(k6Script.includes('/api/v1/notifications/history'));
-  console.log('  ✔ k6 load test script verified (100, 200, 500 VUs across all 5 banking scenarios)');
+  console.log(
+    '  ✔ k6 load test script verified (100, 200, 500 VUs across all 5 banking scenarios)'
+  );
 
   // 6. Test Documentation Report
   console.log('\n[6. Testing Performance Report Documentation]');

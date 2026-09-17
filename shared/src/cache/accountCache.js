@@ -6,12 +6,18 @@ const logger = createLogger('account-cache');
 
 export class AccountCacheService {
   constructor(options = {}) {
-    this.redis = options.redis || createRedisClient({
-      host: options.host || process.env.REDIS_HOST || 'localhost',
-      port: options.port || (process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379),
-      password: options.password || process.env.REDIS_PASSWORD || undefined,
-      db: options.db !== undefined ? options.db : REDIS_DATABASES.ACCOUNT_CACHE,
-    }, logger);
+    this.redis =
+      options.redis ||
+      createRedisClient(
+        {
+          host: options.host || process.env.REDIS_HOST || 'localhost',
+          port:
+            options.port || (process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379),
+          password: options.password || process.env.REDIS_PASSWORD || undefined,
+          db: options.db !== undefined ? options.db : REDIS_DATABASES.ACCOUNT_CACHE,
+        },
+        logger
+      );
 
     this.metrics = {
       hits: 0,
@@ -243,9 +249,10 @@ export class AccountCacheService {
    * Expose collected metrics
    */
   getMetrics() {
-    const avgWriteLatencyMs = this.metrics.sets > 0
-      ? Number((this.metrics.writeLatencyTotalMs / this.metrics.sets).toFixed(2))
-      : 0;
+    const avgWriteLatencyMs =
+      this.metrics.sets > 0
+        ? Number((this.metrics.writeLatencyTotalMs / this.metrics.sets).toFixed(2))
+        : 0;
 
     return {
       hits: this.metrics.hits,
@@ -253,9 +260,10 @@ export class AccountCacheService {
       sets: this.metrics.sets,
       invalidations: this.metrics.invalidations,
       avgWriteLatencyMs,
-      hitRatio: this.metrics.hits + this.metrics.misses > 0
-        ? Number((this.metrics.hits / (this.metrics.hits + this.metrics.misses)).toFixed(4))
-        : 0,
+      hitRatio:
+        this.metrics.hits + this.metrics.misses > 0
+          ? Number((this.metrics.hits / (this.metrics.hits + this.metrics.misses)).toFixed(4))
+          : 0,
     };
   }
 }

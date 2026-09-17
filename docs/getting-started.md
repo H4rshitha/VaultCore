@@ -11,11 +11,13 @@ This guide will help you set up and run the VaultCore distributed banking platfo
 ## Quick Start with Docker Compose
 
 1. **Clone & Setup Environment Variables**:
+
    ```bash
    cp .env.example .env
    ```
 
 2. **Start Infrastructure & Microservices**:
+
    ```bash
    docker compose up --build
    ```
@@ -30,16 +32,19 @@ This guide will help you set up and run the VaultCore distributed banking platfo
 ## Local Development (Without Docker for Microservices)
 
 1. **Start Infrastructure Containers (Postgres, Redis, RabbitMQ)**:
+
    ```bash
    docker compose up postgres redis rabbitmq -d
    ```
 
 2. **Install Workspace Dependencies**:
+
    ```bash
    npm install
    ```
 
 3. **Generate Prisma Client Schemas**:
+
    ```bash
    npm run prisma:generate
    ```
@@ -55,6 +60,7 @@ This guide will help you set up and run the VaultCore distributed banking platfo
 ## Running Load Tests
 
 Run k6 performance tests against the API Gateway:
+
 ```bash
 k6 run load-tests/k6/payment-flow.js
 ```

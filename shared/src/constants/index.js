@@ -98,7 +98,8 @@ export const RATE_LIMIT_CONFIG = {
     SUSTAINED_LIMIT: 20,
     BURST: 5,
     WINDOW_SECONDS: 60,
-    DESCRIPTION: '20 sustained + 5 burst (total 25) requests per minute per authenticated user for Payment endpoints',
+    DESCRIPTION:
+      '20 sustained + 5 burst (total 25) requests per minute per authenticated user for Payment endpoints',
   },
   GENERAL: {
     LIMIT: 100,

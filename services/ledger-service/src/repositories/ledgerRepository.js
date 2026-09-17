@@ -31,7 +31,12 @@ export class LedgerRepository {
         where: { idempotencyKey },
         include: { ledgerEntries: true },
       });
-      if (existingTx && existingTx.status === 'COMPLETED' && existingTx.ledgerEntries && existingTx.ledgerEntries.length > 0) {
+      if (
+        existingTx &&
+        existingTx.status === 'COMPLETED' &&
+        existingTx.ledgerEntries &&
+        existingTx.ledgerEntries.length > 0
+      ) {
         return { transaction: existingTx, isIdempotent: true };
       }
 
@@ -43,7 +48,9 @@ export class LedgerRepository {
         throw new NotFoundError(`Source account ${sourceAccountNumber} not found`);
       }
       if (sourceAccount.status !== 'ACTIVE') {
-        throw new BadRequestError(`Source account ${sourceAccountNumber} is ${sourceAccount.status}`);
+        throw new BadRequestError(
+          `Source account ${sourceAccountNumber} is ${sourceAccount.status}`
+        );
       }
 
       const targetAccount = await tx.account.findFirst({
@@ -53,7 +60,9 @@ export class LedgerRepository {
         throw new NotFoundError(`Target account ${targetAccountNumber} not found`);
       }
       if (targetAccount.status !== 'ACTIVE') {
-        throw new BadRequestError(`Target account ${targetAccountNumber} is ${targetAccount.status}`);
+        throw new BadRequestError(
+          `Target account ${targetAccountNumber} is ${targetAccount.status}`
+        );
       }
 
       // 3. Sufficient Funds Check
@@ -141,7 +150,10 @@ export class LedgerRepository {
   /**
    * Fetch ledger history for an account with Cursor Pagination, Date Filters, Type Filter, Reference Search
    */
-  async getAccountLedgerEntries(accountId, { cursor, limit = 20, type, startDate, endDate, referenceId }) {
+  async getAccountLedgerEntries(
+    accountId,
+    { cursor, limit = 20, type, startDate, endDate, referenceId }
+  ) {
     const where = {
       accountId,
     };

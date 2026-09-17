@@ -74,7 +74,9 @@ export class NotificationConsumer {
     await this.channel.bindQueue(this.smsQueue, this.exchange, 'notification.sms');
 
     if (this.logger) {
-      this.logger.info(`Notification topology initialized. Listening on [${this.emailQueue}] and [${this.smsQueue}], DLQ: [${this.dlqQueue}]`);
+      this.logger.info(
+        `Notification topology initialized. Listening on [${this.emailQueue}] and [${this.smsQueue}], DLQ: [${this.dlqQueue}]`
+      );
     }
   }
 
@@ -129,8 +131,15 @@ export class NotificationConsumer {
 
         const eventId = headers.eventId || content.eventId || `evt-${Date.now()}`;
         const traceId = headers.traceId || content.traceId || `trace-${eventId}`;
-        const transactionId = headers.transactionId || content.transactionId || content.payload?.transactionId || content.aggregateId;
-        const currentRetry = typeof headers.retryAttempt === 'number' ? headers.retryAttempt : (content.retryAttempt || 0);
+        const transactionId =
+          headers.transactionId ||
+          content.transactionId ||
+          content.payload?.transactionId ||
+          content.aggregateId;
+        const currentRetry =
+          typeof headers.retryAttempt === 'number'
+            ? headers.retryAttempt
+            : content.retryAttempt || 0;
 
         const logMeta = {
           traceId,
@@ -146,7 +155,10 @@ export class NotificationConsumer {
           const existingAudit = await this.repository.findByEventId(eventId);
           if (existingAudit) {
             if (this.logger) {
-              this.logger.info(`Duplicate event ignored (already processed): [${eventId}]`, logMeta);
+              this.logger.info(
+                `Duplicate event ignored (already processed): [${eventId}]`,
+                logMeta
+              );
             }
             this.channel.ack(msg);
             return;
@@ -191,14 +203,18 @@ export class NotificationConsumer {
           this.metrics.lastProcessingLatencyMs = latencyMs;
           this.metrics.totalLatencyMs += latencyMs;
           this.metrics.averageLatencyMs = Math.round(
-            this.metrics.totalLatencyMs / (this.metrics.successfulDeliveries + this.metrics.failedDeliveries)
+            this.metrics.totalLatencyMs /
+              (this.metrics.successfulDeliveries + this.metrics.failedDeliveries)
           );
 
           if (this.logger) {
-            this.logger.info(`Notification delivered successfully to ${recipient} [${notificationType}]`, {
-              ...logMeta,
-              latencyMs,
-            });
+            this.logger.info(
+              `Notification delivered successfully to ${recipient} [${notificationType}]`,
+              {
+                ...logMeta,
+                latencyMs,
+              }
+            );
           }
 
           // 7. ACK message
@@ -228,7 +244,10 @@ export class NotificationConsumer {
 
             // Record failed audit record in PostgreSQL
             try {
-              const recipient = this.service.resolveRecipient(content.payload || content, notificationType);
+              const recipient = this.service.resolveRecipient(
+                content.payload || content,
+                notificationType
+              );
               await this.repository.createAudit({
                 eventId,
                 transactionId,
@@ -241,7 +260,8 @@ export class NotificationConsumer {
                 payload: content,
               });
             } catch (auditErr) {
-              if (this.logger) this.logger.warn(`Could not save failed audit log: ${auditErr.message}`);
+              if (this.logger)
+                this.logger.warn(`Could not save failed audit log: ${auditErr.message}`);
             }
 
             // ACK original message so it leaves the primary queue
@@ -275,10 +295,13 @@ export class NotificationConsumer {
       headers,
     });
     if (this.logger) {
-      this.logger.warn(`Message scheduled for retry ${headers.retryAttempt}/${this.maxRetries} on [${routingKey}]`, {
-        eventId: headers.eventId,
-        retryAttempt: headers.retryAttempt,
-      });
+      this.logger.warn(
+        `Message scheduled for retry ${headers.retryAttempt}/${this.maxRetries} on [${routingKey}]`,
+        {
+          eventId: headers.eventId,
+          retryAttempt: headers.retryAttempt,
+        }
+      );
     }
   }
 

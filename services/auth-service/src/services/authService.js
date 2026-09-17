@@ -1,10 +1,6 @@
 import { UserRepository } from '../repositories/userRepository.js';
 import { hashPassword, comparePassword } from '../utils/password.js';
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  verifyRefreshToken,
-} from '../utils/token.js';
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/token.js';
 import { TokenStore } from '../utils/tokenStore.js';
 import { ConflictError, UnauthorizedError, NotFoundError, createLogger } from '@vaultcore/shared';
 

@@ -1,4 +1,9 @@
-import { rateLimiterService, RATE_LIMIT_CONFIG, ApiResponse, createLogger } from '@vaultcore/shared';
+import {
+  rateLimiterService,
+  RATE_LIMIT_CONFIG,
+  ApiResponse,
+  createLogger,
+} from '@vaultcore/shared';
 import { rateLimitAllowedTotal, rateLimitBlockedTotal } from './metrics.js';
 
 const logger = createLogger('rate-limiter-middleware');
@@ -54,7 +59,7 @@ export const createRateLimiter = (options = {}) => {
     }
 
     const clientIp = getClientIp(req);
-    const userId = req.user ? (req.user.userId || req.user.id || req.user.sub) : null;
+    const userId = req.user ? req.user.userId || req.user.id || req.user.sub : null;
 
     // Generate Redis DB0 key format: rate:user:{userId} or rate:ip:{ipAddress}
     let key;
@@ -70,7 +75,12 @@ export const createRateLimiter = (options = {}) => {
 
     // RFC-compliant integer seconds for Retry-After and Unix timestamp in seconds for X-RateLimit-Reset
     const retryAfterSec = Math.max(1, Math.ceil(Number(checkResult.retryAfter) || 1));
-    const resetTimeSec = Math.max(0, Math.ceil(Number(checkResult.resetTime) || Math.ceil((Date.now() + windowSeconds * 1000) / 1000)));
+    const resetTimeSec = Math.max(
+      0,
+      Math.ceil(
+        Number(checkResult.resetTime) || Math.ceil((Date.now() + windowSeconds * 1000) / 1000)
+      )
+    );
 
     // Set standard rate limit headers on response
     res.setHeader('X-RateLimit-Limit', checkResult.limit);
@@ -94,29 +104,30 @@ export const createRateLimiter = (options = {}) => {
       rateLimitBlockedTotal.inc({ tier: tierName });
       res.setHeader('Retry-After', retryAfterSec);
 
-      logger.warn(`Rate limit exceeded for [${key}] on endpoint [${req.method} ${req.originalUrl || req.path}]`, {
-        ...logMetadata,
-        retryAfter: retryAfterSec,
-      });
-
-      return ApiResponse.error(
-        res,
-        'Too many requests. Please try again later.',
-        429,
+      logger.warn(
+        `Rate limit exceeded for [${key}] on endpoint [${req.method} ${req.originalUrl || req.path}]`,
         {
-          code: 'RATE_LIMIT_EXCEEDED',
-          tier: tierName,
-          limit: checkResult.limit,
+          ...logMetadata,
           retryAfter: retryAfterSec,
-          resetTime: resetTimeSec,
-          traceId: req.traceId,
         }
       );
+
+      return ApiResponse.error(res, 'Too many requests. Please try again later.', 429, {
+        code: 'RATE_LIMIT_EXCEEDED',
+        tier: tierName,
+        limit: checkResult.limit,
+        retryAfter: retryAfterSec,
+        resetTime: resetTimeSec,
+        traceId: req.traceId,
+      });
     }
 
     // Quota available -> log and proceed
     rateLimitAllowedTotal.inc({ tier: tierName });
-    logger.info(`Rate limit quota checked: ${checkResult.remaining}/${checkResult.limit} remaining for [${key}]`, logMetadata);
+    logger.info(
+      `Rate limit quota checked: ${checkResult.remaining}/${checkResult.limit} remaining for [${key}]`,
+      logMetadata
+    );
     next();
   };
 };
@@ -142,7 +153,7 @@ export const paymentRateLimiter = createRateLimiter({
   windowSeconds: RATE_LIMIT_CONFIG.PAYMENT.WINDOW_SECONDS,
   tierName: 'PAYMENT',
   keyGenerator: (req) => {
-    const userId = req.user ? (req.user.userId || req.user.id || req.user.sub) : null;
+    const userId = req.user ? req.user.userId || req.user.id || req.user.sub : null;
     if (userId) return `rate:user:${userId}`;
     const clientIp = getClientIp(req);
     return `rate:ip:${clientIp}`;
@@ -155,7 +166,7 @@ export const generalRateLimiter = createRateLimiter({
   windowSeconds: RATE_LIMIT_CONFIG.GENERAL.WINDOW_SECONDS,
   tierName: 'GENERAL',
   keyGenerator: (req) => {
-    const userId = req.user ? (req.user.userId || req.user.id || req.user.sub) : null;
+    const userId = req.user ? req.user.userId || req.user.id || req.user.sub : null;
     if (userId) return `rate:user:${userId}`;
     const clientIp = getClientIp(req);
     return `rate:ip:${clientIp}`;

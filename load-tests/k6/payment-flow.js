@@ -4,13 +4,13 @@ import { uuidv4 } from 'https://jslib.k6.io/k6utils/1.4.0/index.js';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },  // Ramp up to 20 virtual users
-    { duration: '1m', target: 50 },   // Sustained load of 50 VUs
-    { duration: '30s', target: 0 },   // Ramp down
+    { duration: '30s', target: 20 }, // Ramp up to 20 virtual users
+    { duration: '1m', target: 50 }, // Sustained load of 50 VUs
+    { duration: '30s', target: 0 }, // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests must complete below 500ms
-    http_req_failed: ['rate<0.01'],    // Error rate under 1%
+    http_req_failed: ['rate<0.01'], // Error rate under 1%
   },
 };
 
@@ -28,7 +28,7 @@ export default function () {
     idempotencyKey: uuidv4(),
     sourceAccountNumber: '100012345678',
     targetAccountNumber: '100087654321',
-    amount: 150.50,
+    amount: 150.5,
     currency: 'USD',
     description: 'k6 load test transfer',
   });
@@ -36,7 +36,7 @@ export default function () {
   const params = {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer mock-jwt-token-for-k6-testing',
+      Authorization: 'Bearer mock-jwt-token-for-k6-testing',
     },
   };
 

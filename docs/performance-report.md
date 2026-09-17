@@ -5,6 +5,7 @@
 This report documents the performance characteristics, throughput limits, latency percentiles, and resilience posture of the **VaultCore Distributed Banking Platform** under realistic multi-user load testing (simulating **100**, **200**, and **500** concurrent virtual users).
 
 The system was evaluated against critical banking workload patterns:
+
 - Authentication & JWT issuance (`/api/v1/auth/login`)
 - High-frequency Cache-Aside balance inquiries (`/api/v1/accounts/:accountNumber/balance`)
 - ACID money transfer orchestration with distributed locks, ledger double-entry creation, and transactional outbox event capture (`/api/v1/payments/transfer`)
@@ -54,12 +55,12 @@ graph TD
 
 Load tests were orchestrated using **k6** across four distinct phases:
 
-| Phase | Virtual Users (VUs) | Duration | Objective | Target RPS |
-| :--- | :--- | :--- | :--- | :--- |
-| **Phase 1: Warm-up & Baseline** | 100 VUs | 1m 30s | Verify cache warm-up, connection pooling, and baseline response times | ~350 RPS |
-| **Phase 2: Target Peak Production** | 200 VUs | 2m 30s | Validate sustained peak business volume with rate-limiting & lock acquisition | ~750 RPS |
-| **Phase 3: Stress & Surge Spike** | 500 VUs | 1m 30s | Evaluate circuit breaker resilience, fail-fast mechanics, and HPA auto-scaling | ~1,600 RPS |
-| **Phase 4: Cooldown & Recovery** | 500 → 0 VUs | 30s | Measure queue drain time and lock release recovery | — |
+| Phase                               | Virtual Users (VUs) | Duration | Objective                                                                      | Target RPS |
+| :---------------------------------- | :------------------ | :------- | :----------------------------------------------------------------------------- | :--------- |
+| **Phase 1: Warm-up & Baseline**     | 100 VUs             | 1m 30s   | Verify cache warm-up, connection pooling, and baseline response times          | ~350 RPS   |
+| **Phase 2: Target Peak Production** | 200 VUs             | 2m 30s   | Validate sustained peak business volume with rate-limiting & lock acquisition  | ~750 RPS   |
+| **Phase 3: Stress & Surge Spike**   | 500 VUs             | 1m 30s   | Evaluate circuit breaker resilience, fail-fast mechanics, and HPA auto-scaling | ~1,600 RPS |
+| **Phase 4: Cooldown & Recovery**    | 500 → 0 VUs         | 30s      | Measure queue drain time and lock release recovery                             | —          |
 
 ---
 
@@ -67,30 +68,30 @@ Load tests were orchestrated using **k6** across four distinct phases:
 
 ### 4.1 Latency Percentiles by Endpoint
 
-| Endpoint / Scenario | Request Method | P50 (ms) | P95 (ms) | P99 (ms) | Error Rate | SLA Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Gateway Health Probe** (`/health/live`) | `GET` | **1.2 ms** | **3.8 ms** | **7.5 ms** | `0.00%` | ✅ EXCEEDED |
-| **Account Balance (Cache Hit)** | `GET` | **4.5 ms** | **14.2 ms** | **28.6 ms** | `0.00%` | ✅ EXCEEDED |
-| **Account Balance (DB Fallback)** | `GET` | **16.8 ms** | **38.4 ms** | **64.2 ms** | `0.02%` | ✅ PASSED |
-| **Customer Authentication** (`/auth/login`) | `POST` | **32.5 ms** | **68.2 ms** | **112.0 ms** | `0.01%` | ✅ PASSED |
-| **ACID Money Transfer** (`/payments/transfer`) | `POST` | **42.1 ms** | **118.5 ms** | **235.0 ms** | `0.04%` | ✅ PASSED |
-| **Payment History Search** (`/payments/history`) | `GET` | **18.4 ms** | **46.2 ms** | **85.0 ms** | `0.00%` | ✅ PASSED |
-| **Notification Audit Retrieval** | `GET` | **11.2 ms** | **29.8 ms** | **52.4 ms** | `0.00%` | ✅ PASSED |
+| Endpoint / Scenario                              | Request Method | P50 (ms)    | P95 (ms)     | P99 (ms)     | Error Rate | SLA Status  |
+| :----------------------------------------------- | :------------- | :---------- | :----------- | :----------- | :--------- | :---------- |
+| **Gateway Health Probe** (`/health/live`)        | `GET`          | **1.2 ms**  | **3.8 ms**   | **7.5 ms**   | `0.00%`    | ✅ EXCEEDED |
+| **Account Balance (Cache Hit)**                  | `GET`          | **4.5 ms**  | **14.2 ms**  | **28.6 ms**  | `0.00%`    | ✅ EXCEEDED |
+| **Account Balance (DB Fallback)**                | `GET`          | **16.8 ms** | **38.4 ms**  | **64.2 ms**  | `0.02%`    | ✅ PASSED   |
+| **Customer Authentication** (`/auth/login`)      | `POST`         | **32.5 ms** | **68.2 ms**  | **112.0 ms** | `0.01%`    | ✅ PASSED   |
+| **ACID Money Transfer** (`/payments/transfer`)   | `POST`         | **42.1 ms** | **118.5 ms** | **235.0 ms** | `0.04%`    | ✅ PASSED   |
+| **Payment History Search** (`/payments/history`) | `GET`          | **18.4 ms** | **46.2 ms**  | **85.0 ms**  | `0.00%`    | ✅ PASSED   |
+| **Notification Audit Retrieval**                 | `GET`          | **11.2 ms** | **29.8 ms**  | **52.4 ms**  | `0.00%`    | ✅ PASSED   |
 
 ---
 
 ### 4.2 Infrastructure & Component Metrics
 
-| Component / Subsystem | Benchmark Metric | Observed Value | Production Threshold | Evaluation |
-| :--- | :--- | :--- | :--- | :--- |
-| **Redis Cache Layer (DB1)** | Cache Hit Ratio | **88.4%** | `> 80.0%` | 🟢 Excellent |
-| **Redis Write Latency** | P95 Execution Time | **1.8 ms** | `< 10.0 ms` | 🟢 Optimal |
-| **Distributed Locks (DB2)** | Contention Rate | **0.82%** | `< 2.0%` | 🟢 Safe Concurrency |
-| **Distributed Locks (DB2)** | Average Hold Duration | **34.2 ms** | `< 100.0 ms` | 🟢 Fast Unlock |
-| **Outbox Event Publisher** | Broker Delivery Rate | **100.0%** | `100.0%` | 🟢 Zero Event Loss |
-| **RabbitMQ Publish Latency** | P95 Publish Duration | **3.6 ms** | `< 15.0 ms` | 🟢 High Throughput |
-| **Rate Limiter (DB0)** | Evaluation Latency | **0.9 ms** | `< 5.0 ms` | 🟢 Sub-millisecond |
-| **Circuit Breakers** | Fast-Fail Latency | **0.4 ms** | `< 2.0 ms` | 🟢 Immediate Shield |
+| Component / Subsystem        | Benchmark Metric      | Observed Value | Production Threshold | Evaluation          |
+| :--------------------------- | :-------------------- | :------------- | :------------------- | :------------------ |
+| **Redis Cache Layer (DB1)**  | Cache Hit Ratio       | **88.4%**      | `> 80.0%`            | 🟢 Excellent        |
+| **Redis Write Latency**      | P95 Execution Time    | **1.8 ms**     | `< 10.0 ms`          | 🟢 Optimal          |
+| **Distributed Locks (DB2)**  | Contention Rate       | **0.82%**      | `< 2.0%`             | 🟢 Safe Concurrency |
+| **Distributed Locks (DB2)**  | Average Hold Duration | **34.2 ms**    | `< 100.0 ms`         | 🟢 Fast Unlock      |
+| **Outbox Event Publisher**   | Broker Delivery Rate  | **100.0%**     | `100.0%`             | 🟢 Zero Event Loss  |
+| **RabbitMQ Publish Latency** | P95 Publish Duration  | **3.6 ms**     | `< 15.0 ms`          | 🟢 High Throughput  |
+| **Rate Limiter (DB0)**       | Evaluation Latency    | **0.9 ms**     | `< 5.0 ms`           | 🟢 Sub-millisecond  |
+| **Circuit Breakers**         | Fast-Fail Latency     | **0.4 ms**     | `< 2.0 ms`           | 🟢 Immediate Shield |
 
 ---
 
@@ -113,16 +114,16 @@ VaultCore provides 7 production Grafana dashboards located in `monitoring/grafan
 During high-concurrency stress testing at **500 VUs**, the following characteristics were observed:
 
 1. **PostgreSQL Connection Exhaustion under Rapid Burst**:
-   - *Observation*: Without connection pool limits, 500 concurrent transfers spawned excessive database client connections.
-   - *Resolution*: Implemented Prisma connection pooling (`connection_limit=20`) and deterministic lock acquisition in ascending account order to prevent deadlock.
+   - _Observation_: Without connection pool limits, 500 concurrent transfers spawned excessive database client connections.
+   - _Resolution_: Implemented Prisma connection pooling (`connection_limit=20`) and deterministic lock acquisition in ascending account order to prevent deadlock.
 
 2. **Account Balance Stale Reads after Transfer**:
-   - *Observation*: High-frequency balance lookups immediately following a transfer read stale cached balances if cache invalidation lagged.
-   - *Resolution*: Implemented post-transfer atomic Redis cache invalidation (`accountCache.invalidateAccount(source)` & `accountCache.invalidateAccount(target)`).
+   - _Observation_: High-frequency balance lookups immediately following a transfer read stale cached balances if cache invalidation lagged.
+   - _Resolution_: Implemented post-transfer atomic Redis cache invalidation (`accountCache.invalidateAccount(source)` & `accountCache.invalidateAccount(target)`).
 
 3. **Burst Payment Spikes & Rate Limiting**:
-   - *Observation*: Legitimate burst transfers by enterprise accounts were prematurely throttled by the rigid 20 req/min limit.
-   - *Resolution*: Introduced **+5 burst allowance** (total 25 immediate requests) before HTTP 429 enforcement.
+   - _Observation_: Legitimate burst transfers by enterprise accounts were prematurely throttled by the rigid 20 req/min limit.
+   - _Resolution_: Introduced **+5 burst allowance** (total 25 immediate requests) before HTTP 429 enforcement.
 
 ---
 

@@ -11,22 +11,10 @@ export const parseCookies = (cookieHeader = '') => {
 };
 
 export const signupValidation = [
-  body('email')
-    .trim()
-    .isEmail()
-    .withMessage('A valid email address is required')
-    .normalizeEmail(),
-  body('password')
-    .isLength({ min: 8 })
-    .withMessage('Password must be at least 8 characters long'),
-  body('firstName')
-    .trim()
-    .notEmpty()
-    .withMessage('First name is required'),
-  body('lastName')
-    .trim()
-    .notEmpty()
-    .withMessage('Last name is required'),
+  body('email').trim().isEmail().withMessage('A valid email address is required').normalizeEmail(),
+  body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+  body('firstName').trim().notEmpty().withMessage('First name is required'),
+  body('lastName').trim().notEmpty().withMessage('Last name is required'),
   body('role')
     .optional()
     .isIn(['CUSTOMER', 'ADMIN', 'TELLER'])
@@ -34,14 +22,8 @@ export const signupValidation = [
 ];
 
 export const loginValidation = [
-  body('email')
-    .trim()
-    .isEmail()
-    .withMessage('A valid email address is required')
-    .normalizeEmail(),
-  body('password')
-    .notEmpty()
-    .withMessage('Password is required'),
+  body('email').trim().isEmail().withMessage('A valid email address is required').normalizeEmail(),
+  body('password').notEmpty().withMessage('Password is required'),
 ];
 
 export const refreshValidation = [

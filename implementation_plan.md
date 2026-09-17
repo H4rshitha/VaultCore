@@ -43,6 +43,7 @@ graph TD
 ## 2. Proposed Manifests & Configurations
 
 ### Configuration & Security
+
 1. **`infrastructure/k8s/01-configmap.yaml`**:
    - `NODE_ENV: "production"`
    - Database connection parameters (`POSTGRES_HOST: "postgres-service"`, `POSTGRES_PORT: "5432"`, `POSTGRES_DB: "vaultcore_db"`)
@@ -56,6 +57,7 @@ graph TD
 ---
 
 ### Infrastructure Layer (StatefulSets + PVCs)
+
 3. **`infrastructure/k8s/03-postgres-statefulset.yaml`**:
    - `StatefulSet` with 1 replica, `image: postgres:16-alpine`.
    - `volumeClaimTemplates` requesting `10Gi` storage.
@@ -75,6 +77,7 @@ graph TD
 ---
 
 ### Application Microservices (Deployments + ClusterIP Services + Probes)
+
 6. **`infrastructure/k8s/06-gateway-deployment.yaml`**:
    - Replicas: 2, `strategy: type: RollingUpdate (maxSurge: 1, maxUnavailable: 0)`.
    - Liveness probe (`/health/live`), Readiness probe (`/health/ready`).
@@ -104,6 +107,7 @@ graph TD
 ---
 
 ### Networking & Autoscaling
+
 12. **`infrastructure/k8s/12-ingress.yaml`**:
     - NGINX Ingress rules with header forwarding, buffer sizes, and timeout annotations.
     - Host: `api.vaultcore.local` and catch-all `/` routing to `gateway-service:3000`.
@@ -119,6 +123,7 @@ graph TD
 ## 3. Verification Plan
 
 ### Automated Manifest Validation Suite (`scratch/test-k8s-manifests.js`)
+
 - Parse and validate all YAML manifests against Kubernetes v1 API schemas.
 - Validate:
   - All 6 microservices have Deployments and ClusterIP Services with correct ports.

@@ -20,13 +20,4 @@ export const ACCOUNT_TYPES = {
 /**
  * Supported Currency ISO codes.
  */
-export const ACCOUNT_CURRENCIES = [
-  'INR',
-  'USD',
-  'EUR',
-  'GBP',
-  'CAD',
-  'AUD',
-  'SGD',
-  'JPY',
-];
+export const ACCOUNT_CURRENCIES = ['INR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'SGD', 'JPY'];

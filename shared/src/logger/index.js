@@ -15,11 +15,13 @@ export const createLogger = (serviceName) => {
       new winston.transports.Console({
         format: winston.format.combine(
           winston.format.colorize(),
-          winston.format.printf(({ timestamp, level, message, service, stack, traceId, ...meta }) => {
-            const tracePrefix = traceId ? `[trace:${traceId}] ` : '';
-            const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
-            return `[${timestamp}] [${service}] ${tracePrefix}${level}: ${stack || message}${metaStr}`;
-          })
+          winston.format.printf(
+            ({ timestamp, level, message, service, stack, traceId, ...meta }) => {
+              const tracePrefix = traceId ? `[trace:${traceId}] ` : '';
+              const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
+              return `[${timestamp}] [${service}] ${tracePrefix}${level}: ${stack || message}${metaStr}`;
+            }
+          )
         ),
       }),
     ],

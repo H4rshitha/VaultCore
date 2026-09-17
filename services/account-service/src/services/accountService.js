@@ -15,7 +15,11 @@ export class AccountService {
   /**
    * Create account with 12-digit account number generation & collision retry loop
    */
-  async createAccount(userId, { type = 'CHECKING', currency = 'USD', initialDeposit = 0 }, traceId) {
+  async createAccount(
+    userId,
+    { type = 'CHECKING', currency = 'USD', initialDeposit = 0 },
+    traceId
+  ) {
     const user = await accountRepository.findUserById(userId);
     if (!user) {
       throw new NotFoundError(`Customer with ID ${userId} not found`);
@@ -49,7 +53,10 @@ export class AccountService {
         return account;
       } catch (error) {
         if (error.code === 'P2002' && attempts < maxAttempts) {
-          logger.warn(`Account number collision detected on ${accountNumber}, retrying attempt ${attempts}...`, { traceId });
+          logger.warn(
+            `Account number collision detected on ${accountNumber}, retrying attempt ${attempts}...`,
+            { traceId }
+          );
           continue;
         }
         throw error;
@@ -68,7 +75,10 @@ export class AccountService {
       // Validate ownership on cache hit
       if (requestingUserRole !== 'ADMIN' && requestingUserRole !== 'TELLER') {
         if (cachedAccount.userId !== requestingUserId) {
-          logger.warn(`Unauthorized account access attempt on cached account: User ${requestingUserId} requested ${accountNumber}`, { traceId });
+          logger.warn(
+            `Unauthorized account access attempt on cached account: User ${requestingUserId} requested ${accountNumber}`,
+            { traceId }
+          );
           throw new ForbiddenError('Access denied: You do not own this bank account');
         }
       }
@@ -83,18 +93,31 @@ export class AccountService {
 
     // 3. Admins and Tellers can view any account
     if (requestingUserRole === 'ADMIN' || requestingUserRole === 'TELLER') {
-      await accountCache.setDetails(accountNumber, existingAccount, traceId, CACHE_TTL.ACCOUNT_DETAILS);
+      await accountCache.setDetails(
+        accountNumber,
+        existingAccount,
+        traceId,
+        CACHE_TTL.ACCOUNT_DETAILS
+      );
       return existingAccount;
     }
 
     // 4. For CUSTOMER role, verify ownership
     if (existingAccount.userId !== requestingUserId) {
-      logger.warn(`Unauthorized account access attempt: User ${requestingUserId} requested ${accountNumber}`, { traceId });
+      logger.warn(
+        `Unauthorized account access attempt: User ${requestingUserId} requested ${accountNumber}`,
+        { traceId }
+      );
       throw new ForbiddenError('Access denied: You do not own this bank account');
     }
 
     // 5. Store in Redis DB1 cache with 5m TTL
-    await accountCache.setDetails(accountNumber, existingAccount, traceId, CACHE_TTL.ACCOUNT_DETAILS);
+    await accountCache.setDetails(
+      accountNumber,
+      existingAccount,
+      traceId,
+      CACHE_TTL.ACCOUNT_DETAILS
+    );
 
     return existingAccount;
   }
@@ -108,7 +131,10 @@ export class AccountService {
     if (cachedBalance) {
       if (requestingUserRole !== 'ADMIN' && requestingUserRole !== 'TELLER') {
         if (cachedBalance.userId !== requestingUserId) {
-          logger.warn(`Unauthorized balance access attempt on cached balance: User ${requestingUserId} requested ${accountNumber}`, { traceId });
+          logger.warn(
+            `Unauthorized balance access attempt on cached balance: User ${requestingUserId} requested ${accountNumber}`,
+            { traceId }
+          );
           throw new ForbiddenError('Access denied: You do not own this bank account');
         }
       }
@@ -121,7 +147,12 @@ export class AccountService {
     }
 
     // 2. Cache miss -> fetch details (which handles ownership validation)
-    const account = await this.getAccountDetails(accountNumber, requestingUserId, requestingUserRole, traceId);
+    const account = await this.getAccountDetails(
+      accountNumber,
+      requestingUserId,
+      requestingUserRole,
+      traceId
+    );
 
     const balancePayload = {
       accountNumber: account.accountNumber,
@@ -132,7 +163,12 @@ export class AccountService {
     };
 
     // 3. Store in Redis DB1 with 30s TTL
-    await accountCache.setBalance(accountNumber, balancePayload, traceId, CACHE_TTL.ACCOUNT_BALANCE);
+    await accountCache.setBalance(
+      accountNumber,
+      balancePayload,
+      traceId,
+      CACHE_TTL.ACCOUNT_BALANCE
+    );
 
     return {
       accountNumber: balancePayload.accountNumber,

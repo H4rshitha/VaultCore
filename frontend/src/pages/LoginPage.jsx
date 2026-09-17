@@ -59,7 +59,9 @@ export const LoginPage = () => {
   };
 
   const serverErrorMessage = loginMutation.error
-    ? loginMutation.error.response?.data?.message || loginMutation.error.message || 'Authentication failed. Please verify your credentials.'
+    ? loginMutation.error.response?.data?.message ||
+      loginMutation.error.message ||
+      'Authentication failed. Please verify your credentials.'
     : null;
 
   return (
@@ -78,7 +80,9 @@ export const LoginPage = () => {
         >
           <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="font-semibold block text-red-800 dark:text-red-200">Authentication Error</span>
+            <span className="font-semibold block text-red-800 dark:text-red-200">
+              Authentication Error
+            </span>
             <span>{serverErrorMessage}</span>
           </div>
         </div>
@@ -87,7 +91,10 @@ export const LoginPage = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* Email Field */}
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+          <label
+            htmlFor="email"
+            className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1.5"
+          >
             Email Address
           </label>
           <div className="relative">
@@ -107,7 +114,9 @@ export const LoginPage = () => {
               })}
               placeholder="name@vaultcore.io"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.email ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.email
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>
@@ -119,7 +128,10 @@ export const LoginPage = () => {
         {/* Password Field */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label htmlFor="password" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+            <label
+              htmlFor="password"
+              className="block text-xs font-medium text-slate-700 dark:text-slate-300"
+            >
               Password
             </label>
             <span className="text-[11px] text-brand-600 dark:text-brand-400 hover:text-brand-500 cursor-pointer">
@@ -139,7 +151,9 @@ export const LoginPage = () => {
               })}
               placeholder="••••••••••••"
               className={`w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border ${
-                errors.password ? 'border-red-500 ring-1 ring-red-500' : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
+                errors.password
+                  ? 'border-red-500 ring-1 ring-red-500'
+                  : 'border-slate-300 dark:border-slate-800 focus:border-brand-500'
               } rounded-lg text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-brand-500`}
             />
           </div>

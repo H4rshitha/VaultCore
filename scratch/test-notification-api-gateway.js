@@ -25,24 +25,37 @@ async function testNotificationEndpoint() {
     }
 
     // 2. Fetch notifications history
-    const notifRes = await axios.get('http://localhost:3000/api/v1/notifications/history?limit=15', {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    console.log(`2. Notifications fetched successfully! Status: ${notifRes.status}, Count: ${notifRes.data.data?.notifications?.length}`);
+    const notifRes = await axios.get(
+      'http://localhost:3000/api/v1/notifications/history?limit=15',
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    console.log(
+      `2. Notifications fetched successfully! Status: ${notifRes.status}, Count: ${notifRes.data.data?.notifications?.length}`
+    );
 
     // 3. Test mark as read
     if (notifRes.data.data?.notifications?.length > 0) {
       const firstId = notifRes.data.data.notifications[0].id;
-      const readRes = await axios.patch(`http://localhost:3000/api/v1/notifications/${firstId}/read`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const readRes = await axios.patch(
+        `http://localhost:3000/api/v1/notifications/${firstId}/read`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       console.log(`3. Mark as read PATCH successful! Status: ${readRes.status}`);
     }
 
     // 4. Test mark all as read
-    const readAllRes = await axios.patch('http://localhost:3000/api/v1/notifications/read-all', {}, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const readAllRes = await axios.patch(
+      'http://localhost:3000/api/v1/notifications/read-all',
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     console.log(`4. Mark all as read PATCH successful! Status: ${readAllRes.status}`);
 
     console.log('\nAll notification API tests passed! ✅');

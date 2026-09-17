@@ -2,8 +2,15 @@ import 'dotenv/config';
 import assert from 'node:assert';
 import jwt from 'jsonwebtoken';
 import http from 'http';
-import { isPublicPath, gatewayAuthMiddleware } from '../services/gateway/src/middleware/gatewayAuth.js';
-import { resolveServiceName, normalizePath, register } from '../services/gateway/src/middleware/metrics.js';
+import {
+  isPublicPath,
+  gatewayAuthMiddleware,
+} from '../services/gateway/src/middleware/gatewayAuth.js';
+import {
+  resolveServiceName,
+  normalizePath,
+  register,
+} from '../services/gateway/src/middleware/metrics.js';
 import { HealthChecker } from '../services/gateway/src/utils/healthChecker.js';
 import { buildAggregatedSwaggerSpec } from '../services/gateway/src/utils/swaggerAggregator.js';
 import { app } from '../services/gateway/src/app.js';
@@ -20,8 +27,14 @@ async function runTests() {
   assert.strictEqual(config.timeouts.account, 5000, 'Account service timeout should be 5000ms');
   assert.strictEqual(config.timeouts.payment, 8000, 'Payment service timeout should be 8000ms');
   assert.strictEqual(config.timeouts.ledger, 8000, 'Ledger service timeout should be 8000ms');
-  assert.strictEqual(config.timeouts.notification, 5000, 'Notification service timeout should be 5000ms');
-  console.log('  ✔ Service timeouts configured: Auth (3s), Account (5s), Payment (8s), Ledger (8s), Notification (5s)');
+  assert.strictEqual(
+    config.timeouts.notification,
+    5000,
+    'Notification service timeout should be 5000ms'
+  );
+  console.log(
+    '  ✔ Service timeouts configured: Auth (3s), Account (5s), Payment (8s), Ledger (8s), Notification (5s)'
+  );
 
   // 2. Test Enhanced Readiness Probe
   console.log('\n[2. Testing Enhanced Readiness Probe (/health/ready)]');
@@ -35,7 +48,9 @@ async function runTests() {
   assert.ok(readiness.microservices.payment);
   assert.ok(readiness.microservices.ledger);
   assert.ok(readiness.microservices.notification);
-  console.log('  ✔ Enhanced readiness probe verifies Postgres, Redis, RabbitMQ, and all 5 microservices');
+  console.log(
+    '  ✔ Enhanced readiness probe verifies Postgres, Redis, RabbitMQ, and all 5 microservices'
+  );
 
   // 3. Test HTTP Server & Response Time Header
   console.log('\n[3. Testing HTTP Server & X-Response-Time Header]');
@@ -67,7 +82,9 @@ async function runTests() {
     assert.ok(readyJson.data.infrastructure);
     assert.ok(readyJson.data.microservices);
     assert.ok(resReady.headers.get('x-response-time'));
-    console.log('  ✔ GET /health/ready returned full infrastructure and microservices health breakdown');
+    console.log(
+      '  ✔ GET /health/ready returned full infrastructure and microservices health breakdown'
+    );
 
     // 3.4 GET /metrics
     const resMetrics = await fetch(`${baseUrl}/metrics`);
@@ -83,18 +100,25 @@ async function runTests() {
       { expiresIn: '1h' }
     );
 
-    const mockReq = { path: '/api/v1/accounts/123456', headers: { authorization: `Bearer ${validToken}` } };
+    const mockReq = {
+      path: '/api/v1/accounts/123456',
+      headers: { authorization: `Bearer ${validToken}` },
+    };
     gatewayAuthMiddleware(mockReq, {}, () => {});
     assert.strictEqual(mockReq.headers['x-user-id'], 'usr-bob-888');
     assert.strictEqual(mockReq.headers['x-user-role'], 'CUSTOMER');
     assert.strictEqual(mockReq.headers['x-user-email'], 'bob@vaultcore.io');
-    console.log('  ✔ User context headers (x-user-id, x-user-role, x-user-email) correctly set for proxy');
+    console.log(
+      '  ✔ User context headers (x-user-id, x-user-role, x-user-email) correctly set for proxy'
+    );
 
     // 3.6 Unauthenticated Protected Path -> 401
     const resProtected = await fetch(`${baseUrl}/api/v1/payments/history`);
     assert.strictEqual(resProtected.status, 401);
     assert.ok(resProtected.headers.get('x-response-time'));
-    console.log('  ✔ Protected endpoint without JWT returns HTTP 401 Unauthorized with X-Response-Time header');
+    console.log(
+      '  ✔ Protected endpoint without JWT returns HTTP 401 Unauthorized with X-Response-Time header'
+    );
   } finally {
     testServer.close();
   }

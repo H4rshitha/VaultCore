@@ -6,10 +6,7 @@ export const validateNotificationHistory = [
     .optional()
     .isInt({ min: 1, max: 100 })
     .withMessage('Limit must be an integer between 1 and 100'),
-  query('cursor')
-    .optional()
-    .isUUID()
-    .withMessage('Cursor must be a valid UUID'),
+  query('cursor').optional().isUUID().withMessage('Cursor must be a valid UUID'),
   query('status')
     .optional()
     .isIn(['PENDING', 'SENT', 'FAILED', 'DELIVERED'])
@@ -18,13 +15,7 @@ export const validateNotificationHistory = [
     .optional()
     .isIn(['EMAIL', 'SMS', 'PUSH'])
     .withMessage('Invalid notification type filter'),
-  query('startDate')
-    .optional()
-    .isISO8601()
-    .withMessage('Start date must be an ISO8601 string'),
-  query('endDate')
-    .optional()
-    .isISO8601()
-    .withMessage('End date must be an ISO8601 string'),
+  query('startDate').optional().isISO8601().withMessage('Start date must be an ISO8601 string'),
+  query('endDate').optional().isISO8601().withMessage('End date must be an ISO8601 string'),
   validateRequest,
 ];

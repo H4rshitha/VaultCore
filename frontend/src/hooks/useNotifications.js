@@ -31,12 +31,18 @@ export const useNotifications = (filters = {}, options = {}) => {
       const formatted = notifications.map((n, idx) => {
         const id = n.id || n._id || `notif-${idx}`;
         const ts = n.timestamp || n.createdAt || n.date || new Date().toISOString();
-        const isRead = Boolean(n.read || n.status === 'READ' || n.isRead || notificationStorage.isRead(id, ts));
+        const isRead = Boolean(
+          n.read || n.status === 'READ' || n.isRead || notificationStorage.isRead(id, ts)
+        );
 
         return {
           id,
           type: (n.type || n.notificationType || 'SYSTEM').toUpperCase(),
-          title: n.title || n.subject || n.payload?.subject || `${n.type || n.notificationType || 'Account'} Notification`,
+          title:
+            n.title ||
+            n.subject ||
+            n.payload?.subject ||
+            `${n.type || n.notificationType || 'Account'} Notification`,
           message: n.message || n.body || n.payload?.body || n.content || 'No details provided.',
           timestamp: ts,
           read: isRead,
@@ -99,7 +105,9 @@ export const useNotificationHistory = (filters = {}, options = {}) => {
         const status = (item.status || 'SENT').toUpperCase();
         const id = item.id || `notif-hist-${idx}`;
         const ts = item.createdAt || item.processedAt || new Date().toISOString();
-        const isRead = Boolean(item.read || item.isRead || item.status === 'READ' || notificationStorage.isRead(id, ts));
+        const isRead = Boolean(
+          item.read || item.isRead || item.status === 'READ' || notificationStorage.isRead(id, ts)
+        );
 
         const title =
           item.title ||

@@ -5,7 +5,9 @@ import { OutboxPublisher } from '../services/payment-service/src/services/outbox
 import { OutboxWorker } from '../services/payment-service/src/services/outboxWorker.js';
 import { RabbitMQClient, createLogger } from '@vaultcore/shared';
 
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public';
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public';
 
 const logger = createLogger('test-outbox');
 
@@ -35,17 +37,21 @@ async function runTests() {
   assert.strictEqual(typeof worker.processBatch, 'function');
   assert.strictEqual(typeof worker.getStatus, 'function');
   assert.strictEqual(typeof worker.calculateBackoffMs, 'function');
-  console.log('  ✔ All required methods exist on OutboxRepository, OutboxPublisher, and OutboxWorker');
+  console.log(
+    '  ✔ All required methods exist on OutboxRepository, OutboxPublisher, and OutboxWorker'
+  );
 
   // 2. Test Exponential Backoff Calculation
   console.log('\n[2. Testing Exponential Backoff Calculation]');
-  assert.strictEqual(worker.calculateBackoffMs(0), 1000);  // 1000 * 2^0 = 1000ms (1s)
-  assert.strictEqual(worker.calculateBackoffMs(1), 2000);  // 1000 * 2^1 = 2000ms (2s)
-  assert.strictEqual(worker.calculateBackoffMs(2), 4000);  // 1000 * 2^2 = 4000ms (4s)
-  assert.strictEqual(worker.calculateBackoffMs(3), 8000);  // 1000 * 2^3 = 8000ms (8s)
+  assert.strictEqual(worker.calculateBackoffMs(0), 1000); // 1000 * 2^0 = 1000ms (1s)
+  assert.strictEqual(worker.calculateBackoffMs(1), 2000); // 1000 * 2^1 = 2000ms (2s)
+  assert.strictEqual(worker.calculateBackoffMs(2), 4000); // 1000 * 2^2 = 4000ms (4s)
+  assert.strictEqual(worker.calculateBackoffMs(3), 8000); // 1000 * 2^3 = 8000ms (8s)
   assert.strictEqual(worker.calculateBackoffMs(4), 16000); // 1000 * 2^4 = 16000ms (16s)
   assert.strictEqual(worker.calculateBackoffMs(5), 30000); // capped at 30000ms (30s)
-  console.log('  ✔ Exponential backoff correctly calculates 1s -> 2s -> 4s -> 8s -> 16s -> 30s max');
+  console.log(
+    '  ✔ Exponential backoff correctly calculates 1s -> 2s -> 4s -> 8s -> 16s -> 30s max'
+  );
 
   // 3. Test In-Memory State Machine & Polling with Mock Repository & Publisher
   console.log('\n[3. Testing OutboxWorker Polling & Publishing Flow]');
@@ -158,7 +164,9 @@ async function runTests() {
   assert.strictEqual(mockDb[0].status, 'PUBLISHED');
   assert.strictEqual(mockDb[1].status, 'PUBLISHED');
   assert.ok(mockDb[0].processedAt);
-  console.log('  ✔ Pending events processed, published to RabbitMQ, and marked as PUBLISHED with timestamp');
+  console.log(
+    '  ✔ Pending events processed, published to RabbitMQ, and marked as PUBLISHED with timestamp'
+  );
 
   // 4. Test Idempotency
   console.log('\n[4. Testing Idempotent Publishing (No Duplicate Publishing)]');
@@ -211,7 +219,9 @@ async function runTests() {
   assert.strictEqual(statusResult.outboxDatabase.statusCounts.pending, 0);
   assert.strictEqual(statusResult.worker.maxRetries, 5);
   assert.strictEqual(statusResult.worker.pollIntervalMs, 2000);
-  console.log('  ✔ Status endpoint data structured properly with pending, published, and failed metrics:');
+  console.log(
+    '  ✔ Status endpoint data structured properly with pending, published, and failed metrics:'
+  );
   console.log(JSON.stringify(statusResult, null, 2));
 
   console.log('\n========================================================================');

@@ -3,13 +3,23 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
-import { createLogger, errorHandler, traceMiddleware, ApiResponse, circuitBreakerRegistry } from '@vaultcore/shared';
+import {
+  createLogger,
+  errorHandler,
+  traceMiddleware,
+  ApiResponse,
+  circuitBreakerRegistry,
+} from '@vaultcore/shared';
 import { config } from './config/index.js';
 import { responseTimeMiddleware } from './middleware/responseTime.js';
 import { gatewayAuthMiddleware } from './middleware/gatewayAuth.js';
 import { metricsMiddleware, metricsHandler, resolveServiceName } from './middleware/metrics.js';
 import { createMicroserviceProxy } from './middleware/proxyFactory.js';
-import { authRateLimiter, paymentRateLimiter, generalRateLimiter } from './middleware/rateLimiter.js';
+import {
+  authRateLimiter,
+  paymentRateLimiter,
+  generalRateLimiter,
+} from './middleware/rateLimiter.js';
 import { HealthChecker } from './utils/healthChecker.js';
 import { buildAggregatedSwaggerSpec } from './utils/swaggerAggregator.js';
 
@@ -43,8 +53,20 @@ app.use(
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Trace-ID', 'x-trace-id', 'X-Requested-With'],
-    exposedHeaders: ['X-Trace-ID', 'X-Response-Time', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Trace-ID',
+      'x-trace-id',
+      'X-Requested-With',
+    ],
+    exposedHeaders: [
+      'X-Trace-ID',
+      'X-Response-Time',
+      'X-RateLimit-Limit',
+      'X-RateLimit-Remaining',
+      'X-RateLimit-Reset',
+    ],
   })
 );
 app.use(compression());
@@ -62,19 +84,22 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const responseTimeMs = req.responseTimeMs || Date.now() - startTime;
     const downstreamService = resolveServiceName(req.path);
-    const userId = req.user ? (req.user.userId || req.user.id || req.user.sub) : undefined;
+    const userId = req.user ? req.user.userId || req.user.id || req.user.sub : undefined;
 
-    logger.info(`${req.method} ${req.originalUrl || req.path} ${res.statusCode} ${responseTimeMs}ms`, {
-      traceId: req.traceId,
-      method: req.method,
-      path: req.originalUrl || req.path,
-      statusCode: res.statusCode,
-      responseTimeMs,
-      latency: `${responseTimeMs}ms`,
-      downstreamService,
-      userId,
-      ip: req.ip,
-    });
+    logger.info(
+      `${req.method} ${req.originalUrl || req.path} ${res.statusCode} ${responseTimeMs}ms`,
+      {
+        traceId: req.traceId,
+        method: req.method,
+        path: req.originalUrl || req.path,
+        statusCode: res.statusCode,
+        responseTimeMs,
+        latency: `${responseTimeMs}ms`,
+        downstreamService,
+        userId,
+        ip: req.ip,
+      }
+    );
   });
   next();
 });
@@ -88,7 +113,11 @@ app.use(['/docs', '/api/v1/docs'], swaggerUi.serve, swaggerUi.setup(unifiedSwagg
 
 // 5. Gateway Health & Readiness Probes
 app.get(['/health', '/api/v1/health'], (req, res) => {
-  return ApiResponse.success(res, 'VaultCore API Gateway is healthy', HealthChecker.getGatewayOverview());
+  return ApiResponse.success(
+    res,
+    'VaultCore API Gateway is healthy',
+    HealthChecker.getGatewayOverview()
+  );
 });
 
 app.get(['/health/live', '/api/v1/health/live'], (req, res) => {
@@ -106,7 +135,11 @@ app.get(['/health/ready', '/api/v1/health/ready'], async (req, res) => {
 
 // 6. Admin Circuit Breaker Observability Endpoint
 app.get(['/admin/circuit-breakers', '/api/v1/admin/circuit-breakers'], (req, res) => {
-  return ApiResponse.success(res, 'Circuit breakers status retrieved successfully', circuitBreakerRegistry.getAllStatus());
+  return ApiResponse.success(
+    res,
+    'Circuit breakers status retrieved successfully',
+    circuitBreakerRegistry.getAllStatus()
+  );
 });
 
 // 6.5. Real-Time Server-Sent Events (SSE) Stream & Event Bus
@@ -149,14 +182,16 @@ app.get(['/api/v1/events/stream', '/events/stream'], (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache, no-transform',
-    'Connection': 'keep-alive',
+    Connection: 'keep-alive',
     'X-Accel-Buffering': 'no',
     'Access-Control-Allow-Origin': req.headers.origin || '*',
     'Access-Control-Allow-Credentials': 'true',
   });
 
   const traceId = `trace-${Date.now()}`;
-  res.write(`data: ${JSON.stringify({ type: 'connected', traceId, timestamp: new Date().toISOString() })}\n\n`);
+  res.write(
+    `data: ${JSON.stringify({ type: 'connected', traceId, timestamp: new Date().toISOString() })}\n\n`
+  );
 
   // Resume stream from Last-Event-ID if provided
   const lastEventId = req.headers['last-event-id'] || req.query.lastEventId;
@@ -217,7 +252,8 @@ app.use(
   '/api/v1/customers',
   generalRateLimiter,
   createMicroserviceProxy(config.services.account, 'Account Service (Customers)', {
-    pathRewrite: (path) => (path.startsWith('/customers') ? path : `/customers${path.startsWith('/') ? '' : '/'}${path}`),
+    pathRewrite: (path) =>
+      path.startsWith('/customers') ? path : `/customers${path.startsWith('/') ? '' : '/'}${path}`,
     timeoutKey: 'account',
   })
 );
@@ -225,7 +261,8 @@ app.use(
   '/customers',
   generalRateLimiter,
   createMicroserviceProxy(config.services.account, 'Account Service (Customers)', {
-    pathRewrite: (path) => (path.startsWith('/customers') ? path : `/customers${path.startsWith('/') ? '' : '/'}${path}`),
+    pathRewrite: (path) =>
+      path.startsWith('/customers') ? path : `/customers${path.startsWith('/') ? '' : '/'}${path}`,
     timeoutKey: 'account',
   })
 );
@@ -267,7 +304,8 @@ app.use(
   '/api/v1/outbox',
   paymentRateLimiter,
   createMicroserviceProxy(config.services.payment, 'Payment Service (Outbox)', {
-    pathRewrite: (path) => (path.startsWith('/outbox') ? path : `/outbox${path.startsWith('/') ? '' : '/'}${path}`),
+    pathRewrite: (path) =>
+      path.startsWith('/outbox') ? path : `/outbox${path.startsWith('/') ? '' : '/'}${path}`,
     timeoutKey: 'payment',
   })
 );
@@ -275,7 +313,8 @@ app.use(
   '/outbox',
   paymentRateLimiter,
   createMicroserviceProxy(config.services.payment, 'Payment Service (Outbox)', {
-    pathRewrite: (path) => (path.startsWith('/outbox') ? path : `/outbox${path.startsWith('/') ? '' : '/'}${path}`),
+    pathRewrite: (path) =>
+      path.startsWith('/outbox') ? path : `/outbox${path.startsWith('/') ? '' : '/'}${path}`,
     timeoutKey: 'payment',
   })
 );

@@ -17,12 +17,18 @@ end
 
 export class LockService {
   constructor(options = {}) {
-    this.redis = options.redis || createRedisClient({
-      host: options.host || process.env.REDIS_HOST || 'localhost',
-      port: options.port || (process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379),
-      password: options.password || process.env.REDIS_PASSWORD || undefined,
-      db: options.db !== undefined ? options.db : REDIS_DATABASES.DISTRIBUTED_LOCKS,
-    }, logger);
+    this.redis =
+      options.redis ||
+      createRedisClient(
+        {
+          host: options.host || process.env.REDIS_HOST || 'localhost',
+          port:
+            options.port || (process.env.REDIS_PORT ? parseInt(process.env.REDIS_PORT, 10) : 6379),
+          password: options.password || process.env.REDIS_PASSWORD || undefined,
+          db: options.db !== undefined ? options.db : REDIS_DATABASES.DISTRIBUTED_LOCKS,
+        },
+        logger
+      );
 
     this.metrics = {
       locksAcquired: 0,
@@ -137,7 +143,11 @@ export class LockService {
    * Acquire locks for multiple accounts in deterministic ascending order to prevent deadlocks
    * Throws 409 ConflictError if any lock fails and releases previously acquired locks
    */
-  async acquireAccountLocks(accountNumbers = [], traceId, ttlMs = LOCK_CONSTANTS.LOCK_EXPIRATION_MS) {
+  async acquireAccountLocks(
+    accountNumbers = [],
+    traceId,
+    ttlMs = LOCK_CONSTANTS.LOCK_EXPIRATION_MS
+  ) {
     // Sort account numbers in ascending alphabetical order to guarantee deadlock-free locking
     const sortedAccounts = [...new Set(accountNumbers.filter(Boolean))].sort();
     const acquiredLocks = [];
@@ -180,7 +190,12 @@ export class LockService {
   /**
    * Execute callback with deterministic distributed locks and guaranteed release in try/finally
    */
-  async withAccountLocks(accountNumbers = [], traceId, callback, ttlMs = LOCK_CONSTANTS.LOCK_EXPIRATION_MS) {
+  async withAccountLocks(
+    accountNumbers = [],
+    traceId,
+    callback,
+    ttlMs = LOCK_CONSTANTS.LOCK_EXPIRATION_MS
+  ) {
     const locks = await this.acquireAccountLocks(accountNumbers, traceId, ttlMs);
     try {
       return await callback();
@@ -231,7 +246,12 @@ export class LockService {
   /**
    * Store idempotency record in Redis DB2 with 24h TTL
    */
-  async setIdempotencyRecord(idempotencyKey, data, traceId, ttlSeconds = LOCK_CONSTANTS.IDEMPOTENCY_TTL_SECONDS) {
+  async setIdempotencyRecord(
+    idempotencyKey,
+    data,
+    traceId,
+    ttlSeconds = LOCK_CONSTANTS.IDEMPOTENCY_TTL_SECONDS
+  ) {
     const key = this.getIdempotencyKey(idempotencyKey);
     const start = Date.now();
 
@@ -259,9 +279,10 @@ export class LockService {
    * Return collected locking & idempotency metrics
    */
   getMetrics() {
-    const avgLockWaitMs = this.metrics.locksAcquired > 0
-      ? Number((this.metrics.lockWaitTimeTotalMs / this.metrics.locksAcquired).toFixed(2))
-      : 0;
+    const avgLockWaitMs =
+      this.metrics.locksAcquired > 0
+        ? Number((this.metrics.lockWaitTimeTotalMs / this.metrics.locksAcquired).toFixed(2))
+        : 0;
 
     return {
       locksAcquired: this.metrics.locksAcquired,

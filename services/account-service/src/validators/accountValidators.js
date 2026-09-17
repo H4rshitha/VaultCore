@@ -16,10 +16,7 @@ export const createAccountValidation = [
     .optional()
     .isFloat({ min: 0 })
     .withMessage('Initial deposit cannot be negative'),
-  body('customerId')
-    .optional()
-    .isString()
-    .withMessage('customerId must be a string'),
+  body('customerId').optional().isString().withMessage('customerId must be a string'),
 ];
 
 export const getAccountParamsValidation = [
@@ -30,11 +27,7 @@ export const getAccountParamsValidation = [
 ];
 
 export const listAccountsQueryValidation = [
-  query('page')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('Page must be a positive integer')
-    .toInt(),
+  query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer').toInt(),
   query('limit')
     .optional()
     .isInt({ min: 1, max: 100 })

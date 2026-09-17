@@ -96,13 +96,39 @@
         "summary": "Fetch customer notification history",
         "description": "Returns paginated notification audit records for the authenticated customer.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
-          { "name": "cursor", "in": "query", "schema": { "type": "string", "format": "uuid" }, "description": "Cursor pagination ID" },
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": { "type": "string", "format": "uuid" },
+            "description": "Cursor pagination ID"
+          },
           { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
-          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "SENT", "FAILED", "DELIVERED"] } },
-          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["EMAIL", "SMS", "PUSH"] } },
-          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
-          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } }
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["PENDING", "SENT", "FAILED", "DELIVERED"] }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["EMAIL", "SMS", "PUSH"] }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date-time" }
+          }
         ],
         "responses": {
           "200": { "description": "Paginated list of customer notification audit records" },
@@ -115,7 +141,12 @@
         "summary": "Retrieve notification queue health and consumer metrics",
         "description": "Admin endpoint returning queue health, DLQ size, delivery statistics, and consumer uptime.",
         "parameters": [
-          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } }
+          {
+            "name": "X-Trace-ID",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          }
         ],
         "responses": {
           "200": {

@@ -211,7 +211,16 @@ export const AuthProvider = ({ children }) => {
       refreshToken: refreshTokenHandler,
       setCurrentUser,
     }),
-    [currentUser, accessToken, loading, isSessionExpired, login, signup, logout, refreshTokenHandler]
+    [
+      currentUser,
+      accessToken,
+      loading,
+      isSessionExpired,
+      login,
+      signup,
+      logout,
+      refreshTokenHandler,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -96,10 +96,12 @@ export const SessionExpiredModal = () => {
         </div>
         <div className="space-y-2">
           <p className="text-sm text-slate-300 font-medium">
-            Your authenticated banking session has expired for security purposes or your credentials have refreshed.
+            Your authenticated banking session has expired for security purposes or your credentials
+            have refreshed.
           </p>
           <p className="text-xs text-slate-400">
-            Please authenticate again to resume real-time transactions, account transfers, and audit logs.
+            Please authenticate again to resume real-time transactions, account transfers, and audit
+            logs.
           </p>
         </div>
       </div>

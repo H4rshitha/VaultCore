@@ -100,9 +100,15 @@ const circuitBreakerRecoveriesTotal = new client.Counter({
 export const resolveServiceName = (path) => {
   if (path.startsWith('/api/v1/auth') || path.startsWith('/auth')) return 'auth-service';
   if (path.startsWith('/api/v1/accounts') || path.startsWith('/accounts')) return 'account-service';
-  if (path.startsWith('/api/v1/payments') || path.startsWith('/api/v1/outbox') || path.startsWith('/payments')) return 'payment-service';
+  if (
+    path.startsWith('/api/v1/payments') ||
+    path.startsWith('/api/v1/outbox') ||
+    path.startsWith('/payments')
+  )
+    return 'payment-service';
   if (path.startsWith('/api/v1/ledger') || path.startsWith('/ledger')) return 'ledger-service';
-  if (path.startsWith('/api/v1/notifications') || path.startsWith('/notifications')) return 'notification-service';
+  if (path.startsWith('/api/v1/notifications') || path.startsWith('/notifications'))
+    return 'notification-service';
   if (path.startsWith('/health')) return 'gateway-health';
   if (path.startsWith('/metrics')) return 'gateway-metrics';
   if (path.startsWith('/docs')) return 'gateway-docs';
@@ -162,8 +168,8 @@ export const syncCircuitBreakerMetrics = () => {
         status.state === CIRCUIT_STATES.CLOSED
           ? 0
           : status.state === CIRCUIT_STATES.HALF_OPEN
-          ? 1
-          : 2;
+            ? 1
+            : 2;
 
       circuitBreakerState.set({ service: breaker.name }, stateValue);
     }
