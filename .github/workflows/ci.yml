@@ -48,13 +48,13 @@ jobs:
         run: npx prisma generate --schema=prisma/schema.prisma
 
       - name: 7. Run Prettier Formatting Check
-        run: npx prettier --check "**/*.{js,jsx,json,md,yml,yaml}"
+        run: npx prettier --check .
 
       - name: 8. Run ESLint Across Workspaces
         run: npx eslint services shared frontend
 
       - name: 9. Run npm security audit (production dependencies)
-        run: npm audit --omit=dev --audit-level=critical || npm audit --omit=dev || true
+        run: npm audit --omit=dev --audit-level=critical || true
 
       - name: 10. Record Quality & Security Summary
         if: always()
