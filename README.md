@@ -12,7 +12,7 @@
 
 ---
 
-## 🏛️ Microservice Architecture Overview
+## Microservice Architecture Overview
 
 VaultCore is organized into dedicated microservices, each built with **Production-Ready Clean Architecture**:
 
@@ -32,7 +32,7 @@ VaultCore is organized into dedicated microservices, each built with **Productio
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Run Complete Platform via Docker Compose
 
@@ -54,7 +54,7 @@ docker compose up --build
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Runtime & Framework**: Node.js (ES Modules `"type": "module"`) + Express.js
 - **Database & ORM**: PostgreSQL + Prisma ORM
@@ -67,7 +67,7 @@ docker compose up --build
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 For complete detailed guides:
 - [Architecture Overview](docs/architecture.md)
