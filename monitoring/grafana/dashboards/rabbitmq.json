@@ -1,0 +1,83 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "RabbitMQ Event Publish Throughput (msg/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (routing_key) (rate(vaultcore_rabbitmq_published_events_total[1m]))",
+          "legendFormat": "Key: {{routing_key}}"
+        }
+      ]
+    },
+    {
+      "title": "Publish Latency (P50, P95, P99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(vaultcore_rabbitmq_publish_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P50 Latency"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_rabbitmq_publish_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P95 Latency"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_rabbitmq_publish_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P99 Latency"
+        }
+      ]
+    },
+    {
+      "title": "Queue Depth (Email, SMS & DLQ)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "vaultcore_rabbitmq_queue_depth",
+          "legendFormat": "Queue: {{queue}}"
+        }
+      ]
+    },
+    {
+      "title": "Dead Letter Queue (DLQ) Cumulative Counter",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(vaultcore_rabbitmq_dlq_count)",
+          "legendFormat": "DLQ Rejected Messages"
+        }
+      ]
+    },
+    {
+      "title": "RabbitMQ Circuit Breaker Health",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "vaultcore_circuit_breaker_state{service=\"rabbitmq-publisher\"}",
+          "legendFormat": "State (0=CLOSED, 1=HALF_OPEN, 2=OPEN)"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["vaultcore", "rabbitmq", "messaging"],
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+  "timezone": "browser",
+  "title": "VaultCore — RabbitMQ & Event Streaming Dashboard",
+  "uid": "vaultcore-rabbitmq"
+}

@@ -1,0 +1,68 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Lock Acquisition Rate (Success vs Failure)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(vaultcore_distributed_lock_acquisitions_total[1m]))",
+          "legendFormat": "Status: {{status}}"
+        }
+      ]
+    },
+    {
+      "title": "Lock Contention & Conflicts Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(vaultcore_distributed_lock_conflicts_total[1m]))",
+          "legendFormat": "Lock Conflicts / sec"
+        }
+      ]
+    },
+    {
+      "title": "Lock Hold Duration (P95, P99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_distributed_lock_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P95 Duration"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_distributed_lock_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P99 Duration"
+        }
+      ]
+    },
+    {
+      "title": "Total Cumulative Lock Conflicts",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(vaultcore_distributed_lock_conflicts_total)",
+          "legendFormat": "Total Contention Events"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["vaultcore", "locks", "concurrency", "redis"],
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+  "timezone": "browser",
+  "title": "VaultCore — Distributed Locks & Concurrency Dashboard",
+  "uid": "vaultcore-distributed-locks"
+}

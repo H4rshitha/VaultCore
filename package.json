@@ -1,0 +1,43 @@
+{
+  "name": "vaultcore",
+  "version": "1.0.0",
+  "description": "VaultCore - Distributed Banking Platform",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "services/*",
+    "frontend"
+  ],
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "start": "docker compose up --build",
+    "start:dev": "docker compose up",
+    "stop": "docker compose down",
+    "gateway:dev": "node services/gateway/src/server.js",
+    "auth:dev": "node services/auth-service/src/server.js",
+    "services:dev": "node scratch/start-all-services.js",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "build": "npm --prefix frontend run build",
+    "lint": "eslint services/*/src shared/src",
+    "lint:fix": "eslint services/*/src shared/src --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "prisma:validate": "prisma validate --schema=prisma/schema.prisma",
+    "prisma:format": "prisma format --schema=prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema=prisma/schema.prisma",
+    "prisma:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.2.5",
+    "prisma": "^6.16.2"
+  }
+}

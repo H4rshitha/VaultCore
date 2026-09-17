@@ -1,0 +1,71 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VaultCore Banking API Gateway",
+    "version": "1.0.0",
+    "description": "Unified API documentation for VaultCore distributed banking platform microservices."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local API Gateway"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Gateway Health Check",
+        "responses": {
+          "200": {
+            "description": "Gateway is operating normally"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/health": {
+      "get": {
+        "summary": "Auth Service Health Check",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Auth service is healthy" }
+        }
+      }
+    },
+    "/api/v1/accounts/health": {
+      "get": {
+        "summary": "Account Service Health Check",
+        "tags": ["Accounts"],
+        "responses": {
+          "200": { "description": "Account service is healthy" }
+        }
+      }
+    },
+    "/api/v1/payments/health": {
+      "get": {
+        "summary": "Payment Service Health Check",
+        "tags": ["Payments"],
+        "responses": {
+          "200": { "description": "Payment service is healthy" }
+        }
+      }
+    },
+    "/api/v1/ledger/health": {
+      "get": {
+        "summary": "Ledger Service Health Check",
+        "tags": ["Ledger"],
+        "responses": {
+          "200": { "description": "Ledger service is healthy" }
+        }
+      }
+    }
+  }
+}

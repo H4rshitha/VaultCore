@@ -1,0 +1,171 @@
+services:
+  # Infrastructure Services
+  postgres:
+    image: postgres:16-alpine
+    container_name: vaultcore-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vaultadmin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vaultsecret}
+      POSTGRES_DB: ${POSTGRES_DB:-vaultcore_db}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vaultadmin}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: vaultcore-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: vaultcore-rabbitmq
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Microservices Stack
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    container_name: vaultcore-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - ACCOUNT_SERVICE_URL=http://account-service:3002
+      - PAYMENT_SERVICE_URL=http://payment-service:3003
+      - LEDGER_SERVICE_URL=http://ledger-service:3004
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3005
+      - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
+    depends_on:
+      - auth-service
+      - account-service
+      - payment-service
+      - ledger-service
+      - notification-service
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: vaultcore-auth-service
+    ports:
+      - "3011:3001"
+    environment:
+      - PORT=3001
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
+      - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  account-service:
+    build:
+      context: .
+      dockerfile: services/account-service/Dockerfile
+    container_name: vaultcore-account-service
+    ports:
+      - "3012:3002"
+    environment:
+      - PORT=3002
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: services/payment-service/Dockerfile
+    container_name: vaultcore-payment-service
+    ports:
+      - "3013:3003"
+    environment:
+      - PORT=3003
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  ledger-service:
+    build:
+      context: .
+      dockerfile: services/ledger-service/Dockerfile
+    container_name: vaultcore-ledger-service
+    ports:
+      - "3014:3004"
+    environment:
+      - PORT=3004
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: services/notification-service/Dockerfile
+    container_name: vaultcore-notification-service
+    ports:
+      - "3015:3005"
+    environment:
+      - PORT=3005
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:

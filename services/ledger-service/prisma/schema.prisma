@@ -1,0 +1,202 @@
+// VaultCore Production PostgreSQL Database Schema (Prisma ORM)
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum UserRole {
+  CUSTOMER
+  TELLER
+  ADMIN
+}
+
+enum AccountType {
+  SAVINGS
+  CHECKING
+  INVESTMENT
+}
+
+enum AccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum TransactionCategory {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REVERSED
+}
+
+enum TransactionType {
+  DEBIT
+  CREDIT
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHED
+  FAILED
+}
+
+// ==========================================
+// MODELS
+// ==========================================
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole    @default(CUSTOMER)
+  isActive     Boolean     @default(true)
+  deletedAt    DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relationships
+  accounts     Account[]
+  auditLogs    AuditLog[]
+
+  @@index([email])
+  @@index([deletedAt])
+  @@map("users")
+}
+
+model Account {
+  id            String        @id @default(uuid())
+  accountNumber String        @unique
+  userId        String
+  type          AccountType   @default(CHECKING)
+  status        AccountStatus @default(ACTIVE)
+  balance       Decimal       @default(0.00) @db.Decimal(18, 2)
+  currency      String        @default("USD")
+  version       Int           @default(0) // Optimistic Locking
+  deletedAt     DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relationships
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceTransactions Transaction[] @relation("SourceAccount")
+  targetTransactions Transaction[] @relation("TargetAccount")
+  ledgerEntries      LedgerEntry[]
+
+  @@index([accountNumber])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("accounts")
+}
+
+model Transaction {
+  id              String              @id @default(uuid())
+  idempotencyKey  String              @unique
+  referenceId     String?             @unique
+  sourceAccountId String?
+  targetAccountId String?
+  amount          Decimal             @db.Decimal(18, 2)
+  currency        String              @default("USD")
+  type            TransactionCategory
+  status          TransactionStatus   @default(PENDING)
+  description     String?
+  failureReason   String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  // Relationships
+  sourceAccount Account?      @relation("SourceAccount", fields: [sourceAccountId], references: [id], onDelete: SetNull)
+  targetAccount Account?      @relation("TargetAccount", fields: [targetAccountId], references: [id], onDelete: SetNull)
+  ledgerEntries LedgerEntry[]
+  outboxEvents  OutboxEvent[]
+
+  @@index([sourceAccountId])
+  @@index([targetAccountId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([idempotencyKey])
+  @@index([referenceId])
+  @@map("transactions")
+}
+
+model LedgerEntry {
+  id            String          @id @default(uuid())
+  transactionId String
+  accountId     String
+  type          TransactionType // DEBIT or CREDIT
+  amount        Decimal         @db.Decimal(18, 2)
+  balanceAfter  Decimal         @db.Decimal(18, 2)
+  createdAt     DateTime        @default(now())
+
+  // Immutable - No updatedAt or deletedAt
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account     Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([transactionId])
+  @@index([accountId])
+  @@index([createdAt])
+  @@map("ledger_entries")
+}
+
+model OutboxEvent {
+  id            String       @id @default(uuid())
+  aggregateType String
+  aggregateId   String
+  eventType     String
+  payload       Json
+  status        OutboxStatus @default(PENDING)
+  retryCount    Int          @default(0)
+  error         String?
+  processedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  // Optional relationship to Transaction
+  transactionId String?
+  transaction   Transaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([aggregateId])
+  @@index([createdAt])
+  @@map("outbox_events")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  // Relationships
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

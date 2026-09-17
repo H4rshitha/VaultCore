@@ -1,0 +1,21 @@
+{
+  "name": "@vaultcore/notification-service",
+  "version": "1.0.0",
+  "description": "Async Notification Microservice for VaultCore",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "@vaultcore/shared": "*",
+    "amqplib": "^0.10.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "swagger-ui-express": "^5.0.0",
+    "winston": "^3.12.0"
+  }
+}

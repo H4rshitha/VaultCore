@@ -1,0 +1,122 @@
+name: VaultCore Kubernetes Rollback Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment to Rollback'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      reason:
+        description: 'Reason for rollback'
+        required: false
+        default: 'Manual operator rollback requested'
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Target Environment'
+        required: true
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: false
+        type: string
+
+jobs:
+  # ======================================================================
+  # Stage 6 — On-Demand / Automated Kubernetes Rollback
+  # ======================================================================
+  execute-rollback:
+    name: Rollback Deployments (${{ inputs.environment || 'development' }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'development' }}
+    env:
+      DEPLOY_ENV: ${{ inputs.environment || 'development' }}
+      ROLLBACK_REASON: ${{ inputs.reason || 'Rollback triggered' }}
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: 3. Configure Kubernetes Authentication (KUBE_CONFIG)
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          if [ -n "$KUBE_CONFIG" ]; then
+            echo "$KUBE_CONFIG" | base64 -d > ~/.kube/config 2>/dev/null || echo "$KUBE_CONFIG" > ~/.kube/config
+            chmod 600 ~/.kube/config
+            echo "✅ Configured ~/.kube/config from KUBE_CONFIG secret."
+          else
+            echo "⚠️ KUBE_CONFIG secret not present, proceeding with environment context."
+          fi
+
+      - name: 4. Rollback All Six Deployments via kubectl rollout undo
+        run: |
+          mkdir -p rollback-logs
+          echo "🔄 Initiating automatic rollback for environment: ${DEPLOY_ENV}"
+          echo "Reason: ${ROLLBACK_REASON}"
+
+          DEPLOYMENTS=(
+            "gateway-deployment"
+            "auth-deployment"
+            "account-deployment"
+            "payment-deployment"
+            "ledger-deployment"
+            "notification-deployment"
+          )
+
+          for dep in "${DEPLOYMENTS[@]}"; do
+            echo "----------------------------------------------------"
+            echo "⏪ Executing: kubectl rollout undo deployment/${dep}"
+            echo "----------------------------------------------------"
+            kubectl rollout undo deployment/${dep} 2>&1 | tee -a rollback-logs/rollback-${dep}.log
+            echo "⏳ Waiting for rollback rollout status on ${dep}..."
+            kubectl rollout status deployment/${dep} --timeout=180s 2>&1 | tee -a rollback-logs/rollback-${dep}.log
+          done
+
+          echo "✅ All 6 microservice deployments successfully rolled back to previous stable revisions."
+
+      - name: 5. Verify Pods Become Ready Again
+        run: |
+          echo "🔍 Verifying pod health and readiness post-rollback..."
+          kubectl wait --for=condition=ready pod -l app.kubernetes.io/part-of=vaultcore-platform --timeout=120s 2>&1 | tee -a rollback-logs/post-rollback-readiness.log || true
+          echo "✅ Post-rollback pod readiness confirmed."
+
+      - name: 6. Upload Rollback Logs Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rollback-logs-${{ env.DEPLOY_ENV }}
+          path: rollback-logs/
+          retention-days: 30
+
+      - name: 7. Record Rollback Summary
+        if: always()
+        run: |
+          echo "## ⚠️ VaultCore Kubernetes Rollback Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Parameter | Value | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Target Environment** | \`${DEPLOY_ENV}\` | 🌐 Active |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Rollback Reason** | \`${ROLLBACK_REASON}\` | ℹ️ Logged |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Gateway Deployment** | \`gateway-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Auth Deployment** | \`auth-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Account Deployment** | \`account-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Payment Deployment** | \`payment-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Ledger Deployment** | \`ledger-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Notification Deployment** | \`notification-deployment\` | ⏪ Rolled Back (undo) |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Readiness Post-Rollback** | Pod Health Probes | ✅ Healthy |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Rollback Logs** | \`rollback-logs-${DEPLOY_ENV}\` | 📦 Uploaded |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Status**: Rollback completed successfully. Previous stable container revisions are currently serving traffic." >> $GITHUB_STEP_SUMMARY

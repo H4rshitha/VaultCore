@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vaultcore-config
+  labels:
+    app.kubernetes.io/name: vaultcore
+    app.kubernetes.io/part-of: vaultcore-platform
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+
+  # PostgreSQL
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "vaultcore_db"
+  DATABASE_URL: "postgresql://vaultadmin:vaultsecretpassword2026@postgres-service:5432/vaultcore_db?schema=public&connection_limit=20"
+
+  # Redis Multi-DB Allocation (DB0: RateLimit, DB1: Cache, DB2: Locks, DB3: Sessions)
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+
+  # RabbitMQ
+  RABBITMQ_HOST: "rabbitmq-service"
+  RABBITMQ_PORT: "5672"
+  RABBITMQ_EXCHANGE: "vaultcore.events"
+  RABBITMQ_URI: "amqp://vaultadmin:vaultsecretpassword2026@rabbitmq-service:5672"
+
+  # Internal Microservice URLs (ClusterIP Routing)
+  GATEWAY_URL: "http://gateway-service:3000"
+  AUTH_SERVICE_URL: "http://auth-service:3001"
+  ACCOUNT_SERVICE_URL: "http://account-service:3002"
+  PAYMENT_SERVICE_URL: "http://payment-service:3003"
+  LEDGER_SERVICE_URL: "http://ledger-service:3004"
+  NOTIFICATION_SERVICE_URL: "http://notification-service:3005"
+
+  # Service-Specific Proxy Timeouts (ms)
+  AUTH_SERVICE_TIMEOUT_MS: "3000"
+  ACCOUNT_SERVICE_TIMEOUT_MS: "5000"
+  PAYMENT_SERVICE_TIMEOUT_MS: "8000"
+  LEDGER_SERVICE_TIMEOUT_MS: "8000"
+  NOTIFICATION_SERVICE_TIMEOUT_MS: "5000"

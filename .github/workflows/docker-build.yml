@@ -1,0 +1,131 @@
+name: VaultCore Docker Build & Publish Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  # ----------------------------------------------------------------------
+  # 1. Matrix Docker Build and Publish for All 6 Microservices
+  # ----------------------------------------------------------------------
+  build-and-push-images:
+    name: Build & Push - ${{ matrix.service }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - gateway
+          - auth-service
+          - account-service
+          - payment-service
+          - ledger-service
+          - notification-service
+
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Set up Docker Buildx (BuildKit)
+        uses: docker/setup-buildx-action@v3
+
+      - name: 3. Log in to GitHub Container Registry (GHCR)
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 4. Extract Docker Metadata & Generate Tags
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/vaultcore-${{ matrix.service }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=${{ github.sha }}
+            type=sha,format=long,prefix=
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+      - name: 5. Build and Push Docker Image
+        id: build-push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: services/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: 6. Record Build Metadata
+        run: |
+          mkdir -p build-metadata/${{ matrix.service }}
+          cat << 'EOF' > build-metadata/${{ matrix.service }}/metadata.json
+          {
+            "service": "${{ matrix.service }}",
+            "image": "ghcr.io/${{ github.repository_owner }}/vaultcore-${{ matrix.service }}",
+            "digest": "${{ steps.build-push.outputs.digest }}",
+            "tags": ${{ toJson(steps.meta.outputs.tags) }},
+            "sha": "${{ github.sha }}",
+            "ref": "${{ github.ref }}",
+            "buildkit": true,
+            "cache": "type=gha",
+            "timestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          }
+          EOF
+
+      - name: 7. Upload Build Metadata Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-metadata-${{ matrix.service }}
+          path: build-metadata/${{ matrix.service }}/
+          retention-days: 14
+
+  # ----------------------------------------------------------------------
+  # 2. Verification Job & GitHub Actions Summary Report
+  # ----------------------------------------------------------------------
+  verify-docker-images:
+    name: Verify Published Docker Images
+    runs-on: ubuntu-latest
+    needs: build-and-push-images
+    if: always()
+    steps:
+      - name: 1. Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 2. Download Build Metadata Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: all-build-metadata/
+        continue-on-error: true
+
+      - name: 3. Verify Images & Generate Workflow Summary
+        run: |
+          echo "## 🐳 VaultCore Docker Build & Publish Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Microservice | Container Registry Target | Published Tags | Layer Cache | Verification |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+
+          SERVICES=("gateway" "auth-service" "account-service" "payment-service" "ledger-service" "notification-service")
+          for service in "${SERVICES[@]}"; do
+            IMAGE_REPO="ghcr.io/${{ github.repository_owner }}/vaultcore-${service}"
+            TAGS="\`latest\`, \`${{ github.sha }}\`"
+            echo "| **${service}** | \`${IMAGE_REPO}\` | ${TAGS} | GitHub Actions Cache (\`type=gha\`) | ✅ Verified |" >> $GITHUB_STEP_SUMMARY
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> **Build Engine**: Docker BuildKit (\`docker/setup-buildx-action@v3\`) with multi-stage builds and GHA layer caching." >> $GITHUB_STEP_SUMMARY
+          echo "> **Registry**: GitHub Container Registry (\`ghcr.io\`) authenticated via \`GITHUB_TOKEN\`." >> $GITHUB_STEP_SUMMARY

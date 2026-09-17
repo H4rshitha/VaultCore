@@ -1,0 +1,45 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import swaggerUi from 'swagger-ui-express';
+import {
+  createLogger,
+  errorHandler,
+  requestLogger,
+  traceMiddleware,
+  ApiResponse,
+  createServiceMetricsMiddleware,
+  metricsEndpointHandler,
+} from '@vaultcore/shared';
+import notificationRoutes from './routes/notificationRoutes.js';
+import swaggerDocument from './swagger.json' with { type: 'json' };
+
+const logger = createLogger('notification-service');
+const app = express();
+
+app.use(helmet());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(traceMiddleware);
+app.use(createServiceMetricsMiddleware('notification-service'));
+app.use(requestLogger(logger));
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.get('/metrics', metricsEndpointHandler);
+
+app.get(['/health', '/health/live'], (req, res) => {
+  return ApiResponse.success(res, 'Notification Service is healthy', { status: 'UP' });
+});
+
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/', notificationRoutes);
+
+app.use(errorHandler(logger));
+
+export { app, logger };

@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - 01-configmap.yaml
+  - 02-secrets.yaml
+  - 03-postgres-statefulset.yaml
+  - 04-redis-statefulset.yaml
+  - 05-rabbitmq-statefulset.yaml
+  - 06-gateway-deployment.yaml
+  - 07-auth-deployment.yaml
+  - 08-account-deployment.yaml
+  - 09-payment-deployment.yaml
+  - 10-ledger-deployment.yaml
+  - 11-notification-deployment.yaml
+  - 12-ingress.yaml
+  - 13-hpa.yaml

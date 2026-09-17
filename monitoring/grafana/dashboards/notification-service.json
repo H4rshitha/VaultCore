@@ -1,0 +1,79 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Notification Dispatch Rate (Email vs SMS)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (type) (rate(vaultcore_notifications_dispatched_total[1m]))",
+          "legendFormat": "{{type}} Dispatch Rate"
+        }
+      ]
+    },
+    {
+      "title": "Delivery Processing Duration (P95, P99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_notification_delivery_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P95 Latency"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_notification_delivery_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "P99 Latency"
+        }
+      ]
+    },
+    {
+      "title": "Notification Failure Rate (%)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(vaultcore_notifications_dispatched_total{status=\"FAILED\"}[1m])) / sum(rate(vaultcore_notifications_dispatched_total[1m])) * 100",
+          "legendFormat": "Failed Notification (%)"
+        }
+      ]
+    },
+    {
+      "title": "Total Notifications Dispatched",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum by (type) (vaultcore_notifications_dispatched_total)",
+          "legendFormat": "Total {{type}}"
+        }
+      ]
+    },
+    {
+      "title": "Notification Consumer Health",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "vaultcore_circuit_breaker_state{service=\"notification-service\"}",
+          "legendFormat": "Circuit State"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["vaultcore", "notifications", "email", "sms"],
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+  "timezone": "browser",
+  "title": "VaultCore — Notification Service Dashboard",
+  "uid": "vaultcore-notifications"
+}

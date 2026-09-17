@@ -1,0 +1,83 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Outbox Events Polled vs Published (Events/sec)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(vaultcore_outbox_events_polled_total[1m])",
+          "legendFormat": "Polled from Database"
+        },
+        {
+          "expr": "rate(vaultcore_outbox_events_published_total[1m])",
+          "legendFormat": "Published to Broker"
+        }
+      ]
+    },
+    {
+      "title": "Outbox Batch Processing Latency (P95, P99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_outbox_batch_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "Batch P95 Duration"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_outbox_batch_duration_seconds_bucket[1m])) by (le))",
+          "legendFormat": "Batch P99 Duration"
+        }
+      ]
+    },
+    {
+      "title": "Outbox Publishing Retries & Failures",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(vaultcore_outbox_events_failed_total[1m])",
+          "legendFormat": "Publish Failures / sec"
+        }
+      ]
+    },
+    {
+      "title": "Total Published Events",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(vaultcore_outbox_events_published_total)",
+          "legendFormat": "Total Delivered to RabbitMQ"
+        }
+      ]
+    },
+    {
+      "title": "Total Failed Outbox Attempts",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(vaultcore_outbox_events_failed_total)",
+          "legendFormat": "Total Failures"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["vaultcore", "outbox", "worker", "events"],
+  "time": { "from": "now-15m", "to": "now" },
+  "timepicker": { "refresh_intervals": ["5s", "10s", "30s", "1m"] },
+  "timezone": "browser",
+  "title": "VaultCore — Outbox Worker & Reliable Event Delivery Dashboard",
+  "uid": "vaultcore-outbox-worker"
+}

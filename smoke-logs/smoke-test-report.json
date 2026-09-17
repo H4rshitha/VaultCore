@@ -1,0 +1,510 @@
+{
+  "targetUrl": "http://localhost:3000",
+  "timestamp": "2026-09-17T09:45:45.376Z",
+  "totalTests": 15,
+  "passed": 15,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Gateway Health",
+      "method": "GET",
+      "endpoint": "/health",
+      "status": 200,
+      "durationMs": 238,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "VaultCore API Gateway is healthy",
+        "data": {
+          "status": "UP",
+          "service": "api-gateway",
+          "version": "1.0.0",
+          "timestamp": "2026-09-17T09:45:43.309Z",
+          "uptime": 5534,
+          "downstreamServices": {
+            "auth": "http://localhost:3001",
+            "account": "http://localhost:3002",
+            "payment": "http://localhost:3003",
+            "ledger": "http://localhost:3004",
+            "notification": "http://localhost:3005"
+          },
+          "timeouts": {
+            "auth": 3000,
+            "account": 5000,
+            "payment": 8000,
+            "ledger": 8000,
+            "notification": 5000
+          }
+        },
+        "timestamp": "2026-09-17T09:45:43.310Z"
+      }
+    },
+    {
+      "name": "Gateway Liveness",
+      "method": "GET",
+      "endpoint": "/health/live",
+      "status": 200,
+      "durationMs": 23,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Gateway is alive",
+        "data": {
+          "status": "UP",
+          "timestamp": "2026-09-17T09:45:43.375Z",
+          "uptime": 5534,
+          "memoryUsage": {
+            "rss": 18784256,
+            "heapTotal": 32391168,
+            "heapUsed": 30775064,
+            "external": 5163729,
+            "arrayBuffers": 1004326
+          }
+        },
+        "timestamp": "2026-09-17T09:45:43.377Z"
+      }
+    },
+    {
+      "name": "Gateway Readiness",
+      "method": "GET",
+      "endpoint": "/health/ready",
+      "status": 200,
+      "durationMs": 256,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "All dependencies are healthy",
+        "data": {
+          "status": "READY",
+          "timestamp": "2026-09-17T09:45:43.633Z",
+          "uptime": 5534,
+          "infrastructure": {
+            "postgres": {
+              "status": "UP",
+              "latencyMs": 137
+            },
+            "redis": {
+              "status": "UP",
+              "latencyMs": 137
+            },
+            "rabbitmq": {
+              "status": "UP",
+              "latencyMs": 227
+            }
+          },
+          "microservices": {
+            "auth": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 77,
+              "endpoint": "http://localhost:3001/health/live"
+            },
+            "account": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 81,
+              "endpoint": "http://localhost:3002/health/live"
+            },
+            "payment": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 67,
+              "endpoint": "http://localhost:3003/health/live"
+            },
+            "ledger": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 69,
+              "endpoint": "http://localhost:3004/health/live"
+            },
+            "notification": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 68,
+              "endpoint": "http://localhost:3005/health/live"
+            }
+          }
+        },
+        "timestamp": "2026-09-17T09:45:43.633Z"
+      }
+    },
+    {
+      "name": "Prometheus Metrics",
+      "method": "GET",
+      "endpoint": "/metrics",
+      "status": 200,
+      "durationMs": 45,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": "# HELP vaultcore_process_cpu_user_seconds_total Total user CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_user_seconds_total counter\nvaultcore_process_cpu_user_seconds_total 11.843\n\n# HELP vaultcore_process_cpu_system_seconds_total Total system CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_system_seconds_total counter\nvaultcore_process_cpu_system_seconds_total 5.795999999999999\n\n# HELP vaultcore_process_cpu_seconds_total Total user and system CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_seconds_total counter\nvaultcore_process_cpu_seconds_total 17.639000000000003\n\n# HELP vaultcore_process_start_time_seconds Start time of the process since unix epoch in seconds.\n# TYPE vaultcore_process_start_time_seconds gauge\nvaultcore_process_start_time_seconds 1789632809\n\n# HELP vaultcore_process_resident_memory_bytes Resident memory size in bytes.\n# TYPE vaultcore_process_resident_memory_bytes gauge\nvaultcore_process_resident_memory_bytes 30375936\n\n# HELP vaultcore_nodejs_eventloop_lag_seconds Lag of event loop in seconds.\n# TYPE vaultcore_nodejs_eventloop_lag_seconds gauge\nvaultcore_nodejs_eventloop_lag_seconds 0.0111124\n\n# HELP vaultcore_nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.\n# TYPE vaultcore_nodejs_eventloop_lag_min_seconds gauge\nvaultcore_nodejs_eventloop_lag_min_seconds 0.009068544\n\n# HELP vaultcore_nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.\n# TYPE vaultcore_nodejs_eventloop_lag_max_seconds gauge\nvaultcore_nodejs_eventloop_lag_max_seconds 1.342177279\n\n# HELP vaultcore_nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_mean_seconds gauge\nvaultcore_nodejs_eventloop_lag_mean_seconds 0.01613920922581455\n\n# HELP vaultcore_nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_stddev_seconds gauge\nvaultcore_nodejs_eventloop_lag_stddev_seconds 0.003994930909108945\n\n# HELP vaultcore_nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p50_seconds gauge\nvaultcore_nodejs_eventloop_lag_p50_seconds 0.015835135\n\n# HELP vaultcore_nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p90_seconds gauge\nvaultcore_nodejs_eventloop_lag_p90_seconds 0.017743871\n\n# HELP vaultcore_nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p99_seconds gauge\nvaultcore_nodejs_eventloop_lag_p99_seconds 0.024707071\n\n# HELP vaultcore_nodejs_active_resources Number of active resources that are currently keeping the event loop alive, grouped by async resource type.\n# TYPE vaultcore_nodejs_active_resources gauge\nvaultcore_nodejs_active_resources{type=\"PipeWrap\"} 2\nvaultcore_nodejs_active_resources{type=\"TCPServerWrap\"} 1\nvaultcore_nodejs_active_resources{type=\"TCPSocketWrap\"} 5\nvaultcore_nodejs_active_resources{type=\"Immediate\"} 1\n\n# HELP vaultcore_nodejs_active_resources_total Total number of active resources.\n# TYPE vaultcore_nodejs_active_resources_total gauge\nvaultcore_nodejs_active_resources_total 9\n\n# HELP vaultcore_nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.\n# TYPE vaultcore_nodejs_active_handles gauge\nvaultcore_nodejs_active_handles{type=\"Socket\"} 7\nvaultcore_nodejs_active_handles{type=\"Server\"} 1\n\n# HELP vaultcore_nodejs_active_handles_total Total number of active handles.\n# TYPE vaultcore_nodejs_active_handles_total gauge\nvaultcore_nodejs_active_handles_total 8\n\n# HELP vaultcore_nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.\n# TYPE vaultcore_nodejs_active_requests gauge\n\n# HELP vaultcore_nodejs_active_requests_total Total number of active requests.\n# TYPE vaultcore_nodejs_active_requests_total gauge\nvaultcore_nodejs_active_requests_total 0\n\n# HELP vaultcore_nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_size_total_bytes gauge\nvaultcore_nodejs_heap_size_total_bytes 33439744\n\n# HELP vaultcore_nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_size_used_bytes gauge\nvaultcore_nodejs_heap_size_used_bytes 31019880\n\n# HELP vaultcore_nodejs_external_memory_bytes Node.js external memory size in bytes.\n# TYPE vaultcore_nodejs_external_memory_bytes gauge\nvaultcore_nodejs_external_memory_bytes 5175895\n\n# HELP vaultcore_nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_total_bytes gauge\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"new\"} 2097152\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"old\"} 22409216\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"code\"} 2883584\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"trusted\"} 4038656\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared_trusted\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"new_large_object\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"large_object\"} 1847296\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"code_large_object\"} 163840\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared_trusted_large_object\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_used_bytes gauge\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"new\"} 776144\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"old\"} 21994184\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"code\"} 2635264\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"trusted\"} 3619048\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared_trusted\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"new_large_object\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"large_object\"} 1835528\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"code_large_object\"} 163520\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared_trusted_large_object\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_available_bytes gauge\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"new\"} 272368\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"old\"} 358888\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"code\"} 247968\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"trusted\"} 418424\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared_trusted\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"new_large_object\"} 1048576\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"code_large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared_trusted_large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_version_info Node.js version info.\n# TYPE vaultcore_nodejs_version_info gauge\nvaultcore_nodejs_version_info{version=\"v24.18.0\",major=\"24\",minor=\"18\",patch=\"0\"} 1\n\n# HELP vaultcore_nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.\n# TYPE vaultcore_nodejs_gc_duration_seconds histogram\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"minor\"} 16\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"minor\"} 0.08683810043334961\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"minor\"} 49\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"incremental\"} 0.001500399947166443\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"incremental\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"major\"} 0\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"major\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"major\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"major\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"major\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"major\"} 3\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"major\"} 0.018413299798965454\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"major\"} 3\n\n# HELP vaultcore_http_requests_total Total number of HTTP requests processed by API Gateway\n# TYPE vaultcore_http_requests_total counter\nvaultcore_http_requests_total{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_requests_total{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_requests_total{method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_requests_total{method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_requests_total{method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\n\n# HELP vaultcore_http_request_duration_seconds HTTP request duration in seconds\n# TYPE vaultcore_http_request_duration_seconds histogram\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 0.0421813\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 0.0090359\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/health\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0.33475140000000003\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 4\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 1.0911798000000001\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/health/ready\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 5\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 7\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 0.3480188\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/metrics\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 0.0011339\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 4\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 6\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 10\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 0.1301412\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/admin/circuit-breakers\",status_code=\"200\",service=\"gateway-internal\"} 11\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 8\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 0.6905194\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/outbox/status\",status_code=\"200\",service=\"payment-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 4\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 8\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 0.6427892\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"200\",service=\"notification-service\"} 9\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 0.0587025\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/notifications/history\",status_code=\"200\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 0.1231832\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/accounts\",status_code=\"200\",service=\"account-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 0.0528188\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/accounts/:accountNumber/balance\",status_code=\"200\",service=\"account-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 0.107575\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/ledger/accounts/:accountNumber/entries\",status_code=\"200\",service=\"ledger-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 0.1149068\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/payments/history\",status_code=\"200\",service=\"payment-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 0.0209882\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_sum{method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 0.47827660000000005\nvaultcore_http_request_duration_seconds_count{method=\"POST\",path=\"/api/v1/auth/refresh\",status_code=\"200\",service=\"auth-service\"} 3\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 0.1879686\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/api/v1/notifications\",status_code=\"200\",service=\"notification-service\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 0.0158368\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\n\n# HELP vaultcore_http_errors_total Total number of HTTP error responses returned by API Gateway\n# TYPE vaultcore_http_errors_total counter\nvaultcore_http_errors_total{method=\"GET\",path=\"/api/v1/notifications/admin/status\",status_code=\"401\",service=\"notification-service\"} 2\n\n# HELP vaultcore_http_active_requests Number of active HTTP requests currently being processed by API Gateway\n# TYPE vaultcore_http_active_requests gauge\nvaultcore_http_active_requests{service=\"gateway-health\"} 0\nvaultcore_http_active_requests{service=\"gateway-internal\"} 7\nvaultcore_http_active_requests{service=\"payment-service\"} 1\nvaultcore_http_active_requests{service=\"notification-service\"} 0\nvaultcore_http_active_requests{service=\"account-service\"} 0\nvaultcore_http_active_requests{service=\"ledger-service\"} 0\nvaultcore_http_active_requests{service=\"auth-service\"} 0\n\n# HELP vaultcore_rate_limit_allowed_total Total number of requests allowed by distributed rate limiter\n# TYPE vaultcore_rate_limit_allowed_total counter\nvaultcore_rate_limit_allowed_total{tier=\"PAYMENT\"} 11\nvaultcore_rate_limit_allowed_total{tier=\"GENERAL\"} 7\nvaultcore_rate_limit_allowed_total{tier=\"AUTH\"} 3\n\n# HELP vaultcore_rate_limit_blocked_total Total number of requests blocked with 429 by distributed rate limiter\n# TYPE vaultcore_rate_limit_blocked_total counter\n\n# HELP vaultcore_circuit_breaker_state Current state of circuit breaker (0=CLOSED, 1=HALF_OPEN, 2=OPEN)\n# TYPE vaultcore_circuit_breaker_state gauge\nvaultcore_circuit_breaker_state{service=\"ledger-service\"} 0\nvaultcore_circuit_breaker_state{service=\"rabbitmq-publisher\"} 0\nvaultcore_circuit_breaker_state{service=\"notification-service\"} 0\nvaultcore_circuit_breaker_state{service=\"auth-service\"} 0\nvaultcore_circuit_breaker_state{service=\"account-service\"} 0\nvaultcore_circuit_breaker_state{service=\"payment-service\"} 0\n\n# HELP vaultcore_circuit_breaker_fail_fast_total Total number of fast-failed requests blocked by OPEN circuit breaker\n# TYPE vaultcore_circuit_breaker_fail_fast_total counter\n\n# HELP vaultcore_circuit_breaker_failures_total Total number of downstream failures recorded by circuit breaker\n# TYPE vaultcore_circuit_breaker_failures_total counter\n\n# HELP vaultcore_circuit_breaker_transitions_total Total number of circuit breaker state transitions\n# TYPE vaultcore_circuit_breaker_transitions_total counter\n\n# HELP vaultcore_circuit_breaker_recoveries_total Total number of successful circuit breaker recoveries\n# TYPE vaultcore_circuit_breaker_recoveries_total counter\n"
+    },
+    {
+      "name": "API Documentation (Swagger)",
+      "method": "GET",
+      "endpoint": "/docs",
+      "status": 200,
+      "durationMs": 45,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": "\n<!-- HTML for static distribution bundle build -->\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  \n  <title>Swagger UI</title>\n  <link rel=\"stylesheet\" type=\"text/css\" href=\"./swagger-ui.css\" >\n  <link rel=\"icon\" type=\"image/png\" href=\"./favicon-32x32.png\" sizes=\"32x32\" /><link rel=\"icon\" type=\"image/png\" href=\"./favicon-16x16.png\" sizes=\"16x16\" />\n  <style>\n    html\n    {\n      box-sizing: border-box;\n      overflow: -moz-scrollbars-vertical;\n      overflow-y: scroll;\n    }\n    *,\n    *:before,\n    *:after\n    {\n      box-sizing: inherit;\n    }\n\n    body {\n      margin:0;\n      background: #fafafa;\n    }\n  </style>\n</head>\n\n<body>\n\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" style=\"position:absolute;width:0;height:0\">\n  <defs>\n    <symbol viewBox=\"0 0 20 20\" id=\"unlocked\">\n      <path d=\"M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V6h2v-.801C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8z\"></path>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"locked\">\n      <path d=\"M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8zM12 8H8V5.199C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"close\">\n      <path d=\"M14.348 14.849c-.469.469-1.229.469-1.697 0L10 11.819l-2.651 3.029c-.469.469-1.229.469-1.697 0-.469-.469-.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-.469-.469-.469-1.228 0-1.697.469-.469 1.228-.469 1.697 0L10 8.183l2.651-3.031c.469-.469 1.228-.469 1.697 0 .469.469.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c.469.469.469 1.229 0 1.698z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"large-arrow\">\n      <path d=\"M13.25 10L6.109 2.58c-.268-.27-.268-.707 0-.979.268-.27.701-.27.969 0l7.83 7.908c.268.271.268.709 0 .979l-7.83 7.908c-.268.271-.701.27-.969 0-.268-.269-.268-.707 0-.979L13.25 10z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"large-arrow-down\">\n      <path d=\"M17.418 6.109c.272-.268.709-.268.979 0s.271.701 0 .969l-7.908 7.83c-.27.268-.707.268-.979 0l-7.908-7.83c-.27-.268-.27-.701 0-.969.271-.268.709-.268.979 0L10 13.25l7.418-7.141z\"/>\n    </symbol>\n\n\n    <symbol viewBox=\"0 0 24 24\" id=\"jump-to\">\n      <path d=\"M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 24 24\" id=\"expand\">\n      <path d=\"M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z\"/>\n    </symbol>\n\n  </defs>\n</svg>\n\n<div id=\"swagger-ui\"></div>\n\n<script src=\"./swagger-ui-bundle.js\"> </script>\n<script src=\"./swagger-ui-standalone-preset.js\"> </script>\n<script src=\"./swagger-ui-init.js\"> </script>\n\n\n\n<style>\n  .swagger-ui .topbar .download-url-wrapper { display: none } undefined\n</style>\n</body>\n\n</html>\n"
+    },
+    {
+      "name": "Customer Signup",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "status": 201,
+      "durationMs": 397,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "smoke.user.1789638343726@vaultcore.io",
+          "password": "Password123!",
+          "firstName": "Smoke",
+          "lastName": "Tester",
+          "role": "CUSTOMER"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "User registered successfully",
+        "data": {
+          "user": {
+            "id": "2f1d86d1-cbde-4588-9142-00fd97118b54",
+            "email": "smoke.user.1789638343726@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester",
+            "role": "CUSTOMER",
+            "isActive": true,
+            "deletedAt": null,
+            "createdAt": "2026-09-17T09:45:44.062Z",
+            "updatedAt": "2026-09-17T09:45:44.062Z"
+          },
+          "tokens": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJqdGkiOiI1N2I3MTliNi0yZWVkLTRiYTItODYwMS0wZWI2YmMyNDM3ODEiLCJ0b2tlblR5cGUiOiJSRUZSRVNIIiwiaWF0IjoxNzg5NjM4MzQ0LCJleHAiOjE3OTAyNDMxNDR9.vVLOIf8RuN1fK4vFpZPlQ14mDUa1UUnDKYbVOMB8e0c"
+          }
+        },
+        "timestamp": "2026-09-17T09:45:44.117Z"
+      }
+    },
+    {
+      "name": "Customer Login",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status": 200,
+      "durationMs": 140,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "smoke.user.1789638343726@vaultcore.io",
+          "password": "Password123!"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Login successful",
+        "data": {
+          "user": {
+            "id": "2f1d86d1-cbde-4588-9142-00fd97118b54",
+            "email": "smoke.user.1789638343726@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester",
+            "role": "CUSTOMER",
+            "isActive": true,
+            "deletedAt": null,
+            "createdAt": "2026-09-17T09:45:44.062Z",
+            "updatedAt": "2026-09-17T09:45:44.062Z"
+          },
+          "tokens": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJqdGkiOiJlOTc4ZjEzZS02NzQxLTQyNjctYWQxMy04MWY1OTA2MjBmMDEiLCJ0b2tlblR5cGUiOiJSRUZSRVNIIiwiaWF0IjoxNzg5NjM4MzQ0LCJleHAiOjE3OTAyNDMxNDR9.DZxbgdeKBT-wQ6aK_0alpZFkx1TcCloiIbb5P0DyNYA"
+          }
+        },
+        "timestamp": "2026-09-17T09:45:44.259Z"
+      }
+    },
+    {
+      "name": "List User Accounts",
+      "method": "GET",
+      "endpoint": "/accounts",
+      "status": 200,
+      "durationMs": 256,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "User bank accounts retrieved",
+        "data": {
+          "accounts": [],
+          "pagination": {
+            "page": 1,
+            "limit": 10,
+            "totalCount": 0,
+            "totalPages": 1
+          }
+        },
+        "timestamp": "2026-09-17T09:45:44.515Z"
+      }
+    },
+    {
+      "name": "Create Checking Account",
+      "method": "POST",
+      "endpoint": "/accounts",
+      "status": 201,
+      "durationMs": 61,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": {
+          "type": "CHECKING",
+          "currency": "USD",
+          "initialDeposit": 1500
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Bank account created successfully",
+        "data": {
+          "id": "2c701de3-018d-46f1-9d57-32d25a31a685",
+          "accountNumber": "100071381133",
+          "userId": "2f1d86d1-cbde-4588-9142-00fd97118b54",
+          "type": "CHECKING",
+          "status": "ACTIVE",
+          "balance": "1500",
+          "currency": "USD",
+          "version": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-17T09:45:44.550Z",
+          "updatedAt": "2026-09-17T09:45:44.550Z"
+        },
+        "timestamp": "2026-09-17T09:45:44.576Z"
+      }
+    },
+    {
+      "name": "Get Account Details",
+      "method": "GET",
+      "endpoint": "/accounts/100071381133",
+      "status": 200,
+      "durationMs": 42,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Account details retrieved",
+        "data": {
+          "id": "2c701de3-018d-46f1-9d57-32d25a31a685",
+          "accountNumber": "100071381133",
+          "userId": "2f1d86d1-cbde-4588-9142-00fd97118b54",
+          "type": "CHECKING",
+          "status": "ACTIVE",
+          "balance": "1500",
+          "currency": "USD",
+          "version": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-17T09:45:44.550Z",
+          "updatedAt": "2026-09-17T09:45:44.550Z",
+          "user": {
+            "id": "2f1d86d1-cbde-4588-9142-00fd97118b54",
+            "email": "smoke.user.1789638343726@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester"
+          }
+        },
+        "timestamp": "2026-09-17T09:45:44.618Z"
+      }
+    },
+    {
+      "name": "Get Account Balance",
+      "method": "GET",
+      "endpoint": "/accounts/100071381133/balance",
+      "status": 200,
+      "durationMs": 21,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Current account balance retrieved",
+        "data": {
+          "accountNumber": "100071381133",
+          "balance": "1500",
+          "currency": "USD",
+          "status": "ACTIVE"
+        },
+        "timestamp": "2026-09-17T09:45:44.641Z"
+      }
+    },
+    {
+      "name": "Get Payment History",
+      "method": "GET",
+      "endpoint": "/payments/history",
+      "status": 200,
+      "durationMs": 237,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Payment history retrieved successfully",
+        "data": {
+          "transactions": [],
+          "pagination": {
+            "limit": 20,
+            "totalCount": 0,
+            "hasMore": false,
+            "nextCursor": null
+          }
+        },
+        "timestamp": "2026-09-17T09:45:44.878Z"
+      }
+    },
+    {
+      "name": "Get Payment Summary",
+      "method": "GET",
+      "endpoint": "/payments/summary",
+      "status": 200,
+      "durationMs": 32,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Financial dashboard summary retrieved successfully",
+        "data": {
+          "currency": "USD",
+          "totalSent": 0,
+          "totalReceived": 0,
+          "totalVolume": 0,
+          "totalSuccessful": 0,
+          "totalFailed": 0,
+          "totalTransactions": 0,
+          "lastTransactionAt": null,
+          "monthlyVolume": []
+        },
+        "timestamp": "2026-09-17T09:45:44.910Z"
+      }
+    },
+    {
+      "name": "Get Notification History",
+      "method": "GET",
+      "endpoint": "/notifications/history",
+      "status": 200,
+      "durationMs": 217,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Notification history retrieved successfully",
+        "data": {
+          "notifications": [],
+          "pagination": {
+            "limit": 20,
+            "totalCount": 0,
+            "hasMore": false,
+            "nextCursor": null
+          }
+        },
+        "timestamp": "2026-09-17T09:45:45.125Z"
+      }
+    },
+    {
+      "name": "Get Ledger Entries for Account",
+      "method": "GET",
+      "endpoint": "/ledger/accounts/100071381133/entries",
+      "status": 200,
+      "durationMs": 247,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIyZjFkODZkMS1jYmRlLTQ1ODgtOTE0Mi0wMGZkOTcxMThiNTQiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTYzODM0MzcyNkB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk2MzgzNDQsImV4cCI6MTc4OTYzOTI0NH0.vKCUonqw6bGhOyOBlC4fofcBG7t0k1ST29p99cTHA_Y"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Account ledger history retrieved successfully",
+        "data": {
+          "accountNumber": "100071381133",
+          "currency": "USD",
+          "entries": [],
+          "pagination": {
+            "limit": 20,
+            "nextCursor": null
+          }
+        },
+        "timestamp": "2026-09-17T09:45:45.372Z"
+      }
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "VaultCore Payment Service API",
+    "version": "1.0.0",
+    "description": "Orchestration Microservice for secure money transfers, idempotency, internal Ledger Service coordination, transactional OutboxEvent emission, AuditLog records, and X-Trace-ID correlation."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3003",
+      "description": "Payment Microservice Direct Port"
+    },
+    {
+      "url": "http://localhost:3000/api/v1/payments",
+      "description": "API Gateway Proxy Route"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "TransferRequest": {
+        "type": "object",
+        "required": ["idempotencyKey", "sourceAccountNumber", "targetAccountNumber", "amount"],
+        "properties": {
+          "idempotencyKey": { "type": "string", "format": "uuid", "example": "a3b8c9d0-1234-4567-89ab-cdef01234567" },
+          "sourceAccountNumber": { "type": "string", "example": "100010001001" },
+          "targetAccountNumber": { "type": "string", "example": "200020002001" },
+          "amount": { "type": "number", "example": 250.00 },
+          "currency": { "type": "string", "default": "USD" },
+          "description": { "type": "string", "example": "Invoice #1042" }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "idempotencyKey": { "type": "string", "format": "uuid" },
+          "referenceId": { "type": "string", "example": "REF-20260915-A4F92C" },
+          "sourceAccountId": { "type": "string", "format": "uuid" },
+          "targetAccountId": { "type": "string", "format": "uuid" },
+          "amount": { "type": "number", "example": 250.00 },
+          "currency": { "type": "string", "example": "USD" },
+          "status": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] },
+          "description": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "security": [],
+        "responses": {
+          "200": { "description": "Payment Service is healthy" }
+        }
+      }
+    },
+    "/transfer": {
+      "post": {
+        "summary": "Initiate secure funds transfer",
+        "description": "Orchestrates money transfer: verifies ownership, creates PENDING state, calls internal Ledger Service with X-Trace-ID, writes OutboxEvent and AuditLog on success, or marks FAILED on ledger error.",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" }, "description": "Correlation trace ID" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Transfer executed and completed successfully" },
+          "200": { "description": "Idempotent duplicate request returned existing transaction" },
+          "400": { "description": "Validation error or insufficient funds" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden - Sender does not own source account" },
+          "404": { "description": "Source or receiver account not found" }
+        }
+      }
+    },
+    "/history": {
+      "get": {
+        "summary": "Fetch cursor-paginated payment transfer history for authenticated user",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" }, "description": "Cursor pagination ID" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] } },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] } },
+          { "name": "minAmount", "in": "query", "schema": { "type": "number" } },
+          { "name": "maxAmount", "in": "query", "schema": { "type": "number" } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "referenceId", "in": "query", "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "List of user payment transactions with nextCursor, hasMore, and totalCount metadata" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Search transactions using multi-criteria filters",
+        "description": "Filter by reference ID, account number, status, category, amount range, and date range.",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "referenceId", "in": "query", "schema": { "type": "string" } },
+          { "name": "accountNumber", "in": "query", "schema": { "type": "string" } },
+          { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "REVERSED"] } },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["TRANSFER", "DEPOSIT", "WITHDRAWAL"] } },
+          { "name": "minAmount", "in": "query", "schema": { "type": "number" } },
+          { "name": "maxAmount", "in": "query", "schema": { "type": "number" } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 20 } }
+        ],
+        "responses": {
+          "200": { "description": "Matching transactions returned with cursor pagination" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/summary": {
+      "get": {
+        "summary": "Financial dashboard summary and monthly analytics",
+        "description": "Returns total sent, total received, total volume, success/fail counts, and monthly breakdown.",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date-time" } },
+          { "name": "accountNumber", "in": "query", "schema": { "type": "string" } },
+          { "name": "currency", "in": "query", "schema": { "type": "string", "default": "USD" } }
+        ],
+        "responses": {
+          "200": { "description": "Financial dashboard summary and monthly volumes returned" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/{referenceId}": {
+      "get": {
+        "summary": "Fetch payment transaction details by Reference ID with ledger correlation",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } },
+          { "name": "referenceId", "in": "path", "required": true, "schema": { "type": "string", "example": "REF-20260915-A4F92C" } }
+        ],
+        "responses": {
+          "200": { "description": "Payment transaction details returned including participants and ledger entries" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden - User is not a participant in this transaction" },
+          "404": { "description": "Payment not found" }
+        }
+      }
+    },
+    "/status": {
+      "get": {
+        "summary": "Outbox status and background worker statistics",
+        "description": "Returns pending events, published events, failed events, queue publish latency, and retry metrics.",
+        "parameters": [
+          { "name": "X-Trace-ID", "in": "header", "required": false, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Outbox monitoring statistics retrieved successfully" }
+        }
+      }
+    }
+  }
+}

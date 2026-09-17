@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'vaultcore-gateway'
+    static_configs:
+      - targets: ['gateway:3000']
+
+  - job_name: 'vaultcore-auth'
+    static_configs:
+      - targets: ['auth-service:3001']
+
+  - job_name: 'vaultcore-account'
+    static_configs:
+      - targets: ['account-service:3002']
+
+  - job_name: 'vaultcore-payment'
+    static_configs:
+      - targets: ['payment-service:3003']
+
+  - job_name: 'vaultcore-ledger'
+    static_configs:
+      - targets: ['ledger-service:3004']
+
+  - job_name: 'vaultcore-notification'
+    static_configs:
+      - targets: ['notification-service:3005']
