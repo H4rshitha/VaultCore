@@ -9,9 +9,6 @@
     "services/*",
     "frontend"
   ],
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "scripts": {
     "start": "docker compose up --build",
     "start:dev": "docker compose up",

@@ -42,9 +42,13 @@ jobs:
         run: npm ci
 
       - name: 5. Run Prisma Schema Validation
+        env:
+          DATABASE_URL: postgresql://vaultcore:vaultcore_password@localhost:5432/vaultcore_db
         run: npx prisma validate --schema=prisma/schema.prisma
 
       - name: 6. Generate Prisma Client
+        env:
+          DATABASE_URL: postgresql://vaultcore:vaultcore_password@localhost:5432/vaultcore_db
         run: npx prisma generate --schema=prisma/schema.prisma
 
       - name: 7. Run Prettier Formatting Check
@@ -96,6 +100,8 @@ jobs:
         run: npm ci
 
       - name: 5. Generate Prisma Client for services
+        env:
+          DATABASE_URL: postgresql://vaultcore:vaultcore_password@localhost:5432/vaultcore_db
         run: npx prisma generate --schema=prisma/schema.prisma
 
       - name: 6. Run Unit Tests for Backend Services
