@@ -197,10 +197,16 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
+      - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
       db-migrate:
         condition: service_completed_successfully
       rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   # ──────────────────────────────────────────────────────────────────────────

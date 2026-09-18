@@ -1,19 +1,477 @@
 {
   "targetUrl": "http://localhost:3000",
-  "timestamp": "2026-09-18T12:23:46.593Z",
-  "totalTests": 1,
-  "passed": 0,
+  "timestamp": "2026-09-18T12:29:43.031Z",
+  "totalTests": 14,
+  "passed": 13,
   "failed": 1,
   "results": [
     {
       "name": "Gateway Health",
       "method": "GET",
       "endpoint": "/health",
-      "status": "NETWORK_ERROR",
-      "durationMs": 134,
+      "status": 200,
+      "durationMs": 171,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "VaultCore API Gateway is healthy",
+        "data": {
+          "status": "UP",
+          "service": "api-gateway",
+          "version": "1.0.0",
+          "timestamp": "2026-09-18T12:29:41.955Z",
+          "uptime": 48,
+          "downstreamServices": {
+            "auth": "http://auth-service:3001",
+            "account": "http://account-service:3002",
+            "payment": "http://payment-service:3003",
+            "ledger": "http://ledger-service:3004",
+            "notification": "http://notification-service:3005"
+          },
+          "timeouts": {
+            "auth": 3000,
+            "account": 5000,
+            "payment": 8000,
+            "ledger": 8000,
+            "notification": 5000
+          }
+        },
+        "timestamp": "2026-09-18T12:29:41.955Z"
+      }
+    },
+    {
+      "name": "Gateway Liveness",
+      "method": "GET",
+      "endpoint": "/health/live",
+      "status": 200,
+      "durationMs": 25,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Gateway is alive",
+        "data": {
+          "status": "UP",
+          "timestamp": "2026-09-18T12:29:41.995Z",
+          "uptime": 49,
+          "memoryUsage": {
+            "rss": 87019520,
+            "heapTotal": 22736896,
+            "heapUsed": 19832752,
+            "external": 4043229,
+            "arrayBuffers": 256402
+          }
+        },
+        "timestamp": "2026-09-18T12:29:41.995Z"
+      }
+    },
+    {
+      "name": "Gateway Readiness",
+      "method": "GET",
+      "endpoint": "/health/ready",
+      "status": 200,
+      "durationMs": 91,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Platform dependencies status",
+        "data": {
+          "status": "DEGRADED",
+          "timestamp": "2026-09-18T12:29:42.086Z",
+          "uptime": 49,
+          "infrastructure": {
+            "postgres": {
+              "status": "UP",
+              "latencyMs": 5
+            },
+            "redis": {
+              "status": "UP",
+              "latencyMs": 66
+            },
+            "rabbitmq": {
+              "status": "DOWN",
+              "error": "",
+              "latencyMs": 39
+            }
+          },
+          "microservices": {
+            "auth": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 53,
+              "endpoint": "http://auth-service:3001/health/live"
+            },
+            "account": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 39,
+              "endpoint": "http://account-service:3002/health/live"
+            },
+            "payment": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 44,
+              "endpoint": "http://payment-service:3003/health/live"
+            },
+            "ledger": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 44,
+              "endpoint": "http://ledger-service:3004/health/live"
+            },
+            "notification": {
+              "status": "UP",
+              "statusCode": 200,
+              "latencyMs": 43,
+              "endpoint": "http://notification-service:3005/health/live"
+            }
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.086Z"
+      }
+    },
+    {
+      "name": "Prometheus Metrics",
+      "method": "GET",
+      "endpoint": "/metrics",
+      "status": 200,
+      "durationMs": 25,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": "# HELP vaultcore_process_cpu_user_seconds_total Total user CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_user_seconds_total counter\nvaultcore_process_cpu_user_seconds_total 0.576944\n\n# HELP vaultcore_process_cpu_system_seconds_total Total system CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_system_seconds_total counter\nvaultcore_process_cpu_system_seconds_total 0.17371799999999998\n\n# HELP vaultcore_process_cpu_seconds_total Total user and system CPU time spent in seconds.\n# TYPE vaultcore_process_cpu_seconds_total counter\nvaultcore_process_cpu_seconds_total 0.7506619999999999\n\n# HELP vaultcore_process_start_time_seconds Start time of the process since unix epoch in seconds.\n# TYPE vaultcore_process_start_time_seconds gauge\nvaultcore_process_start_time_seconds 1789734533\n\n# HELP vaultcore_process_resident_memory_bytes Resident memory size in bytes.\n# TYPE vaultcore_process_resident_memory_bytes gauge\nvaultcore_process_resident_memory_bytes 97939456\n\n# HELP vaultcore_process_virtual_memory_bytes Virtual memory size in bytes.\n# TYPE vaultcore_process_virtual_memory_bytes gauge\nvaultcore_process_virtual_memory_bytes 11513815040\n\n# HELP vaultcore_process_heap_bytes Process heap size in bytes.\n# TYPE vaultcore_process_heap_bytes gauge\nvaultcore_process_heap_bytes 124784640\n\n# HELP vaultcore_process_open_fds Number of open file descriptors.\n# TYPE vaultcore_process_open_fds gauge\nvaultcore_process_open_fds 30\n\n# HELP vaultcore_process_max_fds Maximum number of open file descriptors.\n# TYPE vaultcore_process_max_fds gauge\nvaultcore_process_max_fds 1048576\n\n# HELP vaultcore_nodejs_eventloop_lag_seconds Lag of event loop in seconds.\n# TYPE vaultcore_nodejs_eventloop_lag_seconds gauge\nvaultcore_nodejs_eventloop_lag_seconds 0.00257848\n\n# HELP vaultcore_nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.\n# TYPE vaultcore_nodejs_eventloop_lag_min_seconds gauge\nvaultcore_nodejs_eventloop_lag_min_seconds 0.010043392\n\n# HELP vaultcore_nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.\n# TYPE vaultcore_nodejs_eventloop_lag_max_seconds gauge\nvaultcore_nodejs_eventloop_lag_max_seconds 0.031260671\n\n# HELP vaultcore_nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_mean_seconds gauge\nvaultcore_nodejs_eventloop_lag_mean_seconds 0.01087682386440678\n\n# HELP vaultcore_nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_stddev_seconds gauge\nvaultcore_nodejs_eventloop_lag_stddev_seconds 0.0030647568008329213\n\n# HELP vaultcore_nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p50_seconds gauge\nvaultcore_nodejs_eventloop_lag_p50_seconds 0.010199039\n\n# HELP vaultcore_nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p90_seconds gauge\nvaultcore_nodejs_eventloop_lag_p90_seconds 0.010379263\n\n# HELP vaultcore_nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.\n# TYPE vaultcore_nodejs_eventloop_lag_p99_seconds gauge\nvaultcore_nodejs_eventloop_lag_p99_seconds 0.021004287\n\n# HELP vaultcore_nodejs_active_resources Number of active resources that are currently keeping the event loop alive, grouped by async resource type.\n# TYPE vaultcore_nodejs_active_resources gauge\nvaultcore_nodejs_active_resources{type=\"PipeWrap\"} 2\nvaultcore_nodejs_active_resources{type=\"TCPServerWrap\"} 1\nvaultcore_nodejs_active_resources{type=\"TCPSocketWrap\"} 6\nvaultcore_nodejs_active_resources{type=\"Immediate\"} 1\n\n# HELP vaultcore_nodejs_active_resources_total Total number of active resources.\n# TYPE vaultcore_nodejs_active_resources_total gauge\nvaultcore_nodejs_active_resources_total 10\n\n# HELP vaultcore_nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.\n# TYPE vaultcore_nodejs_active_handles gauge\nvaultcore_nodejs_active_handles{type=\"Socket\"} 8\nvaultcore_nodejs_active_handles{type=\"Server\"} 1\n\n# HELP vaultcore_nodejs_active_handles_total Total number of active handles.\n# TYPE vaultcore_nodejs_active_handles_total gauge\nvaultcore_nodejs_active_handles_total 9\n\n# HELP vaultcore_nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.\n# TYPE vaultcore_nodejs_active_requests gauge\n\n# HELP vaultcore_nodejs_active_requests_total Total number of active requests.\n# TYPE vaultcore_nodejs_active_requests_total gauge\nvaultcore_nodejs_active_requests_total 0\n\n# HELP vaultcore_nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_size_total_bytes gauge\nvaultcore_nodejs_heap_size_total_bytes 22736896\n\n# HELP vaultcore_nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_size_used_bytes gauge\nvaultcore_nodejs_heap_size_used_bytes 20370168\n\n# HELP vaultcore_nodejs_external_memory_bytes Node.js external memory size in bytes.\n# TYPE vaultcore_nodejs_external_memory_bytes gauge\nvaultcore_nodejs_external_memory_bytes 4032627\n\n# HELP vaultcore_nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_total_bytes gauge\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"new\"} 1048576\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"old\"} 15777792\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"code\"} 1572864\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"trusted\"} 2670592\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"new_large_object\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"large_object\"} 1511424\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"code_large_object\"} 155648\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_total_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_used_bytes gauge\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"new\"} 537488\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"old\"} 14580552\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"code\"} 1282944\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"trusted\"} 2343320\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"new_large_object\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"large_object\"} 1491232\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"code_large_object\"} 138432\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_used_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.\n# TYPE vaultcore_nodejs_heap_space_size_available_bytes gauge\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"read_only\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"new\"} 493424\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"old\"} 919472\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"code\"} 191424\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"trusted\"} 278664\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"new_large_object\"} 1048576\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"code_large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"shared_large_object\"} 0\nvaultcore_nodejs_heap_space_size_available_bytes{space=\"trusted_large_object\"} 0\n\n# HELP vaultcore_nodejs_version_info Node.js version info.\n# TYPE vaultcore_nodejs_version_info gauge\nvaultcore_nodejs_version_info{version=\"v22.23.2\",major=\"22\",minor=\"23\",patch=\"2\"} 1\n\n# HELP vaultcore_nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.\n# TYPE vaultcore_nodejs_gc_duration_seconds histogram\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"incremental\"} 1\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"incremental\"} 0.0030359009997919205\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"incremental\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"major\"} 0\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"major\"} 1\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"major\"} 0.021324285998940467\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"major\"} 2\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.001\",kind=\"minor\"} 1\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.01\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"0.1\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"1\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"2\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"5\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_bucket{le=\"+Inf\",kind=\"minor\"} 3\nvaultcore_nodejs_gc_duration_seconds_sum{kind=\"minor\"} 0.004261670999228954\nvaultcore_nodejs_gc_duration_seconds_count{kind=\"minor\"} 3\n\n# HELP vaultcore_http_requests_total Total number of HTTP requests processed by API Gateway\n# TYPE vaultcore_http_requests_total counter\nvaultcore_http_requests_total{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_requests_total{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\n\n# HELP vaultcore_http_request_duration_seconds HTTP request duration in seconds\n# TYPE vaultcore_http_request_duration_seconds histogram\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 0.004652356\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 0.001622867\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health/live\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.005\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.01\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.025\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.05\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0\nvaultcore_http_request_duration_seconds_bucket{le=\"0.1\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.25\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"0.5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"1\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"2.5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"5\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"10\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_bucket{le=\"+Inf\",method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\nvaultcore_http_request_duration_seconds_sum{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 0.069643995\nvaultcore_http_request_duration_seconds_count{method=\"GET\",path=\"/health/ready\",status_code=\"200\",service=\"gateway-health\"} 1\n\n# HELP vaultcore_http_errors_total Total number of HTTP error responses returned by API Gateway\n# TYPE vaultcore_http_errors_total counter\n\n# HELP vaultcore_http_active_requests Number of active HTTP requests currently being processed by API Gateway\n# TYPE vaultcore_http_active_requests gauge\nvaultcore_http_active_requests{service=\"gateway-health\"} 0\n\n# HELP vaultcore_rate_limit_allowed_total Total number of requests allowed by distributed rate limiter\n# TYPE vaultcore_rate_limit_allowed_total counter\n\n# HELP vaultcore_rate_limit_blocked_total Total number of requests blocked with 429 by distributed rate limiter\n# TYPE vaultcore_rate_limit_blocked_total counter\n\n# HELP vaultcore_circuit_breaker_state Current state of circuit breaker (0=CLOSED, 1=HALF_OPEN, 2=OPEN)\n# TYPE vaultcore_circuit_breaker_state gauge\nvaultcore_circuit_breaker_state{service=\"ledger-service\"} 0\nvaultcore_circuit_breaker_state{service=\"rabbitmq-publisher\"} 0\nvaultcore_circuit_breaker_state{service=\"notification-service\"} 0\nvaultcore_circuit_breaker_state{service=\"auth-service\"} 0\nvaultcore_circuit_breaker_state{service=\"account-service\"} 0\nvaultcore_circuit_breaker_state{service=\"payment-service\"} 0\n\n# HELP vaultcore_circuit_breaker_fail_fast_total Total number of fast-failed requests blocked by OPEN circuit breaker\n# TYPE vaultcore_circuit_breaker_fail_fast_total counter\n\n# HELP vaultcore_circuit_breaker_failures_total Total number of downstream failures recorded by circuit breaker\n# TYPE vaultcore_circuit_breaker_failures_total counter\n\n# HELP vaultcore_circuit_breaker_transitions_total Total number of circuit breaker state transitions\n# TYPE vaultcore_circuit_breaker_transitions_total counter\n\n# HELP vaultcore_circuit_breaker_recoveries_total Total number of successful circuit breaker recoveries\n# TYPE vaultcore_circuit_breaker_recoveries_total counter\n"
+    },
+    {
+      "name": "API Documentation (Swagger)",
+      "method": "GET",
+      "endpoint": "/docs",
+      "status": 200,
+      "durationMs": 19,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null
+      },
+      "response": "\n<!-- HTML for static distribution bundle build -->\n<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  \n  <title>Swagger UI</title>\n  <link rel=\"stylesheet\" type=\"text/css\" href=\"./swagger-ui.css\" >\n  <link rel=\"icon\" type=\"image/png\" href=\"./favicon-32x32.png\" sizes=\"32x32\" /><link rel=\"icon\" type=\"image/png\" href=\"./favicon-16x16.png\" sizes=\"16x16\" />\n  <style>\n    html\n    {\n      box-sizing: border-box;\n      overflow: -moz-scrollbars-vertical;\n      overflow-y: scroll;\n    }\n    *,\n    *:before,\n    *:after\n    {\n      box-sizing: inherit;\n    }\n\n    body {\n      margin:0;\n      background: #fafafa;\n    }\n  </style>\n</head>\n\n<body>\n\n<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" style=\"position:absolute;width:0;height:0\">\n  <defs>\n    <symbol viewBox=\"0 0 20 20\" id=\"unlocked\">\n      <path d=\"M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V6h2v-.801C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8z\"></path>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"locked\">\n      <path d=\"M15.8 8H14V5.6C14 2.703 12.665 1 10 1 7.334 1 6 2.703 6 5.6V8H4c-.553 0-1 .646-1 1.199V17c0 .549.428 1.139.951 1.307l1.197.387C5.672 18.861 6.55 19 7.1 19h5.8c.549 0 1.428-.139 1.951-.307l1.196-.387c.524-.167.953-.757.953-1.306V9.199C17 8.646 16.352 8 15.8 8zM12 8H8V5.199C8 3.754 8.797 3 10 3c1.203 0 2 .754 2 2.199V8z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"close\">\n      <path d=\"M14.348 14.849c-.469.469-1.229.469-1.697 0L10 11.819l-2.651 3.029c-.469.469-1.229.469-1.697 0-.469-.469-.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-.469-.469-.469-1.228 0-1.697.469-.469 1.228-.469 1.697 0L10 8.183l2.651-3.031c.469-.469 1.228-.469 1.697 0 .469.469.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c.469.469.469 1.229 0 1.698z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"large-arrow\">\n      <path d=\"M13.25 10L6.109 2.58c-.268-.27-.268-.707 0-.979.268-.27.701-.27.969 0l7.83 7.908c.268.271.268.709 0 .979l-7.83 7.908c-.268.271-.701.27-.969 0-.268-.269-.268-.707 0-.979L13.25 10z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 20 20\" id=\"large-arrow-down\">\n      <path d=\"M17.418 6.109c.272-.268.709-.268.979 0s.271.701 0 .969l-7.908 7.83c-.27.268-.707.268-.979 0l-7.908-7.83c-.27-.268-.27-.701 0-.969.271-.268.709-.268.979 0L10 13.25l7.418-7.141z\"/>\n    </symbol>\n\n\n    <symbol viewBox=\"0 0 24 24\" id=\"jump-to\">\n      <path d=\"M19 7v4H5.83l3.58-3.59L8 6l-6 6 6 6 1.41-1.41L5.83 13H21V7z\"/>\n    </symbol>\n\n    <symbol viewBox=\"0 0 24 24\" id=\"expand\">\n      <path d=\"M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z\"/>\n    </symbol>\n\n  </defs>\n</svg>\n\n<div id=\"swagger-ui\"></div>\n\n<script src=\"./swagger-ui-bundle.js\"> </script>\n<script src=\"./swagger-ui-standalone-preset.js\"> </script>\n<script src=\"./swagger-ui-init.js\"> </script>\n\n\n\n<style>\n  .swagger-ui .topbar .download-url-wrapper { display: none } undefined\n</style>\n</body>\n\n</html>\n"
+    },
+    {
+      "name": "Customer Signup",
+      "method": "POST",
+      "endpoint": "/auth/signup",
+      "status": 201,
+      "durationMs": 300,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "smoke.user.1789734582135@vaultcore.io",
+          "password": "Password123!",
+          "firstName": "Smoke",
+          "lastName": "Tester",
+          "role": "CUSTOMER"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "User registered successfully",
+        "data": {
+          "user": {
+            "id": "7e909078-1564-42ef-b4bf-fd277226b96c",
+            "email": "smoke.user.1789734582135@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester",
+            "role": "CUSTOMER",
+            "isActive": true,
+            "deletedAt": null,
+            "createdAt": "2026-09-18T12:29:42.401Z",
+            "updatedAt": "2026-09-18T12:29:42.401Z"
+          },
+          "tokens": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJqdGkiOiI5NTgzN2FjZS1mZDFlLTQ4NmEtYmZkZi1kNTc5NTJlOTRmMDYiLCJ0b2tlblR5cGUiOiJSRUZSRVNIIiwiaWF0IjoxNzg5NzM0NTgyLCJleHAiOjE3OTAzMzkzODJ9.QPRxc7FdJGo7yVJcfWX2ljvte8iWnGjoAiPue9McwzE"
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.428Z"
+      }
+    },
+    {
+      "name": "Customer Login",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "status": 200,
+      "durationMs": 142,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "email": "smoke.user.1789734582135@vaultcore.io",
+          "password": "Password123!"
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Login successful",
+        "data": {
+          "user": {
+            "id": "7e909078-1564-42ef-b4bf-fd277226b96c",
+            "email": "smoke.user.1789734582135@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester",
+            "role": "CUSTOMER",
+            "isActive": true,
+            "deletedAt": null,
+            "createdAt": "2026-09-18T12:29:42.401Z",
+            "updatedAt": "2026-09-18T12:29:42.401Z"
+          },
+          "tokens": {
+            "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA",
+            "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJqdGkiOiIwOTkyZTY2My00ZGUwLTRjMjMtOGEyOC0wYzhjMjFmYjI0NjciLCJ0b2tlblR5cGUiOiJSRUZSRVNIIiwiaWF0IjoxNzg5NzM0NTgyLCJleHAiOjE3OTAzMzkzODJ9.wDV4ZmvRR-6B-_JtnY0W1bclUGOdjjqixiT44UtP_Y4"
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.574Z"
+      }
+    },
+    {
+      "name": "List User Accounts",
+      "method": "GET",
+      "endpoint": "/accounts",
+      "status": 200,
+      "durationMs": 119,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "User bank accounts retrieved",
+        "data": {
+          "accounts": [],
+          "pagination": {
+            "page": 1,
+            "limit": 10,
+            "totalCount": 0,
+            "totalPages": 1
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.691Z"
+      }
+    },
+    {
+      "name": "Create Checking Account",
+      "method": "POST",
+      "endpoint": "/accounts",
+      "status": 201,
+      "durationMs": 48,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": {
+          "type": "CHECKING",
+          "currency": "USD",
+          "initialDeposit": 1500
+        }
+      },
+      "response": {
+        "success": true,
+        "message": "Bank account created successfully",
+        "data": {
+          "id": "6111cbe0-7a66-4cba-9c69-8375249d7b41",
+          "accountNumber": "100072739647",
+          "userId": "7e909078-1564-42ef-b4bf-fd277226b96c",
+          "type": "CHECKING",
+          "status": "ACTIVE",
+          "balance": "1500",
+          "currency": "USD",
+          "version": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-18T12:29:42.728Z",
+          "updatedAt": "2026-09-18T12:29:42.728Z"
+        },
+        "timestamp": "2026-09-18T12:29:42.742Z"
+      }
+    },
+    {
+      "name": "Get Account Details",
+      "method": "GET",
+      "endpoint": "/accounts/100072739647",
+      "status": 200,
+      "durationMs": 27,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Account details retrieved",
+        "data": {
+          "id": "6111cbe0-7a66-4cba-9c69-8375249d7b41",
+          "accountNumber": "100072739647",
+          "userId": "7e909078-1564-42ef-b4bf-fd277226b96c",
+          "type": "CHECKING",
+          "status": "ACTIVE",
+          "balance": "1500",
+          "currency": "USD",
+          "version": 0,
+          "deletedAt": null,
+          "createdAt": "2026-09-18T12:29:42.728Z",
+          "updatedAt": "2026-09-18T12:29:42.728Z",
+          "user": {
+            "id": "7e909078-1564-42ef-b4bf-fd277226b96c",
+            "email": "smoke.user.1789734582135@vaultcore.io",
+            "firstName": "Smoke",
+            "lastName": "Tester"
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.768Z"
+      }
+    },
+    {
+      "name": "Get Account Balance",
+      "method": "GET",
+      "endpoint": "/accounts/100072739647/balance",
+      "status": 200,
+      "durationMs": 16,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Current account balance retrieved",
+        "data": {
+          "accountNumber": "100072739647",
+          "balance": "1500",
+          "currency": "USD",
+          "status": "ACTIVE"
+        },
+        "timestamp": "2026-09-18T12:29:42.785Z"
+      }
+    },
+    {
+      "name": "Get Payment History",
+      "method": "GET",
+      "endpoint": "/payments/history",
+      "status": 200,
+      "durationMs": 112,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Payment history retrieved successfully",
+        "data": {
+          "transactions": [],
+          "pagination": {
+            "limit": 20,
+            "totalCount": 0,
+            "hasMore": false,
+            "nextCursor": null
+          }
+        },
+        "timestamp": "2026-09-18T12:29:42.896Z"
+      }
+    },
+    {
+      "name": "Get Payment Summary",
+      "method": "GET",
+      "endpoint": "/payments/summary",
+      "status": 200,
+      "durationMs": 31,
+      "success": true,
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": true,
+        "message": "Financial dashboard summary retrieved successfully",
+        "data": {
+          "currency": "USD",
+          "totalSent": 0,
+          "totalReceived": 0,
+          "totalVolume": 0,
+          "totalSuccessful": 0,
+          "totalFailed": 0,
+          "totalTransactions": 0,
+          "lastTransactionAt": null,
+          "monthlyVolume": []
+        },
+        "timestamp": "2026-09-18T12:29:42.929Z"
+      }
+    },
+    {
+      "name": "Get Notification History",
+      "method": "GET",
+      "endpoint": "/notifications/history",
+      "status": 500,
+      "durationMs": 97,
       "success": false,
-      "error": "fetch failed"
+      "request": {
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZTkwOTA3OC0xNTY0LTQyZWYtYjRiZi1mZDI3NzIyNmI5NmMiLCJlbWFpbCI6InNtb2tlLnVzZXIuMTc4OTczNDU4MjEzNUB2YXVsdGNvcmUuaW8iLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODk3MzQ1ODIsImV4cCI6MTc4OTczNTQ4Mn0.AEKED2lhFXh6Q9dFsVFmgIjauiCQx8ui4zbUHFG3dkA"
+        },
+        "body": null
+      },
+      "response": {
+        "success": false,
+        "error": {
+          "message": "Internal Server Error",
+          "details": null
+        },
+        "timestamp": "2026-09-18T12:29:43.026Z"
+      }
     }
   ],
-  "error": "fetch failed"
+  "error": "Smoke test failed at [GET /notifications/history] with status 500"
 }
