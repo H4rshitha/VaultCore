@@ -76,6 +76,7 @@ services:
     environment:
       - PORT=3000
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
       - AUTH_SERVICE_URL=http://auth-service:3001
       - ACCOUNT_SERVICE_URL=http://account-service:3002
       - PAYMENT_SERVICE_URL=http://payment-service:3003
@@ -193,9 +194,12 @@ services:
       - '3015:3005'
     environment:
       - PORT=3005
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
     depends_on:
+      db-migrate:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
 
