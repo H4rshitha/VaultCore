@@ -75,3 +75,7 @@ For complete detailed guides:
 - [Architecture Overview](docs/architecture.md)
 - [API Specifications](docs/api-spec.md)
 - [Getting Started & Local Development](docs/getting-started.md)
+
+## CI Test
+
+Testing GitHub Actions CI workflow.
