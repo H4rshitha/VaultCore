@@ -121,7 +121,11 @@ export const DashboardPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2 flex-wrap">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-semibold uppercase tracking-wider">
-              {isStaff ? <Building2 className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+              {isStaff ? (
+                <Building2 className="w-3.5 h-3.5" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5" />
+              )}
               <span>{isStaff ? 'Branch Operations Console' : 'VaultCore Banking Portal'}</span>
             </div>
             {isStaff && (
@@ -218,7 +222,9 @@ export const DashboardPage = () => {
               <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                 {stats?.totalAccounts !== undefined ? stats.totalAccounts : accounts.length}
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">Active Portfolios</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">
+                Active Portfolios
+              </span>
             </div>
             <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
               <ShieldCheck className="w-3.5 h-3.5" />
@@ -338,7 +344,9 @@ export const DashboardPage = () => {
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Transfer Money
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Instant ACID payment</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Instant ACID payment
+              </span>
             </div>
 
             <div
@@ -351,7 +359,9 @@ export const DashboardPage = () => {
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 View Accounts
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Manage all portfolios</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Manage all portfolios
+              </span>
             </div>
 
             <div
@@ -364,7 +374,9 @@ export const DashboardPage = () => {
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Transactions
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">History & audit logs</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                History & audit logs
+              </span>
             </div>
 
             <div
@@ -377,7 +389,9 @@ export const DashboardPage = () => {
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Notifications
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">Email & SMS alerts</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                Email & SMS alerts
+              </span>
             </div>
           </div>
         </div>

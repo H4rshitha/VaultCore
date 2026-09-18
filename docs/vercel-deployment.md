@@ -56,40 +56,45 @@ flowchart TD
 ## 3. Step-by-Step Vercel Deployment
 
 ### Step 3.1: Log into Vercel
+
 1. Navigate to [https://vercel.com](https://vercel.com).
 2. Click **Log In** and select **Continue with GitHub**.
 
 ### Step 3.2: Import Git Repository
+
 1. In the Vercel Dashboard, click **"Add New..."** > **"Project"**.
 2. Select your GitHub repository (`VaultCore` or `H4rshitha/VaultCore`).
 3. Click **Import**.
 
 ### Step 3.3: Configure Project Settings
+
 In the project configuration screen, set the following parameters:
 
-| Configuration Field | Value | Notes |
-| :--- | :--- | :--- |
-| **Project Name** | `vaultcore-frontend` | Or any unique name you prefer |
-| **Framework Preset** | `Vite` | Auto-detected from package.json |
-| **Root Directory** | `frontend` | **Crucial**: Click "Edit" and select `frontend` |
-| **Build Command** | `npm run build` | Default Vite build script |
-| **Output Directory** | `dist` | Default Vite build output directory |
-| **Install Command** | `npm install` | Default package installation |
+| Configuration Field  | Value                | Notes                                           |
+| :------------------- | :------------------- | :---------------------------------------------- |
+| **Project Name**     | `vaultcore-frontend` | Or any unique name you prefer                   |
+| **Framework Preset** | `Vite`               | Auto-detected from package.json                 |
+| **Root Directory**   | `frontend`           | **Crucial**: Click "Edit" and select `frontend` |
+| **Build Command**    | `npm run build`      | Default Vite build script                       |
+| **Output Directory** | `dist`               | Default Vite build output directory             |
+| **Install Command**  | `npm install`        | Default package installation                    |
 
 ### Step 3.4: Set Environment Variables
+
 Expand the **Environment Variables** accordion and add the following:
 
-| Variable Name | Example Value (Production) | Description |
-| :--- | :--- | :--- |
-| `VITE_GATEWAY_URL` | `https://vaultcore-gateway.onrender.com` | Root URL of production API Gateway |
-| `VITE_API_BASE_URL` | `https://vaultcore-gateway.onrender.com/api/v1` | Base REST API endpoint |
-| `VITE_SSE_URL` | `https://vaultcore-gateway.onrender.com/api/v1/events/stream` | Real-time SSE notification stream |
-| `VITE_APP_ENV` | `production` | Deployment environment identifier |
-| `VITE_APP_NAME` | `VaultCore Enterprise` | App title branding |
+| Variable Name       | Example Value (Production)                                    | Description                        |
+| :------------------ | :------------------------------------------------------------ | :--------------------------------- |
+| `VITE_GATEWAY_URL`  | `https://vaultcore-gateway.onrender.com`                      | Root URL of production API Gateway |
+| `VITE_API_BASE_URL` | `https://vaultcore-gateway.onrender.com/api/v1`               | Base REST API endpoint             |
+| `VITE_SSE_URL`      | `https://vaultcore-gateway.onrender.com/api/v1/events/stream` | Real-time SSE notification stream  |
+| `VITE_APP_ENV`      | `production`                                                  | Deployment environment identifier  |
+| `VITE_APP_NAME`     | `VaultCore Enterprise`                                        | App title branding                 |
 
 > **Note**: You can also add variables for **Preview** and **Development** environments in Vercel if using staging gateway endpoints.
 
 ### Step 3.5: Deploy
+
 1. Click **Deploy**.
 2. Vercel will clone the repository, install dependencies in `frontend/`, run `vite build`, and deploy the production bundle to global Edge locations.
 3. Once complete, you will receive a live URL: `https://vaultcore-frontend.vercel.app` (or your custom domain).
@@ -152,13 +157,13 @@ The repository includes `frontend/vercel.json` which guarantees proper SPA behav
 
 ## 5. Local Development vs. Production Configuration
 
-| Feature | Local Development | Production (Vercel) |
-| :--- | :--- | :--- |
-| **Gateway URL** | `http://localhost:3000` | `https://<your-backend-gateway-url>` |
-| **API Base URL** | `http://localhost:3000/api/v1` | `https://<your-backend-gateway-url>/api/v1` |
-| **Config Source** | `frontend/.env.development` or `frontend/.env.local` | Vercel Environment Variables (`VITE_*`) |
-| **Trace ID** | Generated per request (`X-Trace-ID: req-...`) | Generated per request (`X-Trace-ID: req-...`) |
-| **CORS** | Handled by API Gateway for `localhost:5173` | Handled by API Gateway for `*.vercel.app` & custom domains |
+| Feature           | Local Development                                    | Production (Vercel)                                        |
+| :---------------- | :--------------------------------------------------- | :--------------------------------------------------------- |
+| **Gateway URL**   | `http://localhost:3000`                              | `https://<your-backend-gateway-url>`                       |
+| **API Base URL**  | `http://localhost:3000/api/v1`                       | `https://<your-backend-gateway-url>/api/v1`                |
+| **Config Source** | `frontend/.env.development` or `frontend/.env.local` | Vercel Environment Variables (`VITE_*`)                    |
+| **Trace ID**      | Generated per request (`X-Trace-ID: req-...`)        | Generated per request (`X-Trace-ID: req-...`)              |
+| **CORS**          | Handled by API Gateway for `localhost:5173`          | Handled by API Gateway for `*.vercel.app` & custom domains |
 
 ---
 
@@ -173,14 +178,17 @@ The repository includes `frontend/vercel.json` which guarantees proper SPA behav
 ## 7. Troubleshooting & FAQ
 
 ### 1. 404 on Page Refresh (e.g., `/dashboard`, `/accounts`, `/transfers`)
+
 - **Cause**: The web server tries to find a physical file matching `/dashboard` instead of falling back to `/index.html`.
 - **Solution**: The `rewrites` configuration in `frontend/vercel.json` resolves this automatically. Verify that `Root Directory` is set to `frontend` in Vercel.
 
 ### 2. CORS Errors in Browser Console
+
 - **Cause**: Backend API Gateway does not allow the Vercel domain origin.
 - **Solution**: Ensure your API Gateway CORS configuration (`CORS_ORIGIN`) permits your Vercel URL (e.g. `https://vaultcore-frontend.vercel.app` or `*` in development).
 
 ### 3. API Requests Going to `http://localhost:3000` on Vercel
+
 - **Cause**: Missing `VITE_GATEWAY_URL` or `VITE_API_BASE_URL` in Vercel project environment variables.
 - **Solution**: Add the variables in Vercel Project Settings > **Environment Variables** and trigger a **Redeploy** (Build cache disabled).
 

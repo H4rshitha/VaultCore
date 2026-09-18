@@ -285,7 +285,13 @@ export class PaymentService {
   async processDeposit(userContext, depositData, metaContext = {}) {
     const { userId, role } = userContext;
     const { traceId, ip, userAgent } = metaContext;
-    const { idempotencyKey, accountNumber, amount, currency = 'USD', description = 'Cash Deposit' } = depositData;
+    const {
+      idempotencyKey,
+      accountNumber,
+      amount,
+      currency = 'USD',
+      description = 'Cash Deposit',
+    } = depositData;
 
     // 1. Layer 1 Idempotency Check
     const cachedResult = await lockService.getIdempotencyRecord(idempotencyKey, traceId);
@@ -352,7 +358,12 @@ export class PaymentService {
       };
 
       await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
-      logger.info('Cash deposit processed successfully', { accountNumber, amount, referenceId, traceId });
+      logger.info('Cash deposit processed successfully', {
+        accountNumber,
+        amount,
+        referenceId,
+        traceId,
+      });
       return responsePayload;
     } finally {
       await lockService.releaseAccountLocks(acquiredLocks, traceId);
@@ -365,7 +376,13 @@ export class PaymentService {
   async processWithdrawal(userContext, withdrawalData, metaContext = {}) {
     const { userId, role } = userContext;
     const { traceId, ip, userAgent } = metaContext;
-    const { idempotencyKey, accountNumber, amount, currency = 'USD', description = 'Cash Withdrawal' } = withdrawalData;
+    const {
+      idempotencyKey,
+      accountNumber,
+      amount,
+      currency = 'USD',
+      description = 'Cash Withdrawal',
+    } = withdrawalData;
 
     // 1. Layer 1 Idempotency Check
     const cachedResult = await lockService.getIdempotencyRecord(idempotencyKey, traceId);
@@ -440,7 +457,12 @@ export class PaymentService {
       };
 
       await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
-      logger.info('Cash withdrawal processed successfully', { accountNumber, amount, referenceId, traceId });
+      logger.info('Cash withdrawal processed successfully', {
+        accountNumber,
+        amount,
+        referenceId,
+        traceId,
+      });
       return responsePayload;
     } finally {
       await lockService.releaseAccountLocks(acquiredLocks, traceId);

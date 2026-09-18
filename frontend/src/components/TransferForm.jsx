@@ -60,7 +60,8 @@ export const TransferForm = ({ onTransferSuccess }) => {
 
   const watchedSource = watch('sourceAccountNumber');
   const watchedAcc = watch('accountNumber');
-  const activeAccountNum = activeTab === 'transfer' ? watchedSource || selectedAccount : watchedAcc || selectedAccount;
+  const activeAccountNum =
+    activeTab === 'transfer' ? watchedSource || selectedAccount : watchedAcc || selectedAccount;
 
   // Real-time balance hook for the currently active account
   const {
@@ -357,7 +358,9 @@ export const TransferForm = ({ onTransferSuccess }) => {
           {operationReceipt.description && (
             <div className="flex items-center justify-between py-1.5 border-b border-slate-100 dark:border-slate-800/60">
               <span className="text-slate-500 dark:text-slate-400">Memo</span>
-              <span className="text-slate-800 dark:text-slate-200">{operationReceipt.description}</span>
+              <span className="text-slate-800 dark:text-slate-200">
+                {operationReceipt.description}
+              </span>
             </div>
           )}
           <div className="flex items-center justify-between py-1.5">
@@ -405,9 +408,12 @@ export const TransferForm = ({ onTransferSuccess }) => {
               {activeTab === 'withdraw' && 'Cash Withdrawal'}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {activeTab === 'transfer' && 'Instant ACID-compliant internal and cross-account payments'}
-              {activeTab === 'deposit' && 'Add verified funds into customer account with ledger credit'}
-              {activeTab === 'withdraw' && 'Deduct funds from customer account with overdraft protection'}
+              {activeTab === 'transfer' &&
+                'Instant ACID-compliant internal and cross-account payments'}
+              {activeTab === 'deposit' &&
+                'Add verified funds into customer account with ledger credit'}
+              {activeTab === 'withdraw' &&
+                'Deduct funds from customer account with overdraft protection'}
             </p>
           </div>
         </div>
@@ -460,7 +466,9 @@ export const TransferForm = ({ onTransferSuccess }) => {
         <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/80 text-red-700 dark:text-red-300 flex items-start gap-3 text-xs">
           <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
           <div>
-            <span className="font-semibold block text-red-800 dark:text-red-200">Operation Error</span>
+            <span className="font-semibold block text-red-800 dark:text-red-200">
+              Operation Error
+            </span>
             <span>{errorMessage}</span>
           </div>
         </div>
@@ -481,7 +489,9 @@ export const TransferForm = ({ onTransferSuccess }) => {
                 disabled={isRefreshingBalance}
                 className="text-[11px] font-medium text-slate-500 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
               >
-                <RefreshCw className={`w-3 h-3 ${isRefreshingBalance ? 'animate-spin text-brand-500' : ''}`} />
+                <RefreshCw
+                  className={`w-3 h-3 ${isRefreshingBalance ? 'animate-spin text-brand-500' : ''}`}
+                />
                 <span>Refresh Balance</span>
               </button>
             </div>
@@ -546,7 +556,9 @@ export const TransferForm = ({ onTransferSuccess }) => {
                   disabled={isRefreshingBalance}
                   className="text-[11px] font-medium text-slate-500 hover:text-brand-500 flex items-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw className={`w-3 h-3 ${isRefreshingBalance ? 'animate-spin text-brand-500' : ''}`} />
+                  <RefreshCw
+                    className={`w-3 h-3 ${isRefreshingBalance ? 'animate-spin text-brand-500' : ''}`}
+                  />
                   <span>Refresh Balance</span>
                 </button>
               )}
@@ -609,7 +621,10 @@ export const TransferForm = ({ onTransferSuccess }) => {
               type="text"
               {...register('targetAccountNumber', {
                 required: 'Destination account number is required',
-                pattern: { value: /^\d{12}$/, message: 'Must be a 12-digit numeric account number' },
+                pattern: {
+                  value: /^\d{12}$/,
+                  message: 'Must be a 12-digit numeric account number',
+                },
               })}
               placeholder="e.g. 100019829799"
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-white focus:outline-none focus:border-brand-500 font-mono"

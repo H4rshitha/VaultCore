@@ -36,7 +36,11 @@ const services = [
   { name: 'Account Service', script: 'services/account-service/src/server.js', port: 3002 },
   { name: 'Payment Service', script: 'services/payment-service/src/server.js', port: 3003 },
   { name: 'Ledger Service', script: 'services/ledger-service/src/server.js', port: 3004 },
-  { name: 'Notification Service', script: 'services/notification-service/src/server.js', port: 3005 },
+  {
+    name: 'Notification Service',
+    script: 'services/notification-service/src/server.js',
+    port: 3005,
+  },
 ];
 
 const children = [];
