@@ -79,22 +79,38 @@ export class LedgerRepository {
       const newSourceBalance = sourceBalanceNum - transferAmountNum;
       const newTargetBalance = Number(targetAccount.balance) + transferAmountNum;
 
-      // 5. Update Account Balances & Version Counters
-      const updatedSourceAccount = await tx.account.update({
-        where: { id: sourceAccount.id },
+      // 5. Update Account Balances with Optimistic Locking (version = expectedVersion)
+      const sourceUpdate = await tx.account.updateMany({
+        where: { id: sourceAccount.id, version: sourceAccount.version },
         data: {
           balance: newSourceBalance,
           version: { increment: 1 },
         },
       });
 
-      const updatedTargetAccount = await tx.account.update({
-        where: { id: targetAccount.id },
+      if (sourceUpdate.count === 0) {
+        throw new ConflictError(
+          `Optimistic lock conflict on source account ${sourceAccountNumber}: concurrent modification detected. Please retry the transfer.`
+        );
+      }
+
+      const targetUpdate = await tx.account.updateMany({
+        where: { id: targetAccount.id, version: targetAccount.version },
         data: {
           balance: newTargetBalance,
           version: { increment: 1 },
         },
       });
+
+      if (targetUpdate.count === 0) {
+        throw new ConflictError(
+          `Optimistic lock conflict on target account ${targetAccountNumber}: concurrent modification detected. Please retry the transfer.`
+        );
+      }
+
+      // Re-fetch updated accounts to return current state
+      const updatedSourceAccount = await tx.account.findUnique({ where: { id: sourceAccount.id } });
+      const updatedTargetAccount = await tx.account.findUnique({ where: { id: targetAccount.id } });
 
       // 6. Reuse existing Transaction or create if not present
       let transactionRecord;

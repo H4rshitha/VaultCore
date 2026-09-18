@@ -8,6 +8,8 @@ import {
   requestLogger,
   traceMiddleware,
   ApiResponse,
+  createServiceMetricsMiddleware,
+  metricsEndpointHandler,
 } from '@vaultcore/shared';
 import fs from 'fs';
 import accountRoutes from './routes/accountRoutes.js';
@@ -29,9 +31,12 @@ app.use(
 );
 app.use(express.json());
 app.use(traceMiddleware);
+app.use(createServiceMetricsMiddleware('account-service'));
 app.use(requestLogger(logger));
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+app.get('/metrics', metricsEndpointHandler);
 
 app.get(['/health', '/health/live'], (req, res) => {
   return ApiResponse.success(res, 'Account Service is healthy', { status: 'UP' });

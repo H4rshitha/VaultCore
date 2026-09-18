@@ -13,7 +13,7 @@
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
       "targets": [
         {
-          "expr": "sum(rate(vaultcore_http_requests_total{service=\"api-gateway\"}[1m]))",
+          "expr": "sum(rate(vaultcore_http_requests_total{service=~\"gateway.*\"}[1m]))",
           "legendFormat": "Total Requests / sec"
         }
       ]
@@ -24,15 +24,15 @@
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=\"api-gateway\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=~\"gateway.*\"}[1m])) by (le))",
           "legendFormat": "P50 Latency"
         },
         {
-          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=\"api-gateway\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=~\"gateway.*\"}[1m])) by (le))",
           "legendFormat": "P95 Latency"
         },
         {
-          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=\"api-gateway\"}[1m])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(vaultcore_http_request_duration_seconds_bucket{service=~\"gateway.*\"}[1m])) by (le))",
           "legendFormat": "P99 Latency"
         }
       ]
@@ -43,7 +43,7 @@
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
       "targets": [
         {
-          "expr": "sum(rate(vaultcore_http_errors_total[1m])) / sum(rate(vaultcore_http_requests_total[1m])) * 100",
+          "expr": "sum(rate(vaultcore_http_errors_total{service=~\"gateway.*\"}[1m])) / sum(rate(vaultcore_http_requests_total{service=~\"gateway.*\"}[1m])) * 100",
           "legendFormat": "Error Rate (%)"
         }
       ]
@@ -71,6 +71,17 @@
         {
           "expr": "vaultcore_circuit_breaker_state",
           "legendFormat": "Service {{service}}"
+        }
+      ]
+    },
+    {
+      "title": "Active Requests per Downstream Service",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "vaultcore_http_active_requests",
+          "legendFormat": "{{service}}"
         }
       ]
     }

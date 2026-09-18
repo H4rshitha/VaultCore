@@ -4,25 +4,43 @@ global:
 
 scrape_configs:
   - job_name: 'vaultcore-gateway'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['gateway:3000']
+        labels:
+          service: 'gateway'
 
   - job_name: 'vaultcore-auth'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['auth-service:3001']
+        labels:
+          service: 'auth-service'
 
   - job_name: 'vaultcore-account'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['account-service:3002']
+        labels:
+          service: 'account-service'
 
   - job_name: 'vaultcore-payment'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['payment-service:3003']
+        labels:
+          service: 'payment-service'
 
   - job_name: 'vaultcore-ledger'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['ledger-service:3004']
+        labels:
+          service: 'ledger-service'
 
   - job_name: 'vaultcore-notification'
+    metrics_path: '/metrics'
     static_configs:
       - targets: ['notification-service:3005']
+        labels:
+          service: 'notification-service'
