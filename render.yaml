@@ -1,5 +1,5 @@
 # VaultCore — Render Infrastructure-as-Code Blueprint
-# Automatically provisions PostgreSQL, Redis Key-Value, API Gateway, and Microservices
+# Automatically provisions PostgreSQL, Redis, API Gateway, and Microservices
 
 databases:
   - name: vaultcore-postgres
@@ -8,13 +8,16 @@ databases:
     plan: free
     region: oregon
 
-keyvalues:
-  - name: vaultcore-redis
+services:
+  # ────────────────────────────────────────────────────────────────────────────
+  # 0. Redis Cache (Key-Value DB0-DB3)
+  # ────────────────────────────────────────────────────────────────────────────
+  - type: redis
+    name: vaultcore-redis
     plan: free
     region: oregon
     ipAllowList: [] # Internal access only within Render private network
 
-services:
   # ────────────────────────────────────────────────────────────────────────────
   # 1. API Gateway (Public Web Service — Entry point for Vercel Frontend)
   # ────────────────────────────────────────────────────────────────────────────
@@ -39,7 +42,8 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
       - key: AUTH_SERVICE_URL
@@ -77,7 +81,8 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
       - key: JWT_SECRET
@@ -106,7 +111,8 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
 
@@ -130,7 +136,8 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
       - key: LEDGER_SERVICE_URL
@@ -166,7 +173,8 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
       - key: JWT_SECRET
@@ -200,6 +208,7 @@ services:
           name: vaultcore-postgres
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: redis
           name: vaultcore-redis
           property: connectionString
