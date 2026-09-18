@@ -4,11 +4,13 @@ import { OutboxRepository } from '../services/payment-service/src/repositories/o
 import { OutboxPublisher } from '../services/payment-service/src/services/outboxPublisher.js';
 import { OutboxWorker } from '../services/payment-service/src/services/outboxWorker.js';
 import { RabbitMQClient, createLogger } from '@vaultcore/shared';
+import { PrismaClient } from '@prisma/client';
 
 process.env.DATABASE_URL =
   process.env.DATABASE_URL ||
-  'postgresql://vaultuser:vaultpass@localhost:5433/vaultcore_db?schema=public';
+  'postgresql://vaultcore:vaultcore_password@localhost:5433/vaultcore_db?schema=public';
 
+const prisma = new PrismaClient();
 const logger = createLogger('test-outbox');
 
 async function runTests() {
@@ -229,7 +231,13 @@ async function runTests() {
   console.log('========================================================================\n');
 }
 
-runTests().catch((err) => {
-  console.error('\n✖ Test failed:', err);
-  process.exit(1);
-});
+runTests()
+  .then(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
+  })
+  .catch(async (err) => {
+    console.error('\n✖ Test failed:', err);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

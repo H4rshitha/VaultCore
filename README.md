@@ -79,3 +79,7 @@ For complete detailed guides:
 ### GitHub Actions CI Verification (Retry)
 
 Testing CI workflow after fixes.
+
+### Docker Pipeline Verification
+
+Testing GitHub Container Registry build workflow.

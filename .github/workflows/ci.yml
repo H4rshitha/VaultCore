@@ -265,7 +265,7 @@ jobs:
             local script="$1"
             local log="$2"
             echo "▶ Running $script..."
-            timeout 300 node "$script" 2>&1 | tee "$log" || echo "⚠️ $script timed out or failed (continuing)"
+            timeout 60 node "$script" 2>&1 | tee "$log" || echo "⚠️ $script timed out or failed (continuing)"
           }
           run_test scratch/test-api-gateway.js          coverage/integration/test-api-gateway.log
           run_test scratch/test-circuit-breaker.js      coverage/integration/test-circuit-breaker.log
