@@ -11,6 +11,27 @@ export const createRedisClient = (config = {}, logger) => {
         ? parseInt(process.env.REDIS_DB, 10)
         : 0;
 
+  if (process.env.REDIS_URL || config.url) {
+    const url = config.url || process.env.REDIS_URL;
+    const redis = new Redis(url, {
+      db,
+      retryStrategy(times) {
+        const delay = Math.min(times * 100, 3000);
+        return delay;
+      },
+    });
+
+    redis.on('connect', () => {
+      if (logger) logger.info(`Connected to Redis via URL (DB ${db})`);
+    });
+
+    redis.on('error', (err) => {
+      if (logger) logger.error(`Redis client error (DB ${db}): ${err.message}`);
+    });
+
+    return redis;
+  }
+
   const redis = new Redis({
     host,
     port,
