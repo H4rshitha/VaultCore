@@ -153,6 +153,8 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - LEDGER_SERVICE_URL=http://ledger-service:3004
+      - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
       db-migrate:
@@ -161,6 +163,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      ledger-service:
+        condition: service_started
 
   ledger-service:
     build:
@@ -176,6 +180,7 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
       db-migrate:

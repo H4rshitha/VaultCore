@@ -84,7 +84,7 @@ export class PaymentService {
         throw new NotFoundError(`Source account ${sourceAccountNumber} not found`);
       }
 
-      if (sourceAccount.userId !== userId && role !== 'ADMIN') {
+      if (sourceAccount.userId !== userId && role !== 'ADMIN' && role !== 'TELLER') {
         logger.warn(
           `Unauthorized transfer attempt: User ${userId} tried to debit account ${sourceAccountNumber}`,
           {
@@ -277,5 +277,173 @@ export class PaymentService {
 
     const summary = await paymentRepository.getFinancialSummary(userContext, filters);
     return summary;
+  }
+
+  /**
+   * Cash Deposit (Orchestrated with distributed locking, idempotency, ledger credit, and cache invalidation)
+   */
+  async processDeposit(userContext, depositData, metaContext = {}) {
+    const { userId, role } = userContext;
+    const { traceId, ip, userAgent } = metaContext;
+    const { idempotencyKey, accountNumber, amount, currency = 'USD', description = 'Cash Deposit' } = depositData;
+
+    // 1. Layer 1 Idempotency Check
+    const cachedResult = await lockService.getIdempotencyRecord(idempotencyKey, traceId);
+    if (cachedResult) {
+      return { ...cachedResult, isIdempotent: true };
+    }
+
+    // 2. Lock Account on Redis DB2
+    const acquiredLocks = await lockService.acquireAccountLocks([accountNumber], traceId);
+
+    try {
+      // 3. Layer 2 Idempotency Check
+      const existingTx = await paymentRepository.findByIdempotencyKey(idempotencyKey);
+      if (existingTx) {
+        const responsePayload = {
+          transaction: existingTx,
+          referenceId: existingTx.referenceId,
+          status: existingTx.status,
+          amount: existingTx.amount,
+          currency: existingTx.currency,
+          accountNumber,
+          description: existingTx.description,
+          isIdempotent: true,
+        };
+        await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
+        return responsePayload;
+      }
+
+      // 4. Validate Account
+      const account = await paymentRepository.findAccountByNumber(accountNumber);
+      if (!account) {
+        throw new NotFoundError(`Account ${accountNumber} not found`);
+      }
+      if (account.status !== 'ACTIVE') {
+        throw new BadRequestError(`Account ${accountNumber} is ${account.status}`);
+      }
+
+      const referenceId = generateReferenceId();
+
+      // 5. Call Ledger Service Deposit
+      const ledgerResult = await LedgerClient.recordDeposit({
+        idempotencyKey,
+        referenceId,
+        accountNumber,
+        amount,
+        currency,
+        description,
+        traceId,
+      });
+
+      // 6. Invalidate Account Cache
+      await accountCache.invalidateAccounts([accountNumber], traceId);
+
+      const responsePayload = {
+        transaction: ledgerResult.transaction,
+        account: ledgerResult.account,
+        referenceId,
+        status: 'COMPLETED',
+        amount,
+        currency,
+        accountNumber,
+        description,
+        isIdempotent: false,
+      };
+
+      await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
+      logger.info('Cash deposit processed successfully', { accountNumber, amount, referenceId, traceId });
+      return responsePayload;
+    } finally {
+      await lockService.releaseAccountLocks(acquiredLocks, traceId);
+    }
+  }
+
+  /**
+   * Cash Withdrawal (Orchestrated with distributed locking, balance verification, ledger debit, and cache invalidation)
+   */
+  async processWithdrawal(userContext, withdrawalData, metaContext = {}) {
+    const { userId, role } = userContext;
+    const { traceId, ip, userAgent } = metaContext;
+    const { idempotencyKey, accountNumber, amount, currency = 'USD', description = 'Cash Withdrawal' } = withdrawalData;
+
+    // 1. Layer 1 Idempotency Check
+    const cachedResult = await lockService.getIdempotencyRecord(idempotencyKey, traceId);
+    if (cachedResult) {
+      return { ...cachedResult, isIdempotent: true };
+    }
+
+    // 2. Lock Account on Redis DB2
+    const acquiredLocks = await lockService.acquireAccountLocks([accountNumber], traceId);
+
+    try {
+      // 3. Layer 2 Idempotency Check
+      const existingTx = await paymentRepository.findByIdempotencyKey(idempotencyKey);
+      if (existingTx) {
+        const responsePayload = {
+          transaction: existingTx,
+          referenceId: existingTx.referenceId,
+          status: existingTx.status,
+          amount: existingTx.amount,
+          currency: existingTx.currency,
+          accountNumber,
+          description: existingTx.description,
+          isIdempotent: true,
+        };
+        await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
+        return responsePayload;
+      }
+
+      // 4. Validate Account & Ownership
+      const account = await paymentRepository.findAccountByNumber(accountNumber);
+      if (!account) {
+        throw new NotFoundError(`Account ${accountNumber} not found`);
+      }
+      if (account.userId !== userId && role !== 'ADMIN' && role !== 'TELLER') {
+        throw new ForbiddenError('Access denied: You do not own this bank account');
+      }
+      if (account.status !== 'ACTIVE') {
+        throw new BadRequestError(`Account ${accountNumber} is ${account.status}`);
+      }
+      if (Number(account.balance) < Number(amount)) {
+        throw new BadRequestError(
+          `Insufficient funds in account ${accountNumber}. Current balance: ${account.balance} ${account.currency}`
+        );
+      }
+
+      const referenceId = generateReferenceId();
+
+      // 5. Call Ledger Service Withdrawal
+      const ledgerResult = await LedgerClient.recordWithdrawal({
+        idempotencyKey,
+        referenceId,
+        accountNumber,
+        amount,
+        currency,
+        description,
+        traceId,
+      });
+
+      // 6. Invalidate Account Cache
+      await accountCache.invalidateAccounts([accountNumber], traceId);
+
+      const responsePayload = {
+        transaction: ledgerResult.transaction,
+        account: ledgerResult.account,
+        referenceId,
+        status: 'COMPLETED',
+        amount,
+        currency,
+        accountNumber,
+        description,
+        isIdempotent: false,
+      };
+
+      await lockService.setIdempotencyRecord(idempotencyKey, responsePayload, traceId);
+      logger.info('Cash withdrawal processed successfully', { accountNumber, amount, referenceId, traceId });
+      return responsePayload;
+    } finally {
+      await lockService.releaseAccountLocks(acquiredLocks, traceId);
+    }
   }
 }

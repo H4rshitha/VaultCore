@@ -29,6 +29,44 @@ export const transferValidation = [
     .withMessage('Description cannot exceed 255 characters'),
 ];
 
+export const depositValidation = [
+  body('idempotencyKey').isUUID().withMessage('idempotencyKey must be a valid UUID'),
+  body('accountNumber')
+    .isLength({ min: 12, max: 12 })
+    .isNumeric()
+    .withMessage('Account number must be a 12-digit numeric string'),
+  body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number greater than 0'),
+  body('currency')
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .toUpperCase()
+    .withMessage('Currency must be a 3-character ISO code (e.g. USD)'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Description cannot exceed 255 characters'),
+];
+
+export const withdrawValidation = [
+  body('idempotencyKey').isUUID().withMessage('idempotencyKey must be a valid UUID'),
+  body('accountNumber')
+    .isLength({ min: 12, max: 12 })
+    .isNumeric()
+    .withMessage('Account number must be a 12-digit numeric string'),
+  body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number greater than 0'),
+  body('currency')
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .toUpperCase()
+    .withMessage('Currency must be a 3-character ISO code (e.g. USD)'),
+  body('description')
+    .optional()
+    .trim()
+    .isLength({ max: 255 })
+    .withMessage('Description cannot exceed 255 characters'),
+];
+
 export const getPaymentParamsValidation = [
   param('referenceId').trim().notEmpty().withMessage('referenceId parameter is required'),
 ];

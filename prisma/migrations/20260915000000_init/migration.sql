@@ -9,6 +9,8 @@ CREATE TYPE "TransactionCategory" AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER');
 CREATE TYPE "TransactionStatus" AS ENUM ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'REVERSED');
 CREATE TYPE "TransactionType" AS ENUM ('DEBIT', 'CREDIT');
 CREATE TYPE "OutboxStatus" AS ENUM ('PENDING', 'PUBLISHED', 'FAILED');
+CREATE TYPE "NotificationType" AS ENUM ('EMAIL', 'SMS', 'PUSH');
+CREATE TYPE "NotificationStatus" AS ENUM ('PENDING', 'SENT', 'FAILED', 'DELIVERED');
 
 -- Create Table: users
 CREATE TABLE "users" (
@@ -108,6 +110,25 @@ CREATE TABLE "audit_logs" (
     CONSTRAINT "audit_logs_pkey" PRIMARY KEY ("id")
 );
 
+-- Create Table: notification_audits
+CREATE TABLE "notification_audits" (
+    "id" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
+    "transactionId" TEXT,
+    "notificationType" "NotificationType" NOT NULL DEFAULT 'EMAIL',
+    "recipient" TEXT NOT NULL,
+    "status" "NotificationStatus" NOT NULL DEFAULT 'SENT',
+    "retryCount" INTEGER NOT NULL DEFAULT 0,
+    "errorMessage" TEXT,
+    "traceId" TEXT,
+    "payload" JSONB,
+    "processedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "notification_audits_pkey" PRIMARY KEY ("id")
+);
+
 -- Unique Indexes
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE UNIQUE INDEX "accounts_accountNumber_key" ON "accounts"("accountNumber");
@@ -143,6 +164,12 @@ CREATE INDEX "audit_logs_userId_idx" ON "audit_logs"("userId");
 CREATE INDEX "audit_logs_action_idx" ON "audit_logs"("action");
 CREATE INDEX "audit_logs_entityId_idx" ON "audit_logs"("entityId");
 CREATE INDEX "audit_logs_createdAt_idx" ON "audit_logs"("createdAt");
+
+CREATE UNIQUE INDEX "notification_audits_eventId_key" ON "notification_audits"("eventId");
+CREATE INDEX "notification_audits_transactionId_idx" ON "notification_audits"("transactionId");
+CREATE INDEX "notification_audits_recipient_idx" ON "notification_audits"("recipient");
+CREATE INDEX "notification_audits_status_idx" ON "notification_audits"("status");
+CREATE INDEX "notification_audits_createdAt_idx" ON "notification_audits"("createdAt");
 
 -- Foreign Keys
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

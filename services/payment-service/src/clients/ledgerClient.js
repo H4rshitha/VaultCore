@@ -134,4 +134,93 @@ export class LedgerClient {
       { traceId }
     );
   }
+
+  /**
+   * Post single-account cash deposit to Ledger Service
+   */
+  static async recordDeposit({
+    idempotencyKey,
+    referenceId,
+    accountNumber,
+    amount,
+    currency = 'USD',
+    description,
+    traceId,
+  }) {
+    return await ledgerCircuitBreaker.execute(
+      async () => {
+        const url = `${config.ledgerServiceUrl}/entries/deposit`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-service-api-key': config.internalApiKey,
+            ...(traceId ? { 'X-Trace-ID': traceId } : {}),
+          },
+          body: JSON.stringify({
+            idempotencyKey,
+            referenceId,
+            accountNumber,
+            amount,
+            currency,
+            description,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          const err = new Error(data.error?.message || 'Ledger deposit failed');
+          err.statusCode = response.status;
+          throw err;
+        }
+        return data.data;
+      },
+      { traceId }
+    );
+  }
+
+  /**
+   * Post single-account cash withdrawal to Ledger Service
+   */
+  static async recordWithdrawal({
+    idempotencyKey,
+    referenceId,
+    accountNumber,
+    amount,
+    currency = 'USD',
+    description,
+    traceId,
+  }) {
+    return await ledgerCircuitBreaker.execute(
+      async () => {
+        const url = `${config.ledgerServiceUrl}/entries/withdraw`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-service-api-key': config.internalApiKey,
+            ...(traceId ? { 'X-Trace-ID': traceId } : {}),
+          },
+          body: JSON.stringify({
+            idempotencyKey,
+            referenceId,
+            accountNumber,
+            amount,
+            currency,
+            description,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          const err = new Error(data.error?.message || 'Ledger withdrawal failed');
+          err.statusCode = response.status;
+          throw err;
+        }
+        return data.data;
+      },
+      { traceId }
+    );
+  }
 }
+

@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { LedgerController } from '../controllers/ledgerController.js';
 import {
   postDoubleEntryValidation,
+  postDepositValidation,
+  postWithdrawalValidation,
   getLedgerHistoryValidation,
 } from '../validators/ledgerValidators.js';
 import { validateRequest } from '../middleware/validateRequest.js';
@@ -20,6 +22,22 @@ router.post(
   postDoubleEntryValidation,
   validateRequest,
   LedgerController.recordTransfer
+);
+
+router.post(
+  '/entries/deposit',
+  authenticateInternalService,
+  postDepositValidation,
+  validateRequest,
+  LedgerController.recordDeposit
+);
+
+router.post(
+  '/entries/withdraw',
+  authenticateInternalService,
+  postWithdrawalValidation,
+  validateRequest,
+  LedgerController.recordWithdrawal
 );
 
 /**

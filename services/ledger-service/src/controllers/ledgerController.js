@@ -44,4 +44,25 @@ export class LedgerController {
       next(error);
     }
   }
+
+  static async recordDeposit(req, res, next) {
+    try {
+      const result = await ledgerService.recordDeposit(req.body, req.traceId);
+      const statusCode = result.isIdempotent ? 200 : 201;
+      return ApiResponse.success(res, 'Cash deposit recorded successfully', result, statusCode);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async recordWithdrawal(req, res, next) {
+    try {
+      const result = await ledgerService.recordWithdrawal(req.body, req.traceId);
+      const statusCode = result.isIdempotent ? 200 : 201;
+      return ApiResponse.success(res, 'Cash withdrawal recorded successfully', result, statusCode);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
+

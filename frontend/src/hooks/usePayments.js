@@ -51,6 +51,96 @@ export const useTransferMoney = () => {
 };
 
 /**
+ * Hook to execute a cash deposit into a bank account.
+ */
+export const useDepositMoney = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (depositData) => {
+      const res = await paymentApi.deposit(depositData);
+      return res?.data || res;
+    },
+    onMutate: () => {
+      const toastId = toast.loading('Processing cash deposit...');
+      return { toastId };
+    },
+    onSuccess: (data, variables, context) => {
+      if (context?.toastId) {
+        toast.success('Cash deposit completed successfully!', { id: context.toastId });
+      } else {
+        toast.success('Cash deposit completed successfully!');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-history'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-summary'] });
+    },
+    onError: (error, variables, context) => {
+      const errData = error.response?.data;
+      const message =
+        errData?.error?.message ||
+        errData?.message ||
+        error.message ||
+        'Deposit failed. Please check account details.';
+
+      if (context?.toastId) {
+        toast.error(message, { id: context.toastId });
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+};
+
+/**
+ * Hook to execute a cash withdrawal from a bank account.
+ */
+export const useWithdrawMoney = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (withdrawData) => {
+      const res = await paymentApi.withdraw(withdrawData);
+      return res?.data || res;
+    },
+    onMutate: () => {
+      const toastId = toast.loading('Processing cash withdrawal...');
+      return { toastId };
+    },
+    onSuccess: (data, variables, context) => {
+      if (context?.toastId) {
+        toast.success('Cash withdrawal completed successfully!', { id: context.toastId });
+      } else {
+        toast.success('Cash withdrawal completed successfully!');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account-balance'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-history'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-summary'] });
+    },
+    onError: (error, variables, context) => {
+      const errData = error.response?.data;
+      const message =
+        errData?.error?.message ||
+        errData?.message ||
+        error.message ||
+        'Withdrawal failed. Please check account balance.';
+
+      if (context?.toastId) {
+        toast.error(message, { id: context.toastId });
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+};
+
+/**
  * Hook to fetch filtered transaction history.
  * Cached with staleTime: 30000 (30 seconds).
  */

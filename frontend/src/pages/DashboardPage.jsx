@@ -9,6 +9,7 @@ import { CreateAccountModal } from '../components/CreateAccountModal.jsx';
 import { Button } from '../components/ui/Button.jsx';
 import { SkeletonCard } from '../components/ui/Skeleton.jsx';
 import { showSuccess, showError, showLoading, dismissToast } from '../utils/toast.js';
+import { formatCurrency, maskAccountNumber } from '../utils/currency.js';
 import {
   ArrowLeftRight,
   Wallet,
@@ -21,7 +22,18 @@ import {
   ArrowUpRight,
   Clock,
   Radio,
+  Search,
+  Users,
+  Building2,
+  Landmark,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Copy,
+  Check,
+  ShieldCheck,
+  SlidersHorizontal,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -29,10 +41,15 @@ export const DashboardPage = () => {
   const { connected } = useRealtimeEvents();
   const [lastUpdated, setLastUpdated] = useState(() => new Date().toLocaleTimeString());
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+  const [copiedAccount, setCopiedAccount] = useState(null);
 
-  // Auto-refresh accounts every 30 seconds on Dashboard only
+  const isStaff = currentUser?.role === 'TELLER' || currentUser?.role === 'ADMIN';
+
+  // Auto-refresh accounts every 30 seconds on Dashboard
   const { data, isLoading, isError, error, refetch, isFetching, dataUpdatedAt } = useAccounts(
-    { limit: 5 },
+    { limit: 50, search: searchQuery },
     {
       refetchInterval: 30000,
       refetchOnReconnect: true,
@@ -47,7 +64,21 @@ export const DashboardPage = () => {
   }, [dataUpdatedAt]);
 
   const accounts = data?.accounts || [];
+  const stats = data?.stats || null;
   const firstName = currentUser?.firstName || currentUser?.email?.split('@')[0] || 'Member';
+
+  // Filter accounts by type if selected
+  const filteredAccounts = accounts.filter((acc) => {
+    if (filterType === 'ALL') return true;
+    return acc.type === filterType;
+  });
+
+  const handleCopy = (accNum) => {
+    navigator.clipboard.writeText(accNum);
+    setCopiedAccount(accNum);
+    toast.success(`Account ${accNum} copied!`);
+    setTimeout(() => setCopiedAccount(null), 2000);
+  };
 
   const handleManualRefresh = async () => {
     const toastId = showLoading('Syncing accounts...');
@@ -90,9 +121,14 @@ export const DashboardPage = () => {
         <div>
           <div className="flex items-center gap-3 mb-2 flex-wrap">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 text-brand-600 dark:text-brand-400 text-xs font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>VaultCore Banking Portal</span>
+              {isStaff ? <Building2 className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
+              <span>{isStaff ? 'Branch Operations Console' : 'VaultCore Banking Portal'}</span>
             </div>
+            {isStaff && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/10 border border-amber-500/20 text-amber-500 uppercase">
+                {currentUser?.role}
+              </span>
+            )}
             {connected && (
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-semibold uppercase tracking-wider">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
@@ -108,7 +144,9 @@ export const DashboardPage = () => {
             Welcome back, {firstName}
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Real-time financial overview and active deposit accounts. Auto-refreshes every 30s.
+            {isStaff
+              ? 'Branch-wide customer directory, real-time deposit metrics, and counter operations.'
+              : 'Real-time financial overview and active deposit accounts. Auto-refreshes every 30s.'}
           </p>
         </div>
 
@@ -129,7 +167,7 @@ export const DashboardPage = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 active:bg-brand-700 text-white text-xs font-semibold shadow-lg shadow-brand-600/30 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Open Account</span>
+            <span>{isStaff ? 'Open Customer Account' : 'Open Account'}</span>
           </button>
         </div>
       </div>
@@ -150,158 +188,430 @@ export const DashboardPage = () => {
               </p>
             </div>
           </div>
-          <button
-            onClick={handleRetry}
-            className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-xs font-semibold text-white transition-colors"
-          >
+          <Button variant="outline" size="sm" onClick={handleRetry} className="text-xs">
             Retry
-          </button>
+          </Button>
         </div>
       )}
 
-      {/* 3. Summary Stats Cards */}
-      <BalanceSummaryCard accounts={accounts} isLoading={isLoading} />
-
-      {/* 4. Quick Actions Hub */}
-      <div>
-        <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3">
-          Quick Actions
-        </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          {/* Action 1: Money Transfer */}
-          <button
-            onClick={() => navigate('/transfer')}
-            className="group p-4 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 shadow-sm dark:shadow-md transition-all text-left flex flex-col justify-between h-28 cursor-pointer"
-          >
-            <div className="h-9 w-9 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <ArrowLeftRight className="w-4 h-4" />
+      {/* 3. Metrics Summary Section */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      ) : isStaff ? (
+        /* Teller / Branch Operations Metrics */
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Total Customer Accounts */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden backdrop-blur-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Managed Customer Accounts
+              </span>
+              <div className="p-2.5 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400">
+                <Users className="w-5 h-5" />
+              </div>
             </div>
-            <div>
+            <div className="mt-4">
+              <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {stats?.totalAccounts !== undefined ? stats.totalAccounts : accounts.length}
+              </span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 ml-2">Active Portfolios</span>
+            </div>
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Full Double-Entry Ledger Backed</span>
+            </div>
+          </div>
+
+          {/* Total Branch Deposit Holdings */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden backdrop-blur-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Total Customer Deposits
+              </span>
+              <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <Landmark className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {formatCurrency(
+                  stats?.totalDeposits !== undefined
+                    ? stats.totalDeposits
+                    : accounts.reduce((acc, a) => acc + Number(a.balance || 0), 0),
+                  'USD'
+                )}
+              </span>
+            </div>
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span>Aggregate Branch Holdings (USD)</span>
+            </div>
+          </div>
+
+          {/* Branch System Status */}
+          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden backdrop-blur-xl">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Core Cluster Telemetry
+              </span>
+              <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                <Radio className="w-5 h-5" />
+              </div>
+            </div>
+            <div className="mt-4">
+              <span className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 tracking-tight flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-emerald-500 animate-ping"></span>
+                Operational
+              </span>
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span>PostgreSQL • Redis • RabbitMQ</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Customer Balance Summary */
+        <BalanceSummaryCard accounts={accounts} />
+      )}
+
+      {/* 4. Teller Quick Action Ribbon */}
+      {isStaff ? (
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-brand-900/20 via-slate-900/40 to-slate-900/20 border border-brand-500/20 shadow-sm backdrop-blur-xl">
+          <span className="text-xs font-bold uppercase tracking-wider text-brand-400 block mb-3">
+            ⚡ Teller Counter Actions
+          </span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-brand-400 mb-1.5" />
+              <div className="text-xs font-bold text-white">Open Account</div>
+              <div className="text-[10px] text-slate-400">Onboard customer</div>
+            </button>
+
+            <button
+              onClick={() => navigate('/transfer?mode=deposit')}
+              className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <ArrowDownToLine className="w-4 h-4 text-emerald-400 mb-1.5" />
+              <div className="text-xs font-bold text-white">Cash Deposit</div>
+              <div className="text-[10px] text-slate-400">Credit customer account</div>
+            </button>
+
+            <button
+              onClick={() => navigate('/transfer?mode=withdraw')}
+              className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <ArrowUpFromLine className="w-4 h-4 text-amber-400 mb-1.5" />
+              <div className="text-xs font-bold text-white">Cash Withdrawal</div>
+              <div className="text-[10px] text-slate-400">Debit customer account</div>
+            </button>
+
+            <button
+              onClick={() => navigate('/transfer?mode=transfer')}
+              className="p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-left transition-all hover:scale-[1.02] cursor-pointer"
+            >
+              <ArrowLeftRight className="w-4 h-4 text-purple-400 mb-1.5" />
+              <div className="text-xs font-bold text-white">Transfer Funds</div>
+              <div className="text-[10px] text-slate-400">Inter-account transfer</div>
+            </button>
+          </div>
+        </div>
+      ) : (
+        /* Customer Quick Actions */
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div
+              onClick={() => navigate('/transfer')}
+              className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/30 transition-all cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <ArrowLeftRight className="w-4 h-4" />
+              </div>
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Transfer Money
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                Instant ACID payment
-              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Instant ACID payment</span>
             </div>
-          </button>
 
-          {/* Action 2: View Accounts */}
-          <button
-            onClick={() => navigate('/accounts')}
-            className="group p-4 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 shadow-sm dark:shadow-md transition-all text-left flex flex-col justify-between h-28 cursor-pointer"
-          >
-            <div className="h-9 w-9 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Wallet className="w-4 h-4" />
-            </div>
-            <div>
+            <div
+              onClick={() => navigate('/accounts')}
+              className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/30 transition-all cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <Wallet className="w-4 h-4" />
+              </div>
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 View Accounts
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                Manage all portfolios
-              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Manage all portfolios</span>
             </div>
-          </button>
 
-          {/* Action 3: Transactions */}
-          <button
-            onClick={() => navigate('/transactions')}
-            className="group p-4 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 shadow-sm dark:shadow-md transition-all text-left flex flex-col justify-between h-28 cursor-pointer"
-          >
-            <div className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <ReceiptText className="w-4 h-4" />
-            </div>
-            <div>
+            <div
+              onClick={() => navigate('/transactions')}
+              className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/30 transition-all cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <ReceiptText className="w-4 h-4" />
+              </div>
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Transactions
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                History & audit logs
-              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">History & audit logs</span>
             </div>
-          </button>
 
-          {/* Action 4: Notifications */}
-          <button
-            onClick={() => navigate('/notifications')}
-            className="group p-4 rounded-2xl bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-800 hover:border-brand-500/40 shadow-sm dark:shadow-md transition-all text-left flex flex-col justify-between h-28 cursor-pointer"
-          >
-            <div className="h-9 w-9 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
-              <Bell className="w-4 h-4" />
-            </div>
-            <div>
+            <div
+              onClick={() => navigate('/notifications')}
+              className="p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-brand-500/30 transition-all cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                <Bell className="w-4 h-4" />
+              </div>
               <span className="text-xs font-bold text-slate-900 dark:text-white block">
                 Notifications
               </span>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                Email & SMS alerts
-              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400">Email & SMS alerts</span>
             </div>
-          </button>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 5. Recent Accounts Section */}
+      {/* 5. Accounts Section */}
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Recent Accounts</h2>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">
+              {isStaff ? 'Customer Accounts Directory' : 'Recent Accounts'}
+            </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Your most active bank accounts
+              {isStaff
+                ? `Showing ${filteredAccounts.length} accounts across active branch customers`
+                : 'Your most active bank accounts'}
             </p>
           </div>
-          {accounts.length > 0 && (
-            <button
-              onClick={() => navigate('/accounts')}
-              className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-500 flex items-center gap-1 transition-colors cursor-pointer"
-            >
-              View All ({accounts.length}) <ArrowUpRight className="w-3.5 h-3.5" />
-            </button>
+
+          {/* Filter & Search Bar for Tellers */}
+          {isStaff && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search name, account..."
+                  className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-brand-500"
+                />
+              </div>
+
+              <div className="flex rounded-xl bg-slate-100 dark:bg-slate-900 p-0.5 border border-slate-200 dark:border-slate-800 text-[11px] font-medium">
+                {['ALL', 'CHECKING', 'SAVINGS', 'INVESTMENT'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setFilterType(t)}
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                      filterType === t
+                        ? 'bg-brand-600 text-white font-semibold shadow-sm'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <SkeletonCard key={i} rows={2} />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
           </div>
-        ) : accounts.length === 0 ? (
-          <div className="p-8 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/80 shadow-sm text-center flex flex-col items-center justify-center">
-            <div className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 flex items-center justify-center mb-3">
-              <Wallet className="w-6 h-6" />
-            </div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-1">
+        ) : filteredAccounts.length === 0 ? (
+          <div className="p-12 text-center rounded-2xl bg-white dark:bg-slate-900/40 border border-dashed border-slate-200 dark:border-slate-800">
+            <Wallet className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+            <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
               No Bank Accounts Found
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
-              You haven't opened any bank accounts yet. Create your first Checking or Savings
-              account to begin transferring funds.
+            </h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
+              {isStaff
+                ? 'No customer accounts match your filter or search query. Click "Open Customer Account" to provision a new account.'
+                : "You haven't opened any bank accounts yet. Create your first checking or savings account to start transacting."}
             </p>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-xl shadow-md transition-colors cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Open Your First Account</span>
-            </button>
+            <div className="mt-4">
+              <Button size="sm" onClick={() => setIsCreateModalOpen(true)}>
+                <Plus className="w-4 h-4 mr-1.5" />
+                {isStaff ? 'Open Customer Account' : 'Open First Account'}
+              </Button>
+            </div>
+          </div>
+        ) : isStaff ? (
+          /* Teller Customer Accounts Table View */
+          <div className="overflow-x-auto rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 shadow-sm backdrop-blur-xl">
+            <table className="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  <th className="py-3 px-4">Customer</th>
+                  <th className="py-3 px-4">Account Number</th>
+                  <th className="py-3 px-4">Type</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Balance</th>
+                  <th className="py-3 px-4 text-right">Counter Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                {filteredAccounts.map((account) => {
+                  const customerName = account.user
+                    ? `${account.user.firstName || ''} ${account.user.lastName || ''}`.trim() ||
+                      account.user.email
+                    : 'Customer';
+                  const customerEmail = account.user?.email || '';
+
+                  return (
+                    <tr
+                      key={account.id || account.accountNumber}
+                      className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors"
+                    >
+                      {/* Customer Info */}
+                      <td className="py-3 px-4">
+                        <div className="font-semibold text-slate-900 dark:text-white">
+                          {customerName}
+                        </div>
+                        {customerEmail && (
+                          <div className="text-[11px] text-slate-400 dark:text-slate-500 font-mono">
+                            {customerEmail}
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Account Number */}
+                      <td className="py-3 px-4 font-mono font-medium text-slate-700 dark:text-slate-300">
+                        <div className="flex items-center gap-2">
+                          <span>{account.accountNumber}</span>
+                          <button
+                            onClick={() => handleCopy(account.accountNumber)}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                            title="Copy Account Number"
+                          >
+                            {copiedAccount === account.accountNumber ? (
+                              <Check className="w-3.5 h-3.5 text-emerald-500" />
+                            ) : (
+                              <Copy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* Type Badge */}
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            account.type === 'CHECKING'
+                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                              : account.type === 'SAVINGS'
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                : 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20'
+                          }`}
+                        >
+                          {account.type}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                            account.status === 'ACTIVE'
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                              : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                          }`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              account.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-red-500'
+                            }`}
+                          ></span>
+                          {account.status}
+                        </span>
+                      </td>
+
+                      {/* Balance */}
+                      <td className="py-3 px-4 font-bold text-slate-900 dark:text-white font-mono text-sm">
+                        {formatCurrency(account.balance, account.currency || 'USD')}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() =>
+                              navigate(`/transfer?mode=deposit&acc=${account.accountNumber}`)
+                            }
+                            className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px] border border-emerald-500/20 transition-all cursor-pointer"
+                            title="Deposit Cash into Account"
+                          >
+                            Deposit
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/transfer?mode=withdraw&acc=${account.accountNumber}`)
+                            }
+                            className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 font-semibold text-[11px] border border-amber-500/20 transition-all cursor-pointer"
+                            title="Withdraw Cash from Account"
+                          >
+                            Withdraw
+                          </button>
+                          <button
+                            onClick={() =>
+                              navigate(`/transfer?mode=transfer&source=${account.accountNumber}`)
+                            }
+                            className="px-2.5 py-1 rounded-lg bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 font-semibold text-[11px] border border-brand-500/20 transition-all cursor-pointer"
+                            title="Transfer from this Account"
+                          >
+                            Transfer
+                          </button>
+                          <button
+                            onClick={() => navigate(`/ledger?acc=${account.accountNumber}`)}
+                            className="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-[11px] transition-all cursor-pointer"
+                            title="View Ledger History"
+                          >
+                            Ledger
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {accounts.slice(0, 3).map((account) => (
-              <AccountCard
-                key={account.accountNumber || account.id}
-                account={account}
-                onSelect={() => navigate('/accounts')}
-              />
+          /* Customer Card Grid View */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredAccounts.map((account) => (
+              <AccountCard key={account.id || account.accountNumber} account={account} />
             ))}
           </div>
         )}
       </div>
 
-      {/* 6. Create Account Modal */}
-      <CreateAccountModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      {/* 6. Modal for Opening Accounts */}
+      <CreateAccountModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        isStaffMode={isStaff}
+      />
     </div>
   );
 };
+
+export default DashboardPage;

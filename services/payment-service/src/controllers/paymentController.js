@@ -26,6 +26,50 @@ export class PaymentController {
     }
   }
 
+  static async deposit(req, res, next) {
+    try {
+      const userContext = {
+        userId: req.user.userId,
+        role: req.user.role,
+        email: req.user.email,
+      };
+
+      const metaContext = {
+        traceId: req.traceId,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      };
+
+      const result = await paymentService.processDeposit(userContext, req.body, metaContext);
+      const statusCode = result.isIdempotent ? 200 : 201;
+      return ApiResponse.success(res, 'Deposit processed successfully', result, statusCode);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async withdraw(req, res, next) {
+    try {
+      const userContext = {
+        userId: req.user.userId,
+        role: req.user.role,
+        email: req.user.email,
+      };
+
+      const metaContext = {
+        traceId: req.traceId,
+        ip: req.ip,
+        userAgent: req.headers['user-agent'],
+      };
+
+      const result = await paymentService.processWithdrawal(userContext, req.body, metaContext);
+      const statusCode = result.isIdempotent ? 200 : 201;
+      return ApiResponse.success(res, 'Withdrawal processed successfully', result, statusCode);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getPaymentByReference(req, res, next) {
     try {
       const { referenceId } = req.params;

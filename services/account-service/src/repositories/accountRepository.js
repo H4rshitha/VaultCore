@@ -86,4 +86,54 @@ export class AccountRepository {
 
     return { accounts, total };
   }
+
+  async findAllAccounts(skip = 0, take = 50, search = '') {
+    const whereClause = {
+      deletedAt: null,
+    };
+
+    if (search) {
+      whereClause.OR = [
+        { accountNumber: { contains: search, mode: 'insensitive' } },
+        { user: { firstName: { contains: search, mode: 'insensitive' } } },
+        { user: { lastName: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [accounts, total, statsAgg] = await Promise.all([
+      prisma.account.findMany({
+        where: whereClause,
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      }),
+      prisma.account.count({ where: whereClause }),
+      prisma.account.aggregate({
+        where: { deletedAt: null },
+        _sum: { balance: true },
+        _count: { id: true },
+      }),
+    ]);
+
+    return {
+      accounts,
+      total,
+      stats: {
+        totalAccounts: statsAgg._count.id || 0,
+        totalDeposits: statsAgg._sum.balance || 0,
+      },
+    };
+  }
 }
+

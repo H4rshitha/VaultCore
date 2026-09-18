@@ -6,7 +6,7 @@ import {
   clearMemoryAccessToken,
   storage,
 } from '../utils/storage.js';
-import { API_BASE_URL } from '../utils/env.js';
+import { API_BASE_URL } from '../config/env.js';
 
 // Global Event Emitter for Developer Request Inspector
 export const requestInspectorEmitter = {

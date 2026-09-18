@@ -8,13 +8,10 @@
  *    and query parameters rather than custom HTTP request headers for correlation.
  */
 
+import { SSE_URL } from '../config/env.js';
+
 const getEventStreamUrl = () => {
-  const envUrl = import.meta.env?.VITE_API_BASE_URL;
-  if (envUrl) {
-    const base = envUrl.replace(/\/+$/, '');
-    return `${base}/events/stream`;
-  }
-  return 'http://localhost:3000/api/v1/events/stream';
+  return SSE_URL;
 };
 
 export class EventStreamClient {

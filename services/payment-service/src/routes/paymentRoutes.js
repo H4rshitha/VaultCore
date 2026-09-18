@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { PaymentController } from '../controllers/paymentController.js';
 import {
   transferValidation,
+  depositValidation,
+  withdrawValidation,
   getPaymentParamsValidation,
   listPaymentsQueryValidation,
   searchPaymentsQueryValidation,
@@ -16,6 +18,8 @@ const router = Router();
 router.use(authenticateToken);
 
 router.post('/transfer', transferValidation, validateRequest, PaymentController.transfer);
+router.post('/deposit', depositValidation, validateRequest, PaymentController.deposit);
+router.post('/withdraw', withdrawValidation, validateRequest, PaymentController.withdraw);
 router.get(
   '/history',
   listPaymentsQueryValidation,

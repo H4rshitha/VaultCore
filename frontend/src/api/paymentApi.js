@@ -43,6 +43,38 @@ export const paymentApi = {
   },
 
   /**
+   * Execute a Cash Deposit into an account.
+   */
+  deposit: async (data) => {
+    const payload = {
+      idempotencyKey: data.idempotencyKey || generateUUID(),
+      accountNumber: String(data.accountNumber).trim(),
+      amount: typeof data.amount === 'number' ? data.amount : parseFloat(data.amount),
+      currency: (data.currency || 'USD').toUpperCase(),
+      description: data.description ? String(data.description).trim() : 'Cash Deposit',
+    };
+
+    const response = await apiClient.post('/payments/deposit', payload);
+    return response.data;
+  },
+
+  /**
+   * Execute a Cash Withdrawal from an account.
+   */
+  withdraw: async (data) => {
+    const payload = {
+      idempotencyKey: data.idempotencyKey || generateUUID(),
+      accountNumber: String(data.accountNumber).trim(),
+      amount: typeof data.amount === 'number' ? data.amount : parseFloat(data.amount),
+      currency: (data.currency || 'USD').toUpperCase(),
+      description: data.description ? String(data.description).trim() : 'Cash Withdrawal',
+    };
+
+    const response = await apiClient.post('/payments/withdraw', payload);
+    return response.data;
+  },
+
+  /**
    * Fetch paginated payment history with optional filtering.
    *
    * @param {Object} params - Query parameters (status, type, minAmount, maxAmount, startDate, endDate, cursor, limit)

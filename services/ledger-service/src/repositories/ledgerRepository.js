@@ -226,4 +226,191 @@ export class LedgerRepository {
       nextCursor,
     };
   }
+
+  /**
+   * Execute ACID single-account cash deposit (CREDIT ledger entry + Account Balance Increment with Optimistic Locking)
+   */
+  async executeDeposit({
+    idempotencyKey,
+    referenceId,
+    accountNumber,
+    amount,
+    currency = 'USD',
+    description = 'Cash Deposit',
+  }) {
+    return prisma.$transaction(async (tx) => {
+      const existingTx = await tx.transaction.findUnique({
+        where: { idempotencyKey },
+        include: { ledgerEntries: true },
+      });
+      if (
+        existingTx &&
+        existingTx.status === 'COMPLETED' &&
+        existingTx.ledgerEntries &&
+        existingTx.ledgerEntries.length > 0
+      ) {
+        return { transaction: existingTx, isIdempotent: true };
+      }
+
+      const account = await tx.account.findFirst({
+        where: { accountNumber, deletedAt: null },
+      });
+      if (!account) {
+        throw new NotFoundError(`Account ${accountNumber} not found`);
+      }
+      if (account.status !== 'ACTIVE') {
+        throw new BadRequestError(`Account ${accountNumber} is ${account.status}`);
+      }
+
+      const depositAmount = Number(amount);
+      const newBalance = Number(account.balance) + depositAmount;
+
+      const updateRes = await tx.account.updateMany({
+        where: { id: account.id, version: account.version },
+        data: {
+          balance: newBalance,
+          version: { increment: 1 },
+        },
+      });
+
+      if (updateRes.count === 0) {
+        throw new ConflictError(
+          `Optimistic lock conflict on account ${accountNumber}: concurrent modification detected. Please retry the deposit.`
+        );
+      }
+
+      const updatedAccount = await tx.account.findUnique({ where: { id: account.id } });
+
+      let transactionRecord = existingTx;
+      if (!transactionRecord) {
+        transactionRecord = await tx.transaction.create({
+          data: {
+            idempotencyKey,
+            referenceId,
+            targetAccountId: account.id,
+            amount: depositAmount,
+            currency,
+            type: 'DEPOSIT',
+            status: 'COMPLETED',
+            description,
+          },
+        });
+      }
+
+      const creditEntry = await tx.ledgerEntry.create({
+        data: {
+          transactionId: transactionRecord.id,
+          accountId: account.id,
+          type: 'CREDIT',
+          amount: depositAmount,
+          balanceAfter: newBalance,
+        },
+      });
+
+      return {
+        transaction: transactionRecord,
+        ledgerEntries: [creditEntry],
+        account: updatedAccount,
+        isIdempotent: false,
+      };
+    });
+  }
+
+  /**
+   * Execute ACID single-account cash withdrawal (DEBIT ledger entry + Account Balance Decrement with Optimistic Locking)
+   */
+  async executeWithdrawal({
+    idempotencyKey,
+    referenceId,
+    accountNumber,
+    amount,
+    currency = 'USD',
+    description = 'Cash Withdrawal',
+  }) {
+    return prisma.$transaction(async (tx) => {
+      const existingTx = await tx.transaction.findUnique({
+        where: { idempotencyKey },
+        include: { ledgerEntries: true },
+      });
+      if (
+        existingTx &&
+        existingTx.status === 'COMPLETED' &&
+        existingTx.ledgerEntries &&
+        existingTx.ledgerEntries.length > 0
+      ) {
+        return { transaction: existingTx, isIdempotent: true };
+      }
+
+      const account = await tx.account.findFirst({
+        where: { accountNumber, deletedAt: null },
+      });
+      if (!account) {
+        throw new NotFoundError(`Account ${accountNumber} not found`);
+      }
+      if (account.status !== 'ACTIVE') {
+        throw new BadRequestError(`Account ${accountNumber} is ${account.status}`);
+      }
+
+      const withdrawAmount = Number(amount);
+      const currentBalance = Number(account.balance);
+
+      if (currentBalance < withdrawAmount) {
+        throw new BadRequestError(
+          `Insufficient funds in account ${accountNumber}. Current balance: ${account.balance} ${account.currency}`
+        );
+      }
+
+      const newBalance = currentBalance - withdrawAmount;
+
+      const updateRes = await tx.account.updateMany({
+        where: { id: account.id, version: account.version },
+        data: {
+          balance: newBalance,
+          version: { increment: 1 },
+        },
+      });
+
+      if (updateRes.count === 0) {
+        throw new ConflictError(
+          `Optimistic lock conflict on account ${accountNumber}: concurrent modification detected. Please retry the withdrawal.`
+        );
+      }
+
+      const updatedAccount = await tx.account.findUnique({ where: { id: account.id } });
+
+      let transactionRecord = existingTx;
+      if (!transactionRecord) {
+        transactionRecord = await tx.transaction.create({
+          data: {
+            idempotencyKey,
+            referenceId,
+            sourceAccountId: account.id,
+            amount: withdrawAmount,
+            currency,
+            type: 'WITHDRAWAL',
+            status: 'COMPLETED',
+            description,
+          },
+        });
+      }
+
+      const debitEntry = await tx.ledgerEntry.create({
+        data: {
+          transactionId: transactionRecord.id,
+          accountId: account.id,
+          type: 'DEBIT',
+          amount: withdrawAmount,
+          balanceAfter: newBalance,
+        },
+      });
+
+      return {
+        transaction: transactionRecord,
+        ledgerEntries: [debitEntry],
+        account: updatedAccount,
+        isIdempotent: false,
+      };
+    });
+  }
 }
+

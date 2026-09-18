@@ -30,6 +30,46 @@ export const postDoubleEntryValidation = [
   body('description').optional().trim(),
 ];
 
+export const postDepositValidation = [
+  body('idempotencyKey').isUUID().withMessage('idempotencyKey must be a valid UUID'),
+  body('referenceId')
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('referenceId must be a non-empty string'),
+  body('accountNumber')
+    .isLength({ min: 12, max: 12 })
+    .isNumeric()
+    .withMessage('Account number must be a 12-digit numeric string'),
+  body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number greater than 0'),
+  body('currency')
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .toUpperCase()
+    .withMessage('Currency must be a 3-character ISO code'),
+  body('description').optional().trim(),
+];
+
+export const postWithdrawalValidation = [
+  body('idempotencyKey').isUUID().withMessage('idempotencyKey must be a valid UUID'),
+  body('referenceId')
+    .optional()
+    .trim()
+    .notEmpty()
+    .withMessage('referenceId must be a non-empty string'),
+  body('accountNumber')
+    .isLength({ min: 12, max: 12 })
+    .isNumeric()
+    .withMessage('Account number must be a 12-digit numeric string'),
+  body('amount').isFloat({ gt: 0 }).withMessage('Amount must be a positive number greater than 0'),
+  body('currency')
+    .optional()
+    .isLength({ min: 3, max: 3 })
+    .toUpperCase()
+    .withMessage('Currency must be a 3-character ISO code'),
+  body('description').optional().trim(),
+];
+
 export const getLedgerHistoryValidation = [
   param('accountNumber')
     .isLength({ min: 12, max: 12 })

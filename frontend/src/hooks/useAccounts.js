@@ -19,13 +19,14 @@ export const useAccounts = (params = {}, options = {}) => {
         : Array.isArray(data)
           ? data
           : [];
+      const stats = data?.stats || null;
       const pagination = data?.pagination || {
         page: 1,
         limit: 10,
         totalCount: accounts.length,
         totalPages: 1,
       };
-      return { accounts, pagination };
+      return { accounts, stats, pagination };
     },
     staleTime: 60000,
     ...options,

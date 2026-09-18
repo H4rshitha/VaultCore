@@ -83,4 +83,35 @@ export class LedgerService {
       },
     };
   }
+
+  /**
+   * Execute ACID cash deposit
+   */
+  async recordDeposit(payload, traceId) {
+    const result = await ledgerRepository.executeDeposit(payload);
+    logger.info('Cash deposit recorded in PostgreSQL ACID transaction', {
+      transactionId: result.transaction.id,
+      referenceId: payload.referenceId,
+      accountNumber: payload.accountNumber,
+      amount: payload.amount,
+      traceId,
+    });
+    return result;
+  }
+
+  /**
+   * Execute ACID cash withdrawal
+   */
+  async recordWithdrawal(payload, traceId) {
+    const result = await ledgerRepository.executeWithdrawal(payload);
+    logger.info('Cash withdrawal recorded in PostgreSQL ACID transaction', {
+      transactionId: result.transaction.id,
+      referenceId: payload.referenceId,
+      accountNumber: payload.accountNumber,
+      amount: payload.amount,
+      traceId,
+    });
+    return result;
+  }
 }
+

@@ -178,9 +178,28 @@ export class AccountService {
     };
   }
 
-  async getUserAccounts(userId, page = 1, limit = 10, traceId) {
+  async getUserAccounts(userId, role, page = 1, limit = 10, search = '', traceId) {
     const skip = (page - 1) * limit;
-    logger.info('Fetching user accounts', { userId, page, limit, traceId });
+    logger.info('Fetching accounts', { userId, role, page, limit, search, traceId });
+
+    if (role === 'TELLER' || role === 'ADMIN') {
+      const { accounts, total, stats } = await accountRepository.findAllAccounts(
+        skip,
+        limit,
+        search
+      );
+
+      return {
+        accounts,
+        stats,
+        pagination: {
+          page,
+          limit,
+          totalCount: total,
+          totalPages: Math.ceil(total / limit) || 1,
+        },
+      };
+    }
 
     const { accounts, total } = await accountRepository.findByUserId(userId, skip, limit);
 

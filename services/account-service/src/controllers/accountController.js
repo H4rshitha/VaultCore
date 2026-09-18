@@ -73,9 +73,18 @@ export class AccountController {
   static async getUserAccounts(req, res, next) {
     try {
       const userId = req.user.userId;
+      const role = req.user.role;
       const page = req.query.page ? parseInt(req.query.page, 10) : 1;
       const limit = req.query.limit ? parseInt(req.query.limit, 10) : 10;
-      const result = await accountService.getUserAccounts(userId, page, limit, req.traceId);
+      const search = req.query.search || '';
+      const result = await accountService.getUserAccounts(
+        userId,
+        role,
+        page,
+        limit,
+        search,
+        req.traceId
+      );
       return ApiResponse.success(res, 'User bank accounts retrieved', result);
     } catch (error) {
       next(error);
