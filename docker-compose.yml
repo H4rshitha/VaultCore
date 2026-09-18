@@ -12,10 +12,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-vaultadmin}']
+      test:
+        ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-vaultadmin} -d ${POSTGRES_DB:-vaultcore_db}']
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
 
   redis:
     image: redis:7-alpine
@@ -47,6 +49,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # ──────────────────────────────────────────────────────────────────────────
+  # Database Migration (runs once before microservices start)
+  # ──────────────────────────────────────────────────────────────────────────
+  db-migrate:
+    build:
+      context: .
+      dockerfile: services/auth-service/Dockerfile
+    container_name: vaultcore-db-migrate
+    command: npx prisma migrate deploy --schema=prisma/schema.prisma
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
   # Microservices Stack
   gateway:
     build:
@@ -65,11 +83,18 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification-service:3005
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
-      - auth-service
-      - account-service
-      - payment-service
-      - ledger-service
-      - notification-service
+      db-migrate:
+        condition: service_completed_successfully
+      auth-service:
+        condition: service_started
+      account-service:
+        condition: service_started
+      payment-service:
+        condition: service_started
+      ledger-service:
+        condition: service_started
+      notification-service:
+        condition: service_started
 
   auth-service:
     build:
@@ -85,8 +110,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
 
@@ -103,8 +128,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
 
@@ -124,8 +149,8 @@ services:
       - REDIS_PORT=6379
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
       redis:
@@ -143,11 +168,15 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-vaultadmin}:${POSTGRES_PASSWORD:-vaultsecret}@postgres:5432/${POSTGRES_DB:-vaultcore_db}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
-      postgres:
-        condition: service_healthy
+      db-migrate:
+        condition: service_completed_successfully
       rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   notification-service:
@@ -172,7 +201,7 @@ services:
     image: prom/prometheus:v2.53.0
     container_name: vaultcore-prometheus
     ports:
-      - '9090:9090'
+      - '9091:9090'
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
