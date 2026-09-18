@@ -11,3 +11,5 @@ coverage
 smoke-logs
 .system_generated
 scratch
+README.md
+**/Dockerfile
