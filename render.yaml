@@ -1,5 +1,5 @@
-# VaultCore — Render Infrastructure-as-Code Blueprint
-# Automatically provisions PostgreSQL, Redis, API Gateway, and Microservices
+# VaultCore — 100% Free Tier Render Blueprint
+# Provisions 1 Free PostgreSQL Database + 1 Free All-in-One Web Service ($0/month, No Card Required)
 
 databases:
   - name: vaultcore-postgres
@@ -9,22 +9,10 @@ databases:
     region: oregon
 
 services:
-  # ────────────────────────────────────────────────────────────────────────────
-  # 0. Redis Cache (Key-Value DB0-DB3)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: redis
-    name: vaultcore-redis
-    plan: free
-    region: oregon
-    ipAllowList: [] # Internal access only within Render private network
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 1. API Gateway (Public Web Service — Entry point for Vercel Frontend)
-  # ────────────────────────────────────────────────────────────────────────────
   - type: web
-    name: vaultcore-gateway
+    name: vaultcore-backend
     runtime: docker
-    dockerfilePath: services/gateway/Dockerfile
+    dockerfilePath: Dockerfile
     dockerContext: .
     plan: free
     region: oregon
@@ -40,174 +28,7 @@ services:
         fromDatabase:
           name: vaultcore-postgres
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
-      - key: AUTH_SERVICE_URL
-        value: http://vaultcore-auth-service:3001
-      - key: ACCOUNT_SERVICE_URL
-        value: http://vaultcore-account-service:3002
-      - key: PAYMENT_SERVICE_URL
-        value: http://vaultcore-payment-service:3003
-      - key: LEDGER_SERVICE_URL
-        value: http://vaultcore-ledger-service:3004
-      - key: NOTIFICATION_SERVICE_URL
-        value: http://vaultcore-notification-service:3005
       - key: JWT_SECRET
         generateValue: true
       - key: INTERNAL_SERVICE_API_KEY
         generateValue: true
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 2. Auth Microservice (Private Service)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: pserv
-    name: vaultcore-auth-service
-    runtime: docker
-    dockerfilePath: services/auth-service/Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: PORT
-        value: 3001
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaultcore-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
-      - key: JWT_SECRET
-        fromService:
-          type: web
-          name: vaultcore-gateway
-          envVarKey: JWT_SECRET
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 3. Account Microservice (Private Service)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: pserv
-    name: vaultcore-account-service
-    runtime: docker
-    dockerfilePath: services/account-service/Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: PORT
-        value: 3002
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaultcore-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 4. Payment Microservice (Private Service)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: pserv
-    name: vaultcore-payment-service
-    runtime: docker
-    dockerfilePath: services/payment-service/Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: PORT
-        value: 3003
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaultcore-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
-      - key: LEDGER_SERVICE_URL
-        value: http://vaultcore-ledger-service:3004
-      - key: JWT_SECRET
-        fromService:
-          type: web
-          name: vaultcore-gateway
-          envVarKey: JWT_SECRET
-      - key: INTERNAL_SERVICE_API_KEY
-        fromService:
-          type: web
-          name: vaultcore-gateway
-          envVarKey: INTERNAL_SERVICE_API_KEY
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 5. Ledger Microservice (Private Service)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: pserv
-    name: vaultcore-ledger-service
-    runtime: docker
-    dockerfilePath: services/ledger-service/Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: PORT
-        value: 3004
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaultcore-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
-      - key: JWT_SECRET
-        fromService:
-          type: web
-          name: vaultcore-gateway
-          envVarKey: JWT_SECRET
-      - key: INTERNAL_SERVICE_API_KEY
-        fromService:
-          type: web
-          name: vaultcore-gateway
-          envVarKey: INTERNAL_SERVICE_API_KEY
-
-  # ────────────────────────────────────────────────────────────────────────────
-  # 6. Notification Microservice (Private Service)
-  # ────────────────────────────────────────────────────────────────────────────
-  - type: pserv
-    name: vaultcore-notification-service
-    runtime: docker
-    dockerfilePath: services/notification-service/Dockerfile
-    dockerContext: .
-    plan: starter
-    region: oregon
-    envVars:
-      - key: PORT
-        value: 3005
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: vaultcore-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: vaultcore-redis
-          property: connectionString
