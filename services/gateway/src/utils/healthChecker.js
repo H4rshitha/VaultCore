@@ -2,15 +2,22 @@ import net from 'net';
 import http from 'http';
 import Redis from 'ioredis';
 import amqp from 'amqplib';
-import { PrismaClient } from '@prisma/client';
 import { config } from '../config/index.js';
 
-let prisma = null;
-try {
-  prisma = new PrismaClient();
-} catch (e) {
-  prisma = null;
-}
+const parsePgConfig = () => {
+  if (config.databaseUrl || process.env.DATABASE_URL) {
+    try {
+      const u = new URL(config.databaseUrl || process.env.DATABASE_URL);
+      return { host: u.hostname || 'postgres', port: parseInt(u.port || '5432', 10) };
+    } catch {
+      // ignore
+    }
+  }
+  return {
+    host: process.env.DB_HOST || 'postgres',
+    port: parseInt(process.env.DB_PORT || '5432', 10),
+  };
+};
 
 const checkTcp = (host, port, timeoutMs = 2000) => {
   return new Promise((resolve) => {
@@ -96,14 +103,8 @@ export class HealthChecker {
   static async checkPostgres() {
     const startTime = Date.now();
     try {
-      if (prisma) {
-        await prisma.$queryRaw`SELECT 1`;
-        return { status: 'UP', latencyMs: Date.now() - startTime };
-      }
-      return await checkTcp(
-        process.env.DB_HOST || 'localhost',
-        parseInt(process.env.DB_PORT || '5433', 10)
-      );
+      const { host, port } = parsePgConfig();
+      return await checkTcp(host, port);
     } catch (error) {
       return { status: 'DOWN', error: error.message, latencyMs: Date.now() - startTime };
     }
