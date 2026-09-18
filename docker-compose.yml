@@ -81,10 +81,15 @@ services:
       - PAYMENT_SERVICE_URL=http://payment-service:3003
       - LEDGER_SERVICE_URL=http://ledger-service:3004
       - NOTIFICATION_SERVICE_URL=http://notification-service:3005
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
       db-migrate:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
       auth-service:
         condition: service_started
       account-service:

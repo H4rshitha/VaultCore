@@ -109,6 +109,7 @@ app.get(['/metrics', '/api/v1/metrics'], metricsHandler);
 
 // 4. Unified Swagger API Documentation
 const unifiedSwaggerSpec = buildAggregatedSwaggerSpec();
+app.get('/', (req, res) => res.redirect('/docs'));
 app.use(['/docs', '/api/v1/docs'], swaggerUi.serve, swaggerUi.setup(unifiedSwaggerSpec));
 
 // 5. Gateway Health & Readiness Probes
