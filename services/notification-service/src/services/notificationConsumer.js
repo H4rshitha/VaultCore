@@ -1,5 +1,10 @@
 import amqp from 'amqplib';
-import { RabbitMQClient, NOTIFICATION_QUEUES, EVENT_EXCHANGES } from '@vaultcore/shared';
+import {
+  RabbitMQClient,
+  NOTIFICATION_QUEUES,
+  EVENT_EXCHANGES,
+  createRedisClient,
+} from '@vaultcore/shared';
 import { NotificationRepository } from '../repositories/notificationRepository.js';
 import { NotificationService } from './notificationService.js';
 import { config } from '../config/index.js';
@@ -19,6 +24,7 @@ export class NotificationConsumer {
 
     this.connection = null;
     this.channel = null;
+    this.redisSubscriber = null;
     this.isRunning = false;
     this.isConnected = false;
     this.reconnectTimer = null;
@@ -102,7 +108,7 @@ export class NotificationConsumer {
   }
 
   /**
-   * Start consuming from Email and SMS queues
+   * Start consuming from Email and SMS queues and Redis pubsub fallback
    */
   async start(uri) {
     if (this.isRunning && this.isConnected) return;
@@ -111,7 +117,104 @@ export class NotificationConsumer {
     this.startedAt = this.startedAt || new Date();
     this.metrics.startedAt = this.metrics.startedAt || this.startedAt.toISOString();
 
+    this.startRedisSubscriber();
     await this.connectAndConsume();
+  }
+
+  startRedisSubscriber() {
+    if (this.redisSubscriber) return;
+    try {
+      this.redisSubscriber = createRedisClient(
+        {
+          host: config.redisHost || '127.0.0.1',
+          port: config.redisPort || 6379,
+          db: 3,
+        },
+        this.logger
+      );
+
+      this.redisSubscriber.subscribe('vaultcore:events:stream', (err) => {
+        if (err && this.logger) {
+          this.logger.warn(`[Redis-Notification] Subscription error: ${err.message}`);
+        } else if (this.logger) {
+          this.logger.info(
+            '[Redis-Notification] Live event subscriber active on channel [vaultcore:events:stream]'
+          );
+        }
+      });
+
+      this.redisSubscriber.on('message', async (channel, message) => {
+        if (channel === 'vaultcore:events:stream') {
+          try {
+            const content = JSON.parse(message);
+            await this.processIncomingEvent(
+              content,
+              content.routingKey || 'payment.completed',
+              'EMAIL'
+            );
+          } catch (err) {
+            if (this.logger)
+              this.logger.warn(`[Redis-Notification] Processing error: ${err.message}`);
+          }
+        }
+      });
+    } catch (err) {
+      if (this.logger)
+        this.logger.warn(`[Redis-Notification] Could not start Redis subscriber: ${err.message}`);
+    }
+  }
+
+  async processIncomingEvent(content, routingKey, notificationType = 'EMAIL') {
+    const eventId = content.eventId || content.id || `evt-${Date.now()}`;
+    const traceId = content.traceId || `trace-${eventId}`;
+    const transactionId =
+      content.transactionId || content.payload?.transactionId || content.aggregateId;
+
+    // 1. Idempotency Check
+    const existingAudit = await this.repository.findByEventId(eventId);
+    if (existingAudit) return;
+
+    const eventPayload = content.payload || content;
+    const eventType = content.eventType || routingKey;
+
+    const messageTemplate = this.service.formatMessage(eventType, routingKey, eventPayload);
+    const recipient = this.service.resolveRecipient(eventPayload, notificationType);
+
+    // 2. Deliver simulated notification
+    await this.service.deliverNotification({
+      notificationType,
+      recipient,
+      subject: messageTemplate.subject,
+      body: messageTemplate.body,
+      payload: eventPayload,
+    });
+
+    // 3. Create Audit Record in PostgreSQL
+    await this.repository.createAudit({
+      eventId,
+      transactionId,
+      notificationType,
+      recipient,
+      status: 'SENT',
+      retryCount: 0,
+      traceId,
+      payload: {
+        ...eventPayload,
+        routingKey,
+        subject: messageTemplate.subject,
+      },
+    });
+
+    this.metrics.messagesConsumed += 1;
+    this.metrics.successfulDeliveries += 1;
+
+    if (this.logger) {
+      this.logger.info(`[Notification] Audit created for ${recipient} [${notificationType}]`, {
+        eventId,
+        transactionId,
+        recipient,
+      });
+    }
   }
 
   async connectAndConsume() {

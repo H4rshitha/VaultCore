@@ -8,10 +8,12 @@ import {
   createLogger,
   accountCache,
   lockService,
+  createRedisClient,
 } from '@vaultcore/shared';
 
 const logger = createLogger('payment-service-logic');
 const paymentRepository = new PaymentRepository();
+const liveEventBus = createRedisClient({ db: 3 }, logger);
 
 export class PaymentService {
   /**
@@ -190,15 +192,38 @@ export class PaymentService {
         // Cache completed payment in Redis DB2 for 24 hours (Layer 1 Idempotency)
         await lockService.setIdempotencyRecord(idempotencyKey, successResponse, traceId);
 
-        logger.info('Payment completed successfully, cache invalidated, and idempotency recorded', {
-          transactionId: completedTransaction.id,
-          referenceId,
-          outboxEventId: outboxEvent.id,
-          auditLogId: auditLog.id,
-          sourceAccountNumber,
-          targetAccountNumber,
-          traceId,
-        });
+        // Publish real-time live event to Redis DB3 bus (for instant SSE broadcast and notification fallback)
+        try {
+          liveEventBus.publish(
+            'vaultcore:events:stream',
+            JSON.stringify({
+              id: outboxEvent.id,
+              eventId: outboxEvent.id,
+              type: 'payment.completed',
+              eventType: 'payment.completed',
+              routingKey: 'payment.completed',
+              traceId,
+              transactionId: completedTransaction.id,
+              referenceId,
+              amount,
+              currency,
+              sourceAccountNumber,
+              targetAccountNumber,
+              recipient: userEmail,
+              payload: {
+                transactionId: completedTransaction.id,
+                referenceId,
+                amount,
+                currency,
+                email: userEmail,
+                recipient: userEmail,
+                sourceAccountNumber,
+                targetAccountNumber,
+              },
+              timestamp: new Date().toISOString(),
+            })
+          );
+        } catch (_) {}
 
         return successResponse;
       } catch (ledgerError) {
@@ -348,6 +373,60 @@ export class PaymentService {
       // 6. Invalidate Account Cache
       await accountCache.invalidateAccounts([accountNumber], traceId);
 
+      const userEmail = userContext.email || account.user?.email;
+
+      // 7. Record Outbox Event & Audit Log
+      let depositOutbox = null;
+      try {
+        const outboxResult = await paymentRepository.recordOperationOutbox({
+          transactionId: ledgerResult.transaction?.id,
+          referenceId,
+          eventType: 'PAYMENT_COMPLETED',
+          accountId: account.id,
+          accountNumber,
+          amount,
+          currency,
+          userId: account.userId || userId,
+          email: userEmail,
+          action: 'CASH_DEPOSIT',
+          ipAddress: ip,
+          userAgent,
+        });
+        depositOutbox = outboxResult.outboxEvent;
+      } catch (_) {}
+
+      // 8. Publish Real-Time Event to Redis DB3 bus
+      try {
+        liveEventBus.publish(
+          'vaultcore:events:stream',
+          JSON.stringify({
+            id: depositOutbox?.id || `evt-${Date.now()}`,
+            eventId: depositOutbox?.id || `evt-${Date.now()}`,
+            type: 'payment.completed',
+            eventType: 'payment.completed',
+            routingKey: 'payment.completed',
+            traceId,
+            transactionId: ledgerResult.transaction?.id,
+            referenceId,
+            amount: Number(amount),
+            currency,
+            accountNumber,
+            recipient: userEmail,
+            payload: {
+              transactionId: ledgerResult.transaction?.id,
+              referenceId,
+              amount: Number(amount),
+              currency,
+              email: userEmail,
+              recipient: userEmail,
+              accountNumber,
+              type: 'DEPOSIT',
+            },
+            timestamp: new Date().toISOString(),
+          })
+        );
+      } catch (_) {}
+
       const responsePayload = {
         transaction: ledgerResult.transaction,
         account: ledgerResult.account,
@@ -446,6 +525,60 @@ export class PaymentService {
 
       // 6. Invalidate Account Cache
       await accountCache.invalidateAccounts([accountNumber], traceId);
+
+      const userEmail = userContext.email || account.user?.email;
+
+      // 7. Record Outbox Event & Audit Log
+      let withdrawalOutbox = null;
+      try {
+        const outboxResult = await paymentRepository.recordOperationOutbox({
+          transactionId: ledgerResult.transaction?.id,
+          referenceId,
+          eventType: 'PAYMENT_COMPLETED',
+          accountId: account.id,
+          accountNumber,
+          amount,
+          currency,
+          userId: account.userId || userId,
+          email: userEmail,
+          action: 'CASH_WITHDRAWAL',
+          ipAddress: ip,
+          userAgent,
+        });
+        withdrawalOutbox = outboxResult.outboxEvent;
+      } catch (_) {}
+
+      // 8. Publish Real-Time Event to Redis DB3 bus
+      try {
+        liveEventBus.publish(
+          'vaultcore:events:stream',
+          JSON.stringify({
+            id: withdrawalOutbox?.id || `evt-${Date.now()}`,
+            eventId: withdrawalOutbox?.id || `evt-${Date.now()}`,
+            type: 'payment.completed',
+            eventType: 'payment.completed',
+            routingKey: 'payment.completed',
+            traceId,
+            transactionId: ledgerResult.transaction?.id,
+            referenceId,
+            amount: Number(amount),
+            currency,
+            accountNumber,
+            recipient: userEmail,
+            payload: {
+              transactionId: ledgerResult.transaction?.id,
+              referenceId,
+              amount: Number(amount),
+              currency,
+              email: userEmail,
+              recipient: userEmail,
+              accountNumber,
+              type: 'WITHDRAWAL',
+            },
+            timestamp: new Date().toISOString(),
+          })
+        );
+      } catch (_) {}
 
       const responsePayload = {
         transaction: ledgerResult.transaction,

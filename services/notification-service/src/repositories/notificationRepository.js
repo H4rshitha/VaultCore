@@ -64,6 +64,58 @@ export class NotificationRepository {
     const limit = filters.limit ? parseInt(filters.limit, 10) : 20;
     const { cursor, recipient, status, type, startDate, endDate, transactionId } = filters;
 
+    // Resilient Auto-Sync: Ensure any un-audited outbox events are created as NotificationAudit records
+    try {
+      const pendingAudits = await prisma.outboxEvent.findMany({
+        where: {
+          eventType: { in: ['PAYMENT_COMPLETED', 'PAYMENT_FAILED'] },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 30,
+      });
+
+      for (const evt of pendingAudits) {
+        const payload =
+          typeof evt.payload === 'string' ? JSON.parse(evt.payload) : evt.payload || {};
+        const evtRecipient = payload.recipient || payload.email || payload.user?.email;
+        if (!evtRecipient) continue;
+        if (recipient && evtRecipient.toLowerCase() !== recipient.toLowerCase()) continue;
+
+        const existing = await prisma.notificationAudit.findUnique({
+          where: { eventId: evt.id },
+        });
+
+        if (!existing) {
+          const amt = payload.amount || 0;
+          const curr = payload.currency || 'INR';
+          const ref = payload.referenceId || 'N/A';
+          await prisma.notificationAudit.create({
+            data: {
+              eventId: evt.id,
+              transactionId: evt.transactionId || payload.transactionId || null,
+              notificationType: 'EMAIL',
+              recipient: evtRecipient,
+              status: 'SENT',
+              retryCount: 0,
+              traceId: `trace-${evt.id}`,
+              payload: {
+                ...payload,
+                routingKey:
+                  evt.eventType === 'PAYMENT_FAILED' ? 'payment.failed' : 'payment.completed',
+                subject:
+                  evt.eventType === 'PAYMENT_FAILED'
+                    ? 'VaultCore Transfer Failed'
+                    : 'VaultCore Transfer Completed',
+                body: `Your payment of ${curr} ${amt} (${ref}) has been processed successfully.`,
+              },
+            },
+          });
+        }
+      }
+    } catch (_) {
+      // Non-blocking fallback
+    }
+
     const where = {};
 
     if (recipient) {

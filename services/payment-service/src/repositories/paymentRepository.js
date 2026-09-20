@@ -170,6 +170,71 @@ export class PaymentRepository {
   }
 
   /**
+   * Record outbox event and audit log for deposit or withdrawal operations
+   */
+  async recordOperationOutbox({
+    transactionId,
+    referenceId,
+    eventType,
+    accountId,
+    accountNumber,
+    amount,
+    currency,
+    userId,
+    email,
+    action,
+    ipAddress = null,
+    userAgent = null,
+  }) {
+    return prisma.$transaction(async (tx) => {
+      const outboxEvent = await tx.outboxEvent.create({
+        data: {
+          aggregateType: 'TRANSACTION',
+          aggregateId: transactionId || referenceId,
+          eventType: eventType || 'PAYMENT_COMPLETED',
+          transactionId: transactionId || null,
+          status: 'PENDING',
+          payload: {
+            transactionId,
+            referenceId,
+            accountId,
+            accountNumber,
+            amount: Number(amount),
+            currency,
+            userId,
+            email,
+            recipient: email,
+            routingKey: 'payment.completed',
+            timestamp: new Date().toISOString(),
+          },
+        },
+      });
+
+      let auditLog = null;
+      if (userId) {
+        auditLog = await tx.auditLog.create({
+          data: {
+            userId,
+            action: action || 'PAYMENT_OPERATION',
+            entity: 'Transaction',
+            entityId: transactionId || referenceId,
+            ipAddress,
+            userAgent,
+            metadata: {
+              referenceId,
+              amount: Number(amount),
+              currency,
+              accountNumber,
+            },
+          },
+        });
+      }
+
+      return { outboxEvent, auditLog };
+    });
+  }
+
+  /**
    * Mark transaction as FAILED with error reason
    */
   async markTransactionFailed(transactionId, failureReason) {

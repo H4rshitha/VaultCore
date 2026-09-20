@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { EVENT_EXCHANGES, EVENT_ROUTING_KEYS } from '@vaultcore/shared';
+import { EVENT_EXCHANGES, EVENT_ROUTING_KEYS, createRedisClient } from '@vaultcore/shared';
 import { broadcastSSEEvent } from '../app.js';
 import { config } from '../config/index.js';
 
@@ -12,6 +12,8 @@ export class GatewayEventConsumer {
 
     this.connection = null;
     this.channel = null;
+    this.redisSubscriber = null;
+    this.processedEventIds = new Set();
     this.isRunning = false;
     this.isConnected = false;
     this.reconnectTimer = null;
@@ -29,7 +31,7 @@ export class GatewayEventConsumer {
   }
 
   /**
-   * Start the RabbitMQ consumer with auto-reconnection
+   * Start the RabbitMQ consumer and Redis PubSub subscriber
    */
   async start(uri) {
     if (this.isRunning && this.isConnected) return;
@@ -37,7 +39,138 @@ export class GatewayEventConsumer {
     this.metrics.startedAt = this.metrics.startedAt || new Date().toISOString();
     if (uri) this.amqpUri = uri;
 
+    this.startRedisSubscriber();
     await this.connectAndConsume();
+  }
+
+  startRedisSubscriber() {
+    if (this.redisSubscriber) return;
+    try {
+      this.redisSubscriber = createRedisClient(
+        {
+          host: config.redisHost || '127.0.0.1',
+          port: config.redisPort || 6379,
+          db: 3,
+        },
+        this.logger
+      );
+
+      this.redisSubscriber.subscribe('vaultcore:events:stream', (err) => {
+        if (err && this.logger) {
+          this.logger.warn(`[Redis-SSE] Subscription error: ${err.message}`);
+        } else if (this.logger) {
+          this.logger.info(
+            '[Redis-SSE] Live event subscriber active on channel [vaultcore:events:stream]'
+          );
+        }
+      });
+
+      this.redisSubscriber.on('message', (channel, message) => {
+        if (channel === 'vaultcore:events:stream') {
+          try {
+            const content = JSON.parse(message);
+            this.handleLiveEvent(
+              content,
+              content.routingKey || content.type || 'payment.completed'
+            );
+          } catch (err) {
+            if (this.logger) this.logger.warn(`[Redis-SSE] Parse error: ${err.message}`);
+          }
+        }
+      });
+    } catch (err) {
+      if (this.logger)
+        this.logger.warn(`[Redis-SSE] Could not start Redis subscriber: ${err.message}`);
+    }
+  }
+
+  handleLiveEvent(content, routingKey, headers = {}) {
+    const eventPayload = content.payload || content;
+    const eventType = content.eventType || content.type || routingKey;
+    const eventId =
+      headers.eventId ||
+      content.eventId ||
+      content.id ||
+      `evt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const traceId = headers.traceId || content.traceId || `trace-${eventId}`;
+
+    // Deduplication check
+    if (this.processedEventIds.has(eventId)) return;
+    this.processedEventIds.add(eventId);
+    if (this.processedEventIds.size > 1000) {
+      const first = this.processedEventIds.values().next().value;
+      this.processedEventIds.delete(first);
+    }
+
+    this.metrics.messagesReceived++;
+
+    if (this.logger) {
+      this.logger.info(`[LiveEvent] Broadcasting [${routingKey}] event (eventId: ${eventId})`, {
+        traceId,
+        routingKey,
+        eventId,
+      });
+    }
+
+    // Transform into SSE-compatible banking event
+    const sseEvent = {
+      id: eventId,
+      eventId,
+      type: routingKey || eventType,
+      eventType: routingKey || eventType,
+      routingKey,
+      traceId,
+      transactionId: eventPayload.transactionId || content.transactionId || headers.transactionId,
+      referenceId: eventPayload.referenceId || content.referenceId || headers.referenceId,
+      amount: eventPayload.amount !== undefined ? Number(eventPayload.amount) : undefined,
+      currency: eventPayload.currency || 'USD',
+      sourceAccountNumber: eventPayload.sourceAccountNumber,
+      targetAccountNumber: eventPayload.targetAccountNumber,
+      recipient: eventPayload.recipient || eventPayload.email,
+      payload: eventPayload,
+      timestamp: content.timestamp || eventPayload.timestamp || new Date().toISOString(),
+    };
+
+    // Broadcast primary event to SSE clients
+    broadcastSSEEvent(sseEvent);
+    this.metrics.eventsBroadcasted++;
+    this.metrics.lastEventAt = new Date().toISOString();
+
+    // If it's a completed payment, also broadcast a notification.created event
+    if (routingKey === 'payment.completed' || eventType === 'PAYMENT_COMPLETED') {
+      const amountFormatted =
+        sseEvent.amount !== undefined ? `${sseEvent.amount} ${sseEvent.currency}` : 'funds';
+      const refFormatted = sseEvent.referenceId ? ` (Ref: ${sseEvent.referenceId})` : '';
+
+      const liveNotificationEvent = {
+        id: `notif-${eventId}`,
+        eventId: `notif-${eventId}`,
+        type: 'notification.created',
+        eventType: 'notification.created',
+        routingKey: 'notification.created',
+        traceId,
+        transactionId: sseEvent.transactionId,
+        referenceId: sseEvent.referenceId,
+        title: 'Payment Completed',
+        subject: 'VaultCore Transfer Completed',
+        message: `Your payment of ${amountFormatted}${refFormatted} was completed successfully.`,
+        amount: sseEvent.amount,
+        currency: sseEvent.currency,
+        recipient: sseEvent.recipient,
+        channel: 'EMAIL',
+        status: 'SENT',
+        read: false,
+        timestamp: sseEvent.timestamp,
+        payload: {
+          ...eventPayload,
+          subject: 'VaultCore Transfer Completed',
+          body: `Your payment of ${amountFormatted}${refFormatted} was completed successfully.`,
+        },
+      };
+
+      broadcastSSEEvent(liveNotificationEvent);
+      this.metrics.eventsBroadcasted++;
+    }
   }
 
   async connectAndConsume() {
@@ -112,7 +245,6 @@ export class GatewayEventConsumer {
         async (msg) => {
           if (!msg) return;
 
-          this.metrics.messagesReceived++;
           const routingKey = msg.fields.routingKey;
 
           try {
@@ -124,84 +256,7 @@ export class GatewayEventConsumer {
             }
 
             const headers = msg.properties.headers || {};
-            const eventPayload = content.payload || content;
-            const eventType = content.eventType || routingKey;
-            const eventId =
-              headers.eventId ||
-              content.eventId ||
-              content.id ||
-              `evt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
-            const traceId = headers.traceId || content.traceId || `trace-${eventId}`;
-
-            if (this.logger) {
-              this.logger.info(`[RabbitMQ] Received [${routingKey}] event (eventId: ${eventId})`, {
-                traceId,
-                routingKey,
-                eventId,
-              });
-            }
-
-            // Transform into SSE-compatible banking event
-            const sseEvent = {
-              id: eventId,
-              eventId,
-              type: routingKey || eventType,
-              eventType: routingKey || eventType,
-              routingKey,
-              traceId,
-              transactionId:
-                eventPayload.transactionId || content.transactionId || headers.transactionId,
-              referenceId: eventPayload.referenceId || content.referenceId || headers.referenceId,
-              amount: eventPayload.amount !== undefined ? Number(eventPayload.amount) : undefined,
-              currency: eventPayload.currency || 'USD',
-              sourceAccountNumber: eventPayload.sourceAccountNumber,
-              targetAccountNumber: eventPayload.targetAccountNumber,
-              recipient: eventPayload.recipient || eventPayload.email,
-              payload: eventPayload,
-              timestamp: content.timestamp || eventPayload.timestamp || new Date().toISOString(),
-            };
-
-            // Broadcast primary event to SSE clients
-            broadcastSSEEvent(sseEvent);
-            this.metrics.eventsBroadcasted++;
-            this.metrics.lastEventAt = new Date().toISOString();
-
-            // If it's a completed payment, also broadcast a notification.created event
-            // so React RealtimeContext creates live notification alerts in the UI
-            if (routingKey === 'payment.completed' || eventType === 'PAYMENT_COMPLETED') {
-              const amountFormatted =
-                sseEvent.amount !== undefined ? `${sseEvent.amount} ${sseEvent.currency}` : 'funds';
-              const refFormatted = sseEvent.referenceId ? ` (Ref: ${sseEvent.referenceId})` : '';
-
-              const liveNotificationEvent = {
-                id: `notif-${eventId}`,
-                eventId: `notif-${eventId}`,
-                type: 'notification.created',
-                eventType: 'notification.created',
-                routingKey: 'notification.created',
-                traceId,
-                transactionId: sseEvent.transactionId,
-                referenceId: sseEvent.referenceId,
-                title: 'Payment Completed',
-                subject: 'VaultCore Transfer Completed',
-                message: `Your payment of ${amountFormatted}${refFormatted} was completed successfully.`,
-                amount: sseEvent.amount,
-                currency: sseEvent.currency,
-                recipient: sseEvent.recipient,
-                channel: 'EMAIL',
-                status: 'SENT',
-                read: false,
-                timestamp: sseEvent.timestamp,
-                payload: {
-                  ...eventPayload,
-                  subject: 'VaultCore Transfer Completed',
-                  body: `Your payment of ${amountFormatted}${refFormatted} was completed successfully.`,
-                },
-              };
-
-              broadcastSSEEvent(liveNotificationEvent);
-              this.metrics.eventsBroadcasted++;
-            }
+            this.handleLiveEvent(content, routingKey, headers);
 
             // Acknowledge the message
             this.channel.ack(msg);
