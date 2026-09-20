@@ -52,11 +52,15 @@ export class NotificationConsumer {
     this.reconnectAttempts = 0;
 
     this.connection.on('error', (err) => {
-      if (this.logger) this.logger.error(`[RabbitMQ] NotificationConsumer connection error: ${err.message}`);
+      if (this.logger)
+        this.logger.error(`[RabbitMQ] NotificationConsumer connection error: ${err.message}`);
     });
 
     this.connection.on('close', () => {
-      if (this.logger) this.logger.warn('[RabbitMQ] NotificationConsumer connection closed, scheduling reconnect...');
+      if (this.logger)
+        this.logger.warn(
+          '[RabbitMQ] NotificationConsumer connection closed, scheduling reconnect...'
+        );
       this.cleanup();
       this.scheduleReconnect();
     });
@@ -127,7 +131,9 @@ export class NotificationConsumer {
       }
     } catch (error) {
       if (this.logger) {
-        this.logger.warn(`Failed to connect NotificationConsumer: ${error.message}. Retrying in background...`);
+        this.logger.warn(
+          `Failed to connect NotificationConsumer: ${error.message}. Retrying in background...`
+        );
       }
       this.cleanup();
       this.scheduleReconnect();
@@ -138,10 +144,15 @@ export class NotificationConsumer {
     if (!this.isRunning || this.reconnectTimer) return;
 
     this.reconnectAttempts++;
-    const delay = Math.min(2000 * Math.pow(1.5, this.reconnectAttempts - 1), this.maxReconnectDelayMs);
+    const delay = Math.min(
+      2000 * Math.pow(1.5, this.reconnectAttempts - 1),
+      this.maxReconnectDelayMs
+    );
 
     if (this.logger) {
-      this.logger.info(`[RabbitMQ] NotificationConsumer scheduling reconnect attempt #${this.reconnectAttempts} in ${delay}ms`);
+      this.logger.info(
+        `[RabbitMQ] NotificationConsumer scheduling reconnect attempt #${this.reconnectAttempts} in ${delay}ms`
+      );
     }
 
     this.reconnectTimer = setTimeout(async () => {

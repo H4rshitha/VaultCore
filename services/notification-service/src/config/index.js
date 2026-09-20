@@ -2,7 +2,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export const config = {
-  port: process.env.NOTIFICATION_SERVICE_PORT || (process.env.PORT && process.env.PORT !== '3000' ? parseInt(process.env.PORT, 10) : 3005),
+  port:
+    process.env.NOTIFICATION_SERVICE_PORT ||
+    (process.env.PORT && process.env.PORT !== '3000' ? parseInt(process.env.PORT, 10) : 3005),
   nodeEnv: process.env.NODE_ENV || 'development',
   jwtSecret: process.env.JWT_SECRET || 'super-secret-vaultcore-jwt-key-2026',
   rabbitmqUri:

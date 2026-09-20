@@ -18,7 +18,11 @@ export const notificationApi = {
       const response = await apiClient.get('/notifications', { params: cleanParams });
       return response.data;
     } catch (err) {
-      if (err.response?.status === 404 || err.response?.status === 502 || err.response?.status === 503) {
+      if (
+        err.response?.status === 404 ||
+        err.response?.status === 502 ||
+        err.response?.status === 503
+      ) {
         try {
           // Fallback to /notifications/history if /notifications is not directly mapped
           const fallback = await apiClient.get('/notifications/history', { params: cleanParams });
@@ -48,7 +52,11 @@ export const notificationApi = {
       const response = await apiClient.get('/notifications/history', { params: cleanParams });
       return response.data;
     } catch (err) {
-      if (err.response?.status === 404 || err.response?.status === 502 || err.response?.status === 503) {
+      if (
+        err.response?.status === 404 ||
+        err.response?.status === 502 ||
+        err.response?.status === 503
+      ) {
         try {
           const fallback = await apiClient.get('/notifications', { params: cleanParams });
           return fallback.data;
