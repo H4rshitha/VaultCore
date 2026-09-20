@@ -6,12 +6,18 @@ export class PaymentRepository {
   async findAccountByNumber(accountNumber) {
     return prisma.account.findFirst({
       where: { accountNumber, deletedAt: null },
+      include: {
+        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+      },
     });
   }
 
   async findAccountByNumberAndUserId(accountNumber, userId) {
     return prisma.account.findFirst({
       where: { accountNumber, userId, deletedAt: null },
+      include: {
+        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+      },
     });
   }
 
@@ -88,7 +94,10 @@ export class PaymentRepository {
   }
 
   /**
-   * Finalize transaction to COMPLETED, create OutboxEvent and AuditLog in a single ACID transaction
+   * Finalize transaction on successful ledger write inside a PostgreSQL ACID transaction:
+   * 1. Updates Transaction status to COMPLETED
+   * 2. Creates OutboxEvent record (Transactional Outbox Pattern)
+   * 3. Creates AuditLog record
    */
   async finalizeSuccessfulTransaction({
     transactionId,
@@ -98,9 +107,12 @@ export class PaymentRepository {
     amount,
     currency,
     userId,
+    email,
+    recipient,
     ipAddress,
     userAgent,
   }) {
+    const userEmail = email || recipient || undefined;
     return prisma.$transaction(async (tx) => {
       // 1. Update Transaction status to COMPLETED
       const updatedTransaction = await tx.transaction.update({
@@ -125,6 +137,9 @@ export class PaymentRepository {
             targetAccountId,
             amount: Number(amount),
             currency,
+            userId,
+            email: userEmail,
+            recipient: userEmail,
             routingKey: 'payment.completed',
             timestamp: new Date().toISOString(),
           },

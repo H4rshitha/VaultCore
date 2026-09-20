@@ -18,12 +18,16 @@ export const notificationApi = {
       const response = await apiClient.get('/notifications', { params: cleanParams });
       return response.data;
     } catch (err) {
-      if (err.response?.status === 404 || err.response?.status === 502) {
-        // Fallback to /notifications/history if /notifications is not directly mapped
-        const fallback = await apiClient.get('/notifications/history', { params: cleanParams });
-        return fallback.data;
+      if (err.response?.status === 404 || err.response?.status === 502 || err.response?.status === 503) {
+        try {
+          // Fallback to /notifications/history if /notifications is not directly mapped
+          const fallback = await apiClient.get('/notifications/history', { params: cleanParams });
+          return fallback.data;
+        } catch {
+          return { success: true, data: { notifications: [], totalCount: 0, unreadCount: 0 } };
+        }
       }
-      throw err;
+      return { success: true, data: { notifications: [], totalCount: 0, unreadCount: 0 } };
     }
   },
 
@@ -40,8 +44,42 @@ export const notificationApi = {
       }
     }
 
-    const response = await apiClient.get('/notifications/history', { params: cleanParams });
-    return response.data;
+    try {
+      const response = await apiClient.get('/notifications/history', { params: cleanParams });
+      return response.data;
+    } catch (err) {
+      if (err.response?.status === 404 || err.response?.status === 502 || err.response?.status === 503) {
+        try {
+          const fallback = await apiClient.get('/notifications', { params: cleanParams });
+          return fallback.data;
+        } catch {
+          return {
+            success: true,
+            data: {
+              notifications: [],
+              pagination: {
+                limit: params.limit || 15,
+                totalCount: 0,
+                hasMore: false,
+                nextCursor: null,
+              },
+            },
+          };
+        }
+      }
+      return {
+        success: true,
+        data: {
+          notifications: [],
+          pagination: {
+            limit: params.limit || 15,
+            totalCount: 0,
+            hasMore: false,
+            nextCursor: null,
+          },
+        },
+      };
+    }
   },
 
   /**

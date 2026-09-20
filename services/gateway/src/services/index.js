@@ -1,2 +1,2 @@
 // Gateway Business Services Layer
-export {};
+export { GatewayEventConsumer } from './gatewayEventConsumer.js';

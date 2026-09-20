@@ -162,16 +162,26 @@ export const broadcastSSEEvent = (eventData) => {
     recentEventBuffer.shift();
   }
 
+  const eventType = enrichedEvent.type || enrichedEvent.eventType || 'message';
   const payload = JSON.stringify(enrichedEvent);
   const sseMessage = `id: ${eventId}\nevent: message\ndata: ${payload}\n\n`;
 
+  let sentCount = 0;
   for (const client of sseClients) {
     try {
       client.write(sseMessage);
+      sentCount++;
     } catch {
       sseClients.delete(client);
     }
   }
+
+  logger.info(`[SSE] Broadcast [${eventType}] to ${sentCount} active client(s)`, {
+    eventId,
+    eventType,
+    activeSubscribers: sseClients.size,
+    traceId: enrichedEvent.traceId,
+  });
 };
 
 // Listen to Banking Event Bus
@@ -209,14 +219,26 @@ app.get(['/api/v1/events/stream', '/events/stream'], (req, res) => {
   }
 
   sseClients.add(res);
+  logger.info(`[SSE] Client connected. Total active subscribers: ${sseClients.size}`, {
+    ip: req.ip,
+    traceId,
+  });
 
   const keepAlive = setInterval(() => {
-    res.write(': keepalive\n\n');
+    try {
+      res.write(': keepalive\n\n');
+    } catch {
+      clearInterval(keepAlive);
+      sseClients.delete(res);
+    }
   }, 15000);
 
   req.on('close', () => {
     clearInterval(keepAlive);
     sseClients.delete(res);
+    logger.info(`[SSE] Client disconnected. Total active subscribers: ${sseClients.size}`, {
+      ip: req.ip,
+    });
   });
 });
 

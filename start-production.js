@@ -52,9 +52,17 @@ for (const svc of services) {
     env: {
       ...process.env,
       PORT: String(svc.port),
+      AUTH_SERVICE_PORT: '3001',
+      ACCOUNT_SERVICE_PORT: '3002',
+      PAYMENT_SERVICE_PORT: '3003',
+      LEDGER_SERVICE_PORT: '3004',
+      NOTIFICATION_SERVICE_PORT: '3005',
       NODE_ENV: 'production',
       REDIS_HOST: process.env.REDIS_HOST || '127.0.0.1',
       REDIS_PORT: process.env.REDIS_PORT || '6379',
+      RABBITMQ_HOST: process.env.RABBITMQ_HOST || '127.0.0.1',
+      RABBITMQ_PORT: process.env.RABBITMQ_PORT || '5672',
+      RABBITMQ_URI: process.env.RABBITMQ_URI || 'amqp://127.0.0.1:5672',
       LEDGER_SERVICE_URL: process.env.LEDGER_SERVICE_URL || 'http://127.0.0.1:3004',
       JWT_SECRET: process.env.JWT_SECRET || 'super-secret-vaultcore-jwt-key-2026',
       INTERNAL_SERVICE_API_KEY:
@@ -83,6 +91,9 @@ setTimeout(() => {
       NOTIFICATION_SERVICE_URL: process.env.NOTIFICATION_SERVICE_URL || 'http://127.0.0.1:3005',
       REDIS_HOST: process.env.REDIS_HOST || '127.0.0.1',
       REDIS_PORT: process.env.REDIS_PORT || '6379',
+      RABBITMQ_HOST: process.env.RABBITMQ_HOST || '127.0.0.1',
+      RABBITMQ_PORT: process.env.RABBITMQ_PORT || '5672',
+      RABBITMQ_URI: process.env.RABBITMQ_URI || 'amqp://127.0.0.1:5672',
       JWT_SECRET: process.env.JWT_SECRET || 'super-secret-vaultcore-jwt-key-2026',
       INTERNAL_SERVICE_API_KEY:
         process.env.INTERNAL_SERVICE_API_KEY || 'vaultcore-internal-service-secret-key-2026',

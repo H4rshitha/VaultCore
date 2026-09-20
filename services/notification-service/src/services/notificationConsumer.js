@@ -20,6 +20,11 @@ export class NotificationConsumer {
     this.connection = null;
     this.channel = null;
     this.isRunning = false;
+    this.isConnected = false;
+    this.reconnectTimer = null;
+    this.reconnectAttempts = 0;
+    this.maxReconnectDelayMs = 30000;
+    this.amqpUri = config.rabbitmqUri;
     this.startedAt = null;
 
     // Runtime Metrics
@@ -40,9 +45,21 @@ export class NotificationConsumer {
    * Initialize RabbitMQ connection and setup full topology (Exchange, Queues, DLQ, Bindings)
    */
   async setupTopology(uri) {
-    const amqpUri = uri || config.rabbitmqUri;
+    const amqpUri = uri || this.amqpUri || config.rabbitmqUri;
     this.connection = await amqp.connect(amqpUri);
     this.channel = await this.connection.createChannel();
+    this.isConnected = true;
+    this.reconnectAttempts = 0;
+
+    this.connection.on('error', (err) => {
+      if (this.logger) this.logger.error(`[RabbitMQ] NotificationConsumer connection error: ${err.message}`);
+    });
+
+    this.connection.on('close', () => {
+      if (this.logger) this.logger.warn('[RabbitMQ] NotificationConsumer connection closed, scheduling reconnect...');
+      this.cleanup();
+      this.scheduleReconnect();
+    });
 
     // 1. Assert Topic Exchange
     await this.channel.assertExchange(this.exchange, 'topic', { durable: true });
@@ -84,12 +101,20 @@ export class NotificationConsumer {
    * Start consuming from Email and SMS queues
    */
   async start(uri) {
-    if (this.isRunning) return;
+    if (this.isRunning && this.isConnected) return;
+    this.isRunning = true;
+    if (uri) this.amqpUri = uri;
+    this.startedAt = this.startedAt || new Date();
+    this.metrics.startedAt = this.metrics.startedAt || this.startedAt.toISOString();
+
+    await this.connectAndConsume();
+  }
+
+  async connectAndConsume() {
+    if (!this.isRunning) return;
+
     try {
-      await this.setupTopology(uri);
-      this.isRunning = true;
-      this.startedAt = new Date();
-      this.metrics.startedAt = this.startedAt.toISOString();
+      await this.setupTopology(this.amqpUri);
 
       // Consume Email Queue
       await this.consumeQueue(this.emailQueue, 'EMAIL');
@@ -102,10 +127,35 @@ export class NotificationConsumer {
       }
     } catch (error) {
       if (this.logger) {
-        this.logger.error(`Failed to start NotificationConsumer: ${error.message}`);
+        this.logger.warn(`Failed to connect NotificationConsumer: ${error.message}. Retrying in background...`);
       }
-      throw error;
+      this.cleanup();
+      this.scheduleReconnect();
     }
+  }
+
+  scheduleReconnect() {
+    if (!this.isRunning || this.reconnectTimer) return;
+
+    this.reconnectAttempts++;
+    const delay = Math.min(2000 * Math.pow(1.5, this.reconnectAttempts - 1), this.maxReconnectDelayMs);
+
+    if (this.logger) {
+      this.logger.info(`[RabbitMQ] NotificationConsumer scheduling reconnect attempt #${this.reconnectAttempts} in ${delay}ms`);
+    }
+
+    this.reconnectTimer = setTimeout(async () => {
+      this.reconnectTimer = null;
+      if (this.isRunning && !this.isConnected) {
+        await this.connectAndConsume();
+      }
+    }, delay);
+  }
+
+  cleanup() {
+    this.isConnected = false;
+    this.channel = null;
+    this.connection = null;
   }
 
   /**
@@ -357,6 +407,10 @@ export class NotificationConsumer {
    */
   async stop() {
     this.isRunning = false;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
     try {
       if (this.channel) await this.channel.close();
       if (this.connection) await this.connection.close();

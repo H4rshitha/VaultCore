@@ -137,6 +137,8 @@ export const RealtimeProvider = ({ children }) => {
           queryClient.invalidateQueries({ queryKey: ['payment-history'] });
           queryClient.invalidateQueries({ queryKey: ['payment-summary'] });
           queryClient.invalidateQueries({ queryKey: ['ledger-entries'] });
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          queryClient.invalidateQueries({ queryKey: ['notification-history'] });
 
           const amt = event.amount
             ? formatCurrency(event.amount, event.currency || 'USD')

@@ -84,12 +84,16 @@ services:
       - NOTIFICATION_SERVICE_URL=http://notification-service:3005
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
       - JWT_SECRET=${JWT_SECRET:-super-secret-vaultcore-jwt-key-2026}
       - INTERNAL_SERVICE_API_KEY=${INTERNAL_SERVICE_API_KEY:-vaultcore-internal-service-secret-key-2026}
     depends_on:
       db-migrate:
         condition: service_completed_successfully
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       auth-service:
         condition: service_started

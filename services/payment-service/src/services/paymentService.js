@@ -153,6 +153,7 @@ export class PaymentService {
         });
 
         // 10. On successful ledger posting: Update status to COMPLETED, write OutboxEvent and AuditLog
+        const userEmail = userContext.email || sourceAccount.user?.email;
         const {
           transaction: completedTransaction,
           outboxEvent,
@@ -165,6 +166,8 @@ export class PaymentService {
           amount,
           currency,
           userId,
+          email: userEmail,
+          recipient: userEmail,
           ipAddress: ip,
           userAgent,
         });
